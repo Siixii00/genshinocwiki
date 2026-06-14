@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色詳情 - 原神角色 Wiki</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <a href="index.html">
+                    <h1>原神角色 Wiki</h1>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-tab">角色列表</a>
+                <a href="gallery.html" class="nav-tab">活動圖片</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content detail-page">
+        <div class="character-hero">
+            <div class="character-artwork" id="character-artwork">
+                <img src="" alt="角色立繪" id="artwork-image">
+                <div class="artwork-placeholder">
+                    <span>立繪</span>
+                </div>
+            </div>
+            
+            <div class="character-info-panel">
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <div class="character-portrait" id="character-portrait">
+                            <div class="portrait-frame">
+                                <img src="" alt="角色頭像" id="portrait-image">
+                                <div class="portrait-placeholder">
+                                    <span>方卡</span>
+                                </div>
+                            </div>
+                            <div class="element-overlay" id="element-overlay"></div>
+                        </div>
+                        <div class="character-basic-info">
+                            <h1 id="char-name">角色名稱</h1>
+                            <p class="char-title" id="char-title">稱號</p>
+                            <div class="rarity-stars" id="rarity-stars"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card-body">
+                        <table class="info-table">
+                            <tbody>
+                                <tr>
+                                    <th>全名/本名</th>
+                                    <td id="info-fullname">-</td>
+                                </tr>
+                                <tr>
+                                    <th>所屬</th>
+                                    <td id="info-affiliation">-</td>
+                                </tr>
+                                <tr>
+                                    <th>地區</th>
+                                    <td id="info-region">-</td>
+                                </tr>
+                                <tr>
+                                    <th>元素</th>
+                                    <td id="info-element">-</td>
+                                </tr>
+                                <tr>
+                                    <th>武器類型</th>
+                                    <td id="info-weapon">-</td>
+                                </tr>
+                                <tr>
+                                    <th>性別</th>
+                                    <td id="info-gender">-</td>
+                                </tr>
+                                <tr>
+                                    <th>生日</th>
+                                    <td id="info-birthday">-</td>
+                                </tr>
+                                <tr>
+                                    <th>命之座</th>
+                                    <td id="info-constellation">-</td>
+                                </tr>
+                                <tr>
+                                    <th>神之眼</th>
+                                    <td id="info-vision">-</td>
+                                </tr>
+                                <tr>
+                                    <th>特殊料理</th>
+                                    <td id="info-dish">-</td>
+                                </tr>
+                                <tr>
+                                    <th>中文配音</th>
+                                    <td id="info-va-cn">-</td>
+                                </tr>
+                                <tr>
+                                    <th>日文配音</th>
+                                    <td id="info-va-jp">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="info-card-footer">
+                        <button class="btn btn-secondary" id="edit-character-btn">編輯角色</button>
+                        <button class="btn btn-danger" id="delete-character-btn">刪除角色</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="character-intro">
+            <div class="intro-card">
+                <h3>角色介紹</h3>
+                <p id="char-description">暫無介紹</p>
+            </div>
+        </div>
+
+        <nav class="detail-tabs">
+            <button class="detail-tab active" data-tab="gallery">立繪/方卡</button>
+            <button class="detail-tab" data-tab="skills">天賦</button>
+            <button class="detail-tab" data-tab="constellation">命之座</button>
+            <button class="detail-tab" data-tab="story">角色故事</button>
+        </nav>
+
+        <div class="tab-content">
+            <section class="tab-panel active" id="gallery-panel">
+                <div class="gallery-section">
+                    <h3>角色立繪</h3>
+                    <div class="gallery-grid" id="artwork-gallery">
+                        <div class="gallery-item">
+                            <img src="" alt="立繪" id="gallery-artwork-1">
+                            <div class="gallery-placeholder">
+                                <span>立繪</span>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="" alt="立繪二" id="gallery-artwork-2">
+                            <div class="gallery-placeholder">
+                                <span>立繪二</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-section">
+                    <h3>角色方卡</h3>
+                    <div class="gallery-grid">
+                        <div class="gallery-item portrait-item">
+                            <img src="" alt="方卡" id="gallery-portrait">
+                            <div class="gallery-placeholder">
+                                <span>方卡</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-section">
+                    <h3>其他圖片</h3>
+                    <div class="gallery-grid" id="extra-gallery">
+                        <div class="gallery-item">
+                            <img src="" alt="其他圖片" id="gallery-extra-1">
+                            <div class="gallery-placeholder">
+                                <span>其他</span>
+                            </div>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="" alt="其他圖片" id="gallery-extra-2">
+                            <div class="gallery-placeholder">
+                                <span>其他</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="skills-panel">
+                <div class="skills-section">
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-icon normal-attack"></div>
+                            <div class="skill-title">
+                                <h4>普通攻擊</h4>
+                                <p class="skill-name" id="skill-normal-name">-</p>
+                            </div>
+                        </div>
+                        <div class="skill-content">
+                            <p class="skill-description" id="skill-normal-desc">暫無資料</p>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-icon elemental-skill"></div>
+                            <div class="skill-title">
+                                <h4>元素戰技</h4>
+                                <p class="skill-name" id="skill-elemental-name">-</p>
+                            </div>
+                        </div>
+                        <div class="skill-content">
+                            <p class="skill-description" id="skill-elemental-desc">暫無資料</p>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-icon elemental-burst"></div>
+                            <div class="skill-title">
+                                <h4>元素爆發</h4>
+                                <p class="skill-name" id="skill-burst-name">-</p>
+                            </div>
+                        </div>
+                        <div class="skill-content">
+                            <p class="skill-description" id="skill-burst-desc">暫無資料</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="constellation-panel">
+                <div class="constellation-grid" id="constellation-list">
+                </div>
+            </section>
+
+            <section class="tab-panel" id="story-panel">
+                <div class="story-content" id="story-content">
+                    <p>暫無故事資料</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>編輯角色</h2>
+                <button class="modal-close" id="edit-modal-close">&times;</button>
+            </div>
+            <form id="edit-form" class="character-form">
+                <input type="hidden" id="edit-id" name="id">
+                
+                <div class="form-section">
+                    <h4 class="form-section-title">基本資訊</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-name">角色名稱 *</label>
+                            <input type="text" id="edit-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-title">稱號</label>
+                            <input type="text" id="edit-title" name="title">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-fullname">全名/本名</label>
+                            <input type="text" id="edit-fullname" name="fullname">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-element">元素 *</label>
+                            <select id="edit-element" name="element" required>
+                                <option value="">選擇元素</option>
+                                <option value="pyro">火</option>
+                                <option value="anemo">風</option>
+                                <option value="geo">岩</option>
+                                <option value="electro">雷</option>
+                                <option value="hydro">水</option>
+                                <option value="cryo">冰</option>
+                                <option value="dendro">草</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-weapon">武器類型 *</label>
+                            <select id="edit-weapon" name="weapon" required>
+                                <option value="">選擇武器</option>
+                                <option value="sword">單手劍</option>
+                                <option value="claymore">雙手劍</option>
+                                <option value="polearm">長柄武器</option>
+                                <option value="bow">弓</option>
+                                <option value="catalyst">法器</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-region">地區 *</label>
+                            <select id="edit-region" name="region" required>
+                                <option value="">選擇地區</option>
+                                <option value="mondstadt">蒙德</option>
+                                <option value="liyue">璃月</option>
+                                <option value="inazuma">稻妻</option>
+                                <option value="sumeru">須彌</option>
+                                <option value="fontaine">楓丹</option>
+                                <option value="natlan">納塔</option>
+                                <option value="snezhnaya">至冬</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-rarity">稀有度 *</label>
+                            <select id="edit-rarity" name="rarity" required>
+                                <option value="">選擇稀有度</option>
+                                <option value="4">4星</option>
+                                <option value="5">5星</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-gender">性別</label>
+                            <select id="edit-gender" name="gender">
+                                <option value="">選擇</option>
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-affiliation">所屬</label>
+                            <input type="text" id="edit-affiliation" name="affiliation">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-constellation">命之座</label>
+                            <input type="text" id="edit-constellation" name="constellation">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-vision">神之眼</label>
+                            <input type="text" id="edit-vision" name="vision">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-dish">特殊料理</label>
+                            <input type="text" id="edit-dish" name="dish">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-birthday">生日</label>
+                            <input type="text" id="edit-birthday" name="birthday" placeholder="例：6月26日">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-va-cn">中文配音</label>
+                            <input type="text" id="edit-va-cn" name="vaCn">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-va-jp">日文配音</label>
+                            <input type="text" id="edit-va-jp" name="vaJp">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">角色圖片</h4>
+                    <div class="form-group">
+                        <label>角色立繪</label>
+                        <div class="image-upload-row">
+                            <div class="image-upload-item">
+                                <div class="image-preview-large" id="edit-artwork-preview">
+                                    <span>立繪</span>
+                                </div>
+                                <input type="file" id="edit-artwork-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-artwork">選擇</button>
+                                <input type="hidden" id="edit-artwork" name="artwork">
+                            </div>
+                            <div class="image-upload-item">
+                                <div class="image-preview-large" id="edit-artwork2-preview">
+                                    <span>立繪二</span>
+                                </div>
+                                <input type="file" id="edit-artwork2-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-artwork2">選擇</button>
+                                <input type="hidden" id="edit-artwork2" name="artwork2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>角色方卡（頭像）</label>
+                        <div class="image-upload-row">
+                            <div class="image-upload-item">
+                                <div class="image-preview-square" id="edit-portrait-preview">
+                                    <span>方卡</span>
+                                </div>
+                                <input type="file" id="edit-portrait-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-portrait">選擇</button>
+                                <input type="hidden" id="edit-portrait" name="portrait">
+                            </div>
+                            <div class="image-upload-item">
+                                <div class="image-preview-square" id="edit-avatar-preview">
+                                    <span>頭像</span>
+                                </div>
+                                <input type="file" id="edit-avatar-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-avatar">選擇</button>
+                                <input type="hidden" id="edit-avatar" name="avatar">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>其他圖片</label>
+                        <div class="image-upload-row">
+                            <div class="image-upload-item">
+                                <div class="image-preview" id="edit-extra1-preview">
+                                    <span>其他1</span>
+                                </div>
+                                <input type="file" id="edit-extra1-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-extra1">選擇</button>
+                                <input type="hidden" id="edit-extra1" name="extraImage1">
+                            </div>
+                            <div class="image-upload-item">
+                                <div class="image-preview" id="edit-extra2-preview">
+                                    <span>其他2</span>
+                                </div>
+                                <input type="file" id="edit-extra2-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-extra2">選擇</button>
+                                <input type="hidden" id="edit-extra2" name="extraImage2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">角色介紹</h4>
+                    <div class="form-group">
+                        <label for="edit-description">角色描述</label>
+                        <textarea id="edit-description" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">技能</h4>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>普通攻擊名稱</label>
+                            <input type="text" id="edit-skill-normal-name" name="skillNormalName">
+                        </div>
+                        <div class="form-group">
+                            <label>普通攻擊描述</label>
+                            <textarea id="edit-skill-normal-desc" name="skillNormalDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>元素戰技名稱</label>
+                            <input type="text" id="edit-skill-elemental-name" name="skillElementalName">
+                        </div>
+                        <div class="form-group">
+                            <label>元素戰技描述</label>
+                            <textarea id="edit-skill-elemental-desc" name="skillElementalDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>元素爆發名稱</label>
+                            <input type="text" id="edit-skill-burst-name" name="skillBurstName">
+                        </div>
+                        <div class="form-group">
+                            <label>元素爆發描述</label>
+                            <textarea id="edit-skill-burst-desc" name="skillBurstDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">角色故事</h4>
+                    <div class="form-group">
+                        <textarea id="edit-story" name="story" rows="4" placeholder="輸入角色背景故事..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="edit-cancel">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>原神角色 Wiki &copy; 2026</p>
+    </footer>
+
+    <script src="js/api-client.js"></script>
+    <script src="js/character-data.js"></script>
+    <script src="js/filter.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+name = "genshin-character-wiki"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "./"
+
+[[kv_namespaces]]
+binding = "GENSHIN_KV"
+id = "YOUR_KV_NAMESPACE_ID_HERE"
+
+[[redirects]]
+from = "/api/*"
+to = "/functions/api/:splat"
+status = 200
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200

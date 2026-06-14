@@ -1,0 +1,38 @@
+[build]
+command = ""
+publish = "./"
+
+[[redirects]]
+from = "/gallery"
+to = "/gallery.html"
+status = 200
+
+[[redirects]]
+from = "/character"
+to = "/character.html"
+status = 200
+
+[[redirects]]
+from = "/character/*"
+to = "/character.html"
+status = 200
+
+[[headers]]
+for = "/*.js"
+[headers.values]
+Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+for = "/*.css"
+[headers.values]
+Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+for = "/*.html"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/data/*"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"

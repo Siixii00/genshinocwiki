@@ -1,0 +1,152 @@
+[
+  {
+    "id": "1",
+    "name": "空",
+    "element": "anemo",
+    "weapon": "sword",
+    "region": "unknown",
+    "rarity": 5,
+    "vision": "",
+    "avatar": "",
+    "description": "從世界之外漂流而來的旅行者，被神帶走血親，自此踏上尋找之路。",
+    "affiliation": "旅行者",
+    "constellation": "異鄉座",
+    "birthday": "",
+    "vaCn": "",
+    "vaJp": "",
+    "skills": {
+      "normal": { "name": "異邦鐵風", "description": "進行至多五段的連續劍擊。" },
+      "elemental": { "name": "風渦劍", "description": "聚集敵人並造成風元素傷害。" },
+      "burst": { "name": "風息激盪", "description": "召喚龍捲風造成風元素傷害。" }
+    },
+    "constellations": [
+      { "level": 1, "name": "迴旋的怒風", "desc": "風渦劍可牽引敵人。" }
+    ],
+    "story": "從世界之外漂流而來的旅行者..."
+  },
+  {
+    "id": "2",
+    "name": "安柏",
+    "element": "pyro",
+    "weapon": "bow",
+    "region": "mondstadt",
+    "rarity": 4,
+    "vision": "火",
+    "avatar": "",
+    "description": "永遠充滿活力的西風騎士團偵察騎士。",
+    "affiliation": "西風騎士團",
+    "constellation": "小兔座",
+    "birthday": "7月10日",
+    "vaCn": "牛奶君",
+    "vaJp": "石見舞菜",
+    "skills": {
+      "normal": { "name": "神射手", "description": "進行至多五段的連續射擊。" },
+      "elemental": { "name": "爆彈玩偶", "description": "投擲兔兔伯爵進行爆炸攻擊。" },
+      "burst": { "name": "箭雨", "description": "射出火焰箭雨造成火元素傷害。" }
+    },
+    "constellations": [
+      { "level": 1, "name": "一觸即發", "desc": "瞄準射擊時提升傷害。" }
+    ],
+    "story": "蒙德城中最年輕的偵察騎士..."
+  },
+  {
+    "id": "3",
+    "name": "鍾離",
+    "element": "geo",
+    "weapon": "polearm",
+    "region": "liyue",
+    "rarity": 5,
+    "vision": "岩",
+    "avatar": "",
+    "description": "璃月港往生堂客卿，知識淵博的紳士。",
+    "affiliation": "往生堂",
+    "constellation": "岩王帝君座",
+    "birthday": "12月31日",
+    "vaCn": "彭博",
+    "vaJp": "前野智昭",
+    "skills": {
+      "normal": { "name": "岩雨", "description": "進行至多六段的長柄武器攻擊。" },
+      "elemental": { "name": "地心", "description": "召喚岩脊造成岩元素傷害。" },
+      "burst": { "name": "天星", "description": "降下巨大的隕石造成大量岩元素傷害。" }
+    },
+    "constellations": [
+      { "level": 1, "name": "岩者，六合引之為骨", "desc": "地心可同時存在兩座岩脊。" }
+    ],
+    "story": "身份神秘的客卿，似乎對璃月的一切都瞭若指掌..."
+  },
+  {
+    "id": "4",
+    "name": "雷電將軍",
+    "element": "electro",
+    "weapon": "polearm",
+    "region": "inazuma",
+    "rarity": 5,
+    "vision": "雷",
+    "avatar": "",
+    "description": "稻妻幕府將軍，追求「永恆」的存在。",
+    "affiliation": "稻妻幕府",
+    "constellation": "真珠座",
+    "birthday": "6月26日",
+    "vaCn": "菊花花",
+    "vaJp": "澤城美雪",
+    "skills": {
+      "normal": { "name": "源流", "description": "進行至多五段的連續攻擊。" },
+      "elemental": { "name": "神變·惡怒", "description": "釋放雷元素造成傷害並獲得願力。" },
+      "burst": { "name": "奧義·夢想真說", "description": "進入夢想一心狀態，造成大量雷元素傷害。" }
+    },
+    "constellations": [
+      { "level": 1, "name": "千萬的願望", "desc": "願力獲取效率提升。" }
+    ],
+    "story": "雷之神，稻妻的最高統治者..."
+  },
+  {
+    "id": "5",
+    "name": "納西妲",
+    "element": "dendro",
+    "weapon": "catalyst",
+    "region": "sumeru",
+    "rarity": 5,
+    "vision": "草",
+    "avatar": "",
+    "description": "須彌的智慧之神，擁有無盡知識的小小神明。",
+    "affiliation": "須彌教令院",
+    "constellation": "時光之夢座",
+    "birthday": "10月3日",
+    "vaCn": "花玲",
+    "vaJp": "田村由香里",
+    "skills": {
+      "normal": { "name": "撫拍", "description": "進行至多四段的攻擊。" },
+      "elemental": { "name": "所聞遍計", "description": "釋放草木領域造成草元素傷害。" },
+      "burst": { "name": "心景幻成", "description": "創造摩耶之殿造成持續草元素傷害。" }
+    },
+    "constellations": [
+      { "level": 1, "name": "初萌之葉", "desc": "所聞遍計可同時存在更多草木。" }
+    ],
+    "story": "智慧之神，小吉祥草王..."
+  },
+  {
+    "id": "6",
+    "name": "芙寧娜",
+    "element": "hydro",
+    "weapon": "sword",
+    "region": "fontaine",
+    "rarity": 5,
+    "vision": "水",
+    "avatar": "",
+    "description": "楓丹的水神，熱愛戲劇的表演者。",
+    "affiliation": "楓丹廷",
+    "constellation": "仲裁者座",
+    "birthday": "10月13日",
+    "vaCn": "錢琛",
+    "vaJp": "水瀨祈",
+    "skills": {
+      "normal": { "name": "獨舞之邀", "description": "進行至多四段的劍擊。" },
+      "elemental": { "name": "孤心沙龍", "description": "召喚沙龍成員進行水元素攻擊。" },
+      "burst": { "name": "萬眾矚目", "description": "進行盛大演出造成水元素傷害。" }
+    },
+    "constellations": [
+      { "level": 1, "name": "愛是難耐艱辛的劇情", "desc": "氣氛值獲取效率提升。" }
+    ],
+    "story": "楓丹的水神，以表演聞名..."
+  }
+]

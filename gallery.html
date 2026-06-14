@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活動圖片 - 原神角色 Wiki</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/gallery.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <a href="index.html">
+                    <h1>原神角色 Wiki</h1>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-tab">角色列表</a>
+                <a href="gallery.html" class="nav-tab active">活動圖片</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content gallery-page">
+        <div class="gallery-header">
+            <h2>活動圖片</h2>
+            <button class="btn btn-primary" id="add-media-btn">新增媒體</button>
+        </div>
+
+        <div class="gallery-filters">
+            <button class="filter-btn active" data-category="all">全部</button>
+            <button class="filter-btn" data-category="official">官方活動</button>
+            <button class="filter-btn" data-category="festival">節日賀圖</button>
+            <button class="filter-btn" data-category="pv">宣傳PV</button>
+            <button class="filter-btn" data-category="wallpaper">桌布</button>
+            <button class="filter-btn" data-category="other">其他</button>
+        </div>
+
+        <div class="gallery-tabs">
+            <button class="gallery-tab active" data-type="all">全部</button>
+            <button class="gallery-tab" data-type="image">圖片</button>
+            <button class="gallery-tab" data-type="video">影片</button>
+        </div>
+
+        <div class="gallery-grid" id="gallery-grid">
+        </div>
+    </main>
+
+    <div class="modal" id="media-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="media-modal-title">新增媒體</h2>
+                <button class="modal-close" id="media-modal-close">&times;</button>
+            </div>
+            <form id="media-form" class="character-form">
+                <div class="form-group">
+                    <label for="media-title">標題 *</label>
+                    <input type="text" id="media-title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="media-type">類型 *</label>
+                    <select id="media-type" name="type" required>
+                        <option value="">選擇類型</option>
+                        <option value="image">圖片</option>
+                        <option value="video">影片</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="image-url-group">
+                    <label for="media-url">圖片連結 *</label>
+                    <input type="url" id="media-url" name="url" placeholder="https://...">
+                    <p class="form-hint">支援 jpg、png、gif、webp 等圖片格式</p>
+                </div>
+
+                <div class="form-group" id="video-url-group" style="display:none">
+                    <label for="media-video-url">影片連結 *</label>
+                    <input type="url" id="media-video-url" name="videoUrl" placeholder="YouTube / Bilibili / mp4連結">
+                    <p class="form-hint">支援 YouTube、Bilibili 連結或 mp4 直接連結</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="media-category">分類 *</label>
+                    <select id="media-category" name="category" required>
+                        <option value="">選擇分類</option>
+                        <option value="official">官方活動</option>
+                        <option value="festival">節日賀圖</option>
+                        <option value="pv">宣傳PV</option>
+                        <option value="wallpaper">桌布</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="media-description">描述</label>
+                    <textarea id="media-description" name="description" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="media-date">日期</label>
+                    <input type="date" id="media-date" name="date">
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="media-cancel">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="preview-modal">
+        <div class="modal-content modal-preview">
+            <button class="modal-close" id="preview-close">&times;</button>
+            <div class="preview-container" id="preview-container">
+            </div>
+            <div class="preview-info">
+                <h3 id="preview-title"></h3>
+                <p id="preview-description"></p>
+                <div class="preview-actions">
+                    <button class="btn btn-secondary" id="preview-edit">編輯</button>
+                    <button class="btn btn-danger" id="preview-delete">刪除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>原神角色 Wiki &copy; 2026</p>
+    </footer>
+
+    <script src="js/character-data.js"></script>
+    <script src="js/gallery.js"></script>
+</body>
+</html>

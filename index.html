@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原神角色 Wiki</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>原神角色 Wiki</h1>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-tab active">角色列表</a>
+                <a href="gallery.html" class="nav-tab">活動圖片</a>
+                <a href="#" class="nav-tab" id="add-character-btn">新增角色</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <aside class="filter-sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">篩選角色</h3>
+                
+                <div class="filter-group">
+                    <label class="filter-label">搜尋</label>
+                    <input type="text" id="search-input" class="search-input" placeholder="輸入角色名稱...">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">元素</label>
+                    <div class="filter-buttons" id="element-filters">
+                        <button class="filter-btn element-pyro" data-element="pyro">火</button>
+                        <button class="filter-btn element-anemo" data-element="anemo">風</button>
+                        <button class="filter-btn element-geo" data-element="geo">岩</button>
+                        <button class="filter-btn element-electro" data-element="electro">雷</button>
+                        <button class="filter-btn element-hydro" data-element="hydro">水</button>
+                        <button class="filter-btn element-cryo" data-element="cryo">冰</button>
+                        <button class="filter-btn element-dendro" data-element="dendro">草</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">武器類型</label>
+                    <div class="filter-buttons" id="weapon-filters">
+                        <button class="filter-btn" data-weapon="sword">單手劍</button>
+                        <button class="filter-btn" data-weapon="claymore">雙手劍</button>
+                        <button class="filter-btn" data-weapon="polearm">長柄武器</button>
+                        <button class="filter-btn" data-weapon="bow">弓</button>
+                        <button class="filter-btn" data-weapon="catalyst">法器</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">地區</label>
+                    <div class="filter-buttons" id="region-filters">
+                        <button class="filter-btn" data-region="mondstadt">蒙德</button>
+                        <button class="filter-btn" data-region="liyue">璃月</button>
+                        <button class="filter-btn" data-region="inazuma">稻妻</button>
+                        <button class="filter-btn" data-region="sumeru">須彌</button>
+                        <button class="filter-btn" data-region="fontaine">楓丹</button>
+                        <button class="filter-btn" data-region="natlan">納塔</button>
+                        <button class="filter-btn" data-region="snezhnaya">至冬</button>
+                    </div>
+                </div>
+
+                <button class="reset-filters-btn" id="reset-filters">重置篩選</button>
+            </div>
+        </aside>
+
+        <section class="character-grid-section">
+            <div class="section-header">
+                <h2>角色列表</h2>
+                <span class="character-count" id="character-count">0 位角色</span>
+            </div>
+            <div class="character-grid" id="character-grid">
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="character-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="modal-title">新增角色</h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <form id="character-form" class="character-form">
+                <div class="form-section">
+                    <h4 class="form-section-title">基本資訊</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-name">角色名稱 *</label>
+                            <input type="text" id="char-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="char-title">稱號</label>
+                            <input type="text" id="char-title" name="title">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-fullname">全名/本名</label>
+                            <input type="text" id="char-fullname" name="fullname">
+                        </div>
+                        <div class="form-group">
+                            <label for="char-element">元素 *</label>
+                            <select id="char-element" name="element" required>
+                                <option value="">選擇元素</option>
+                                <option value="pyro">火</option>
+                                <option value="anemo">風</option>
+                                <option value="geo">岩</option>
+                                <option value="electro">雷</option>
+                                <option value="hydro">水</option>
+                                <option value="cryo">冰</option>
+                                <option value="dendro">草</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-weapon">武器類型 *</label>
+                            <select id="char-weapon" name="weapon" required>
+                                <option value="">選擇武器</option>
+                                <option value="sword">單手劍</option>
+                                <option value="claymore">雙手劍</option>
+                                <option value="polearm">長柄武器</option>
+                                <option value="bow">弓</option>
+                                <option value="catalyst">法器</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="char-region">地區 *</label>
+                            <select id="char-region" name="region" required>
+                                <option value="">選擇地區</option>
+                                <option value="mondstadt">蒙德</option>
+                                <option value="liyue">璃月</option>
+                                <option value="inazuma">稻妻</option>
+                                <option value="sumeru">須彌</option>
+                                <option value="fontaine">楓丹</option>
+                                <option value="natlan">納塔</option>
+                                <option value="snezhnaya">至冬</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-rarity">稀有度 *</label>
+                            <select id="char-rarity" name="rarity" required>
+                                <option value="">選擇稀有度</option>
+                                <option value="4">4星</option>
+                                <option value="5">5星</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="char-gender">性別</label>
+                            <select id="char-gender" name="gender">
+                                <option value="">選擇</option>
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">角色圖片</h4>
+                    <div class="form-group">
+                        <label>角色立繪</label>
+                        <div class="image-upload-row">
+                            <div class="image-upload-item">
+                                <div class="image-preview-large" id="char-artwork-preview">
+                                    <span>立繪</span>
+                                </div>
+                                <input type="file" id="char-artwork-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary" id="upload-artwork-btn">選擇</button>
+                                <input type="hidden" id="char-artwork" name="artwork">
+                            </div>
+                            <div class="image-upload-item">
+                                <div class="image-preview-large" id="char-artwork2-preview">
+                                    <span>立繪二</span>
+                                </div>
+                                <input type="file" id="char-artwork2-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary" id="upload-artwork2-btn">選擇</button>
+                                <input type="hidden" id="char-artwork2" name="artwork2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>角色方卡（頭像）</label>
+                        <div class="image-upload-row">
+                            <div class="image-upload-item">
+                                <div class="image-preview-square" id="char-portrait-preview">
+                                    <span>方卡</span>
+                                </div>
+                                <input type="file" id="char-portrait-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary" id="upload-portrait-btn">選擇</button>
+                                <input type="hidden" id="char-portrait" name="portrait">
+                            </div>
+                            <div class="image-upload-item">
+                                <div class="image-preview-square" id="avatar-preview">
+                                    <span>頭像</span>
+                                </div>
+                                <input type="file" id="char-avatar-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary" id="upload-avatar-btn">選擇</button>
+                                <input type="hidden" id="char-avatar" name="avatar">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">詳細資訊</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-affiliation">所屬</label>
+                            <input type="text" id="char-affiliation" name="affiliation">
+                        </div>
+                        <div class="form-group">
+                            <label for="char-constellation">命之座</label>
+                            <input type="text" id="char-constellation" name="constellation">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-vision">神之眼</label>
+                            <input type="text" id="char-vision" name="vision">
+                        </div>
+                        <div class="form-group">
+                            <label for="char-dish">特殊料理</label>
+                            <input type="text" id="char-dish" name="dish">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-birthday">生日</label>
+                            <input type="text" id="char-birthday" name="birthday" placeholder="例：6月26日">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="char-va-cn">中文配音</label>
+                            <input type="text" id="char-va-cn" name="vaCn">
+                        </div>
+                        <div class="form-group">
+                            <label for="char-va-jp">日文配音</label>
+                            <input type="text" id="char-va-jp" name="vaJp">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="char-description">角色描述</label>
+                        <textarea id="char-description" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">技能</h4>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>普通攻擊名稱</label>
+                            <input type="text" id="skill-normal-name" name="skillNormalName">
+                        </div>
+                        <div class="form-group">
+                            <label>普通攻擊描述</label>
+                            <textarea id="skill-normal-desc" name="skillNormalDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>元素戰技名稱</label>
+                            <input type="text" id="skill-elemental-name" name="skillElementalName">
+                        </div>
+                        <div class="form-group">
+                            <label>元素戰技描述</label>
+                            <textarea id="skill-elemental-desc" name="skillElementalDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>元素爆發名稱</label>
+                            <input type="text" id="skill-burst-name" name="skillBurstName">
+                        </div>
+                        <div class="form-group">
+                            <label>元素爆發描述</label>
+                            <textarea id="skill-burst-desc" name="skillBurstDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">角色故事</h4>
+                    <div class="form-group">
+                        <textarea id="char-story" name="story" rows="4" placeholder="輸入角色背景故事..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="form-cancel">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>原神角色 Wiki &copy; 2026</p>
+    </footer>
+
+    <script src="js/api-client.js"></script>
+    <script src="js/character-data.js"></script>
+    <script src="js/filter.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
