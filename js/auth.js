@@ -118,13 +118,17 @@ const Auth = {
         
         const qrContainer = document.getElementById('twofa-qrcode');
         if (qrContainer) {
-            qrContainer.style.display = 'block';
+            qrContainer.style.display = 'flex';
+            qrContainer.style.justifyContent = 'center';
+            qrContainer.style.alignItems = 'center';
+            qrContainer.style.padding = '16px';
             this.generateQRCode(secret);
         }
         
         const secretDisplay = document.getElementById('twofa-secret-display');
         if (secretDisplay) {
             secretDisplay.style.display = 'block';
+            secretDisplay.style.textAlign = 'center';
             secretDisplay.textContent = `密鑰: ${secret}`;
         }
     },
