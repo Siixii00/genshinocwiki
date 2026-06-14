@@ -1,111 +1,70 @@
 const ApiClient = {
-    baseUrl: '/api',
+    baseUrl: null,
     
     async getCharacters() {
-        try {
-            const response = await fetch(`${this.baseUrl}/characters`);
-            const data = await response.json();
-            return Array.isArray(data) ? data : [];
-        } catch (error) {
-            console.error('API Error:', error);
-            return this.getFallbackCharacters();
-        }
+        return this.getFallbackCharacters();
     },
     
     async getCharacter(id) {
-        const characters = await this.getCharacters();
+        const characters = await this.getFallbackCharacters();
         return characters.find(c => c.id === id) || null;
     },
     
     async addCharacter(character) {
-        try {
-            const response = await fetch(`${this.baseUrl}/characters`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(character)
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('API Error:', error);
-            return null;
-        }
+        const characters = this.getFallbackCharacters();
+        character.id = Date.now().toString();
+        characters.push(character);
+        this.saveToLocal('genshin_characters', characters);
+        return character;
     },
     
     async updateCharacter(id, updates) {
-        try {
-            const response = await fetch(`${this.baseUrl}/characters`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, ...updates })
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('API Error:', error);
-            return null;
+        const characters = this.getFallbackCharacters();
+        const index = characters.findIndex(c => c.id === id);
+        if (index !== -1) {
+            characters[index] = { ...characters[index], ...updates };
+            this.saveToLocal('genshin_characters', characters);
+            return characters[index];
         }
+        return null;
     },
     
     async deleteCharacter(id) {
-        try {
-            const response = await fetch(`${this.baseUrl}/characters?id=${id}`, {
-                method: 'DELETE'
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('API Error:', error);
-            return { success: false };
-        }
+        let characters = this.getFallbackCharacters();
+        characters = characters.filter(c => c.id !== id);
+        this.saveToLocal('genshin_characters', characters);
+        return { success: true };
     },
     
     async getGallery() {
-        try {
-            const response = await fetch(`${this.baseUrl}/gallery`);
-            const data = await response.json();
-            return Array.isArray(data) ? data : [];
-        } catch (error) {
-            console.error('API Error:', error);
-            return [];
-        }
+        const local = localStorage.getItem('genshin_gallery');
+        return local ? JSON.parse(local) : [];
     },
     
     async addGalleryItem(item) {
-        try {
-            const response = await fetch(`${this.baseUrl}/gallery`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item)
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('API Error:', error);
-            return null;
-        }
+        const gallery = await this.getGallery();
+        item.id = Date.now().toString();
+        gallery.push(item);
+        this.saveToLocal('genshin_gallery', gallery);
+        return item;
     },
     
     async updateGalleryItem(id, updates) {
-        try {
-            const response = await fetch(`${this.baseUrl}/gallery`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, ...updates })
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('API Error:', error);
-            return null;
+        const gallery = await this.getGallery();
+        const index = gallery.findIndex(g => g.id === id);
+        if (index !== -1) {
+            gallery[index] = { ...gallery[index], ...updates };
+            this.saveToLocal('genshin_gallery', gallery);
+            return gallery[index];
         }
+        return null;
     },
     
     async deleteGalleryItem(id) {
-        try {
-            const response = await fetch(`${this.baseUrl}/gallery?id=${id}`, {
-                method: 'DELETE'
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('API Error:', error);
-            return { success: false };
-        }
+        let gallery = await this.getGallery();
+        gallery = gallery.filter(g => g.id !== id);
+        this.saveToLocal('genshin_gallery', gallery);
+        return { success: true };
     },
     
     getFallbackCharacters() {
