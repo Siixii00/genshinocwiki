@@ -140,17 +140,39 @@ const GalleryData = {
 };
 
 const GalleryUI = {
+    getVideoThumbnail(url) {
+        if (!url) return null;
+        
+        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+        if (youtubeMatch) {
+            return `https://img.youtube.com/vi/${youtubeMatch[1]}/mqdefault.jpg`;
+        }
+        
+        return null;
+    },
+    
     renderItem(item) {
         const categoryLabel = GalleryData.getCategoryName(item.category);
         
         let mediaHtml;
         if (item.type === 'video') {
-            mediaHtml = `
-                <div class="video-placeholder">
-                    <span class="play-icon">▶</span>
-                    <span class="video-title">${item.title}</span>
-                </div>
-            `;
+            const thumbnail = this.getVideoThumbnail(item.videoUrl || item.url);
+            if (thumbnail) {
+                mediaHtml = `
+                    <div class="video-thumbnail" style="background-image: url('${thumbnail}')">
+                        <div class="video-play-overlay">
+                            <span class="play-icon">▶</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                mediaHtml = `
+                    <div class="video-placeholder">
+                        <span class="play-icon">▶</span>
+                        <span class="video-title">${item.title}</span>
+                    </div>
+                `;
+            }
         } else {
             mediaHtml = `<img src="${item.url}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=\\'video-placeholder\\'><span>圖片載入失敗</span></div>'">`;
         }
@@ -394,7 +416,9 @@ const Gallery = {
         }
         
         if (data.type === 'video') {
+            data.videoUrl = data.videoUrl || '';
             data.url = data.videoUrl;
+        } else {
             delete data.videoUrl;
         }
         
