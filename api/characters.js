@@ -1,4 +1,4 @@
-const { supabase } = require('../lib/supabase');
+const { connectToDatabase } = require('../lib/mongodb');
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,49 +9,59 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method === 'GET') {
-    const { data, error } = await supabase
-      .from('characters')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
-  }
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection('characters');
 
-  if (req.method === 'POST') {
-    const character = req.body;
-    const { data, error } = await supabase
-      .from('characters')
-      .insert([character])
-      .select();
-    
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(201).json(data[0]);
-  }
+    if (req.method === 'GET') {
+      const characters = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      return res.status(200).json(characters);
+    }
 
-  if (req.method === 'PUT') {
-    const { id, ...updates } = req.body;
-    const { data, error } = await supabase
-      .from('characters')
-      .update(updates)
-      .eq('id', id)
-      .select();
-    
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data[0]);
-  }
+    if (req.method === 'POST') {
+      const character = {
+        ...req.body,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      const result = await collection.insertOne(character);
+      return res.status(201).json({ ...character, _id: result.insertedId });
+    }
 
-  if (req.method === 'DELETE') {
-    const { id } = req.query;
-    const { error } = await supabase
-      .from('characters')
-      .delete()
-      .eq('id', id);
-    
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ success: true });
-  }
+    if (req.method === 'PUT') {
+      const { id, _id, ...updates } = req.body;
+      const filter = id ? { id } : _id ? { _id } : null;
+      
+      if (!filter) {
+        return res.status(400).json({ error: 'Missing id or _id' });
+      }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+      updates.updatedAt = new Date();
+      const result = await collection.updateOne(filter, { $set: updates });
+      
+      if (result.matchedCount === 0) {
+        return res.status(404).json({ error: 'Character not found' });
+      }
+
+      const updated = await collection.findOne(filter);
+      return res.status(200).json(updated);
+    }
+
+    if (req.method === 'DELETE') {
+      const { id, _id } = req.query;
+      const filter = id ? { id } : _id ? { _id } : null;
+
+      if (!filter) {
+        return res.status(400).json({ error: 'Missing id or _id' });
+      }
+
+      await collection.deleteOne(filter);
+      return res.status(200).json({ success: true });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+  } catch (error) {
+    console.error('Database error:', error);
+    return res.status(500).json({ error: error.message });
+  }
 }
