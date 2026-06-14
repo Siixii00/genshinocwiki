@@ -195,7 +195,7 @@ const Auth = {
     
     async generateTOTP(secret, offset = 0) {
         const key = await this.base32ToKey(secret);
-        const time = Math.floor((Date.now() / 1000) + (offset * 30));
+        const time = Math.floor(Date.now() / 1000 / 30) + offset;
         const timeBuffer = new ArrayBuffer(8);
         const timeView = new DataView(timeBuffer);
         timeView.setUint32(4, time, false);
