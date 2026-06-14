@@ -1,7 +1,7 @@
 const App = {
     config: {
-        googleClientId: 'YOUR_GOOGLE_CLIENT_ID',
-        adminEmails: ['your-email@gmail.com'],
+        googleClientId: '807013160344-7u52pcr2s2cplmck6jdq0nija2nu0dks.apps.googleusercontent.com',
+        adminEmails: ['yaninlin@gmail.com'],
         twoFactorEnabled: true
     },
     
