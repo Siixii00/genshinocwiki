@@ -301,6 +301,21 @@
     font-size: 0.875rem;
 }
 
+.twofa-qrcode {
+    margin-bottom: var(--spacing-md);
+}
+
+.twofa-qrcode img {
+    border-radius: var(--border-radius-md);
+}
+
+.twofa-secret-display {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+    word-break: break-all;
+}
+
 .twofa-input {
     width: 100%;
     padding: var(--spacing-md);
