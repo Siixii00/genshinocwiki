@@ -1,5 +1,7 @@
 const GalleryData = {
     STORAGE_KEY: 'genshin_gallery',
+    useApi: true,
+    cachedGallery: null,
     
     defaultItems: [
         {
@@ -13,13 +15,27 @@ const GalleryData = {
         }
     ],
     
-    init() {
-        if (!localStorage.getItem(this.STORAGE_KEY)) {
-            this.saveAll(this.defaultItems);
+    async init() {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            try {
+                this.cachedGallery = await ApiClient.getGallery();
+            } catch (e) {
+                console.warn('Gallery API unavailable, using localStorage');
+                this.useApi = false;
+                this.initLocalStorage();
+            }
+        } else {
+            this.initLocalStorage();
         }
     },
     
-    getAll() {
+    initLocalStorage() {
+        if (!localStorage.getItem(this.STORAGE_KEY)) {
+            this.saveAllLocal(this.defaultItems);
+        }
+    },
+    
+    getAllLocal() {
         try {
             const data = localStorage.getItem(this.STORAGE_KEY);
             return data ? JSON.parse(data) : [];
@@ -29,12 +45,19 @@ const GalleryData = {
         }
     },
     
-    getById(id) {
-        const items = this.getAll();
+    async getAll() {
+        if (this.useApi) {
+            return this.cachedGallery || await ApiClient.getGallery();
+        }
+        return this.getAllLocal();
+    },
+    
+    async getById(id) {
+        const items = await this.getAll();
         return items.find(item => item.id === id) || null;
     },
     
-    saveAll(items) {
+    saveAllLocal(items) {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items));
             return true;
@@ -44,30 +67,54 @@ const GalleryData = {
         }
     },
     
-    add(item) {
-        const items = this.getAll();
+    async add(item) {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            const added = await ApiClient.addGalleryItem(item);
+            if (added) {
+                this.cachedGallery = await ApiClient.getGallery();
+            }
+            return added;
+        }
+        
+        const items = this.getAllLocal();
         item.id = Date.now().toString();
         items.unshift(item);
-        return this.saveAll(items) ? item : null;
+        return this.saveAllLocal(items) ? item : null;
     },
     
-    update(id, updates) {
-        const items = this.getAll();
+    async update(id, updates) {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            const updated = await ApiClient.updateGalleryItem(id, updates);
+            if (updated) {
+                this.cachedGallery = await ApiClient.getGallery();
+            }
+            return updated;
+        }
+        
+        const items = this.getAllLocal();
         const index = items.findIndex(item => item.id === id);
         if (index === -1) return null;
         
         items[index] = { ...items[index], ...updates };
-        return this.saveAll(items) ? items[index] : null;
+        return this.saveAllLocal(items) ? items[index] : null;
     },
     
-    delete(id) {
-        const items = this.getAll();
+    async delete(id) {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            const result = await ApiClient.deleteGalleryItem(id);
+            if (result.success) {
+                this.cachedGallery = await ApiClient.getGallery();
+            }
+            return result.success;
+        }
+        
+        const items = this.getAllLocal();
         const filtered = items.filter(item => item.id !== id);
-        return this.saveAll(filtered);
+        return this.saveAllLocal(filtered);
     },
     
-    filter(filters = {}) {
-        let items = this.getAll();
+    async filter(filters = {}) {
+        let items = await this.getAll();
         
         if (filters.category && filters.category !== 'all') {
             items = items.filter(item => item.category === filters.category);
@@ -223,14 +270,14 @@ const Gallery = {
     currentItemId: null,
     editMode: false,
     
-    init() {
-        GalleryData.init();
+    async init() {
+        await GalleryData.init();
         this.bindEvents();
-        this.refresh();
+        await this.refresh();
     },
     
-    refresh() {
-        const items = GalleryData.filter(this.currentFilters);
+    async refresh() {
+        const items = await GalleryData.filter(this.currentFilters);
         GalleryUI.renderGrid(items);
     },
     
@@ -270,27 +317,27 @@ const Gallery = {
         });
         
         document.querySelectorAll('.gallery-filters .filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 document.querySelectorAll('.gallery-filters .filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.currentFilters.category = btn.dataset.category;
-                this.refresh();
+                await this.refresh();
             });
         });
         
         document.querySelectorAll('.gallery-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', async () => {
                 document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 this.currentFilters.type = tab.dataset.type;
-                this.refresh();
+                await this.refresh();
             });
         });
         
-        document.getElementById('gallery-grid')?.addEventListener('click', (e) => {
+        document.getElementById('gallery-grid')?.addEventListener('click', async (e) => {
             const card = e.target.closest('.gallery-card');
             if (card) {
-                const item = GalleryData.getById(card.dataset.id);
+                const item = await GalleryData.getById(card.dataset.id);
                 if (item) {
                     GalleryUI.showPreview(item);
                 }
@@ -309,18 +356,18 @@ const Gallery = {
             }
         });
         
-        document.getElementById('preview-delete')?.addEventListener('click', () => {
+        document.getElementById('preview-delete')?.addEventListener('click', async () => {
             if (this.currentItemId && confirm('確定要刪除此媒體嗎？')) {
-                GalleryData.delete(this.currentItemId);
+                await GalleryData.delete(this.currentItemId);
                 GalleryUI.hideModal('preview-modal');
                 document.getElementById('preview-container').innerHTML = '';
                 GalleryUI.showToast('已刪除');
-                this.refresh();
+                await this.refresh();
             }
         });
         
-        document.getElementById('preview-edit')?.addEventListener('click', () => {
-            const item = GalleryData.getById(this.currentItemId);
+        document.getElementById('preview-edit')?.addEventListener('click', async () => {
+            const item = await GalleryData.getById(this.currentItemId);
             if (item) {
                 this.editMode = true;
                 this.populateEditForm(item);
@@ -337,7 +384,7 @@ const Gallery = {
         });
     },
     
-    handleFormSubmit() {
+    async handleFormSubmit() {
         const form = document.getElementById('media-form');
         const formData = new FormData(form);
         const data = {};
@@ -352,14 +399,14 @@ const Gallery = {
         }
         
         if (this.editMode && this.currentItemId) {
-            const updated = GalleryData.update(this.currentItemId, data);
+            const updated = await GalleryData.update(this.currentItemId, data);
             if (updated) {
                 GalleryUI.showToast('已更新');
             } else {
                 GalleryUI.showToast('更新失敗', 'error');
             }
         } else {
-            const added = GalleryData.add(data);
+            const added = await GalleryData.add(data);
             if (added) {
                 GalleryUI.showToast('已新增');
             } else {
@@ -368,7 +415,7 @@ const Gallery = {
         }
         
         GalleryUI.hideModal('media-modal');
-        this.refresh();
+        await this.refresh();
         this.editMode = false;
     },
     
@@ -393,6 +440,10 @@ const Gallery = {
         this.currentItemId = item.id;
     }
 };
+
+if (typeof window !== 'undefined') {
+    window.GalleryData = GalleryData;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     Gallery.init();

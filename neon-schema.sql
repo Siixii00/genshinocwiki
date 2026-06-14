@@ -1,8 +1,27 @@
 -- Neon PostgreSQL Schema
 -- 在 Neon Console 的 SQL Editor 執行此腳本
 
+-- ============================================
+-- 如果資料庫已存在，執行以下 MIGRATION
+-- ============================================
+
+-- 新增缺少的欄位（如果不存在）
+ALTER TABLE gallery ADD COLUMN IF NOT EXISTS url TEXT;
+ALTER TABLE gallery ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'image';
+ALTER TABLE gallery ADD COLUMN IF NOT EXISTS date TEXT;
+
+-- 遷移舊的 image_url 到 url
+UPDATE gallery SET url = image_url WHERE url IS NULL AND image_url IS NOT NULL;
+
+-- 刪除舊欄位（可選，建議備份後執行）
+-- ALTER TABLE gallery DROP COLUMN IF EXISTS image_url;
+
+-- ============================================
+-- 建立新表（如果不存在）
+-- ============================================
+
 -- 角色表
-CREATE TABLE characters (
+CREATE TABLE IF NOT EXISTS characters (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   title TEXT,
@@ -36,12 +55,14 @@ CREATE TABLE characters (
 );
 
 -- 圖庫表
-CREATE TABLE gallery (
+CREATE TABLE IF NOT EXISTS gallery (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  image_url TEXT NOT NULL,
+  url TEXT,
+  type TEXT DEFAULT 'image',
   category TEXT,
+  date TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -12,7 +12,8 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const items = await sql`
-        SELECT * FROM gallery 
+        SELECT id, title, description, url, type, category, date, created_at, updated_at 
+        FROM gallery 
         ORDER BY created_at DESC
       `;
       return res.status(200).json(items);
@@ -21,9 +22,9 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const item = req.body;
       const [result] = await sql`
-        INSERT INTO gallery (title, description, image_url, category)
-        VALUES (${item.title}, ${item.description || null}, ${item.image_url || item.imageUrl}, ${item.category || null})
-        RETURNING *
+        INSERT INTO gallery (title, description, url, type, category, date)
+        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null})
+        RETURNING id, title, description, url, type, category, date, created_at, updated_at
       `;
       return res.status(201).json(result);
     }
@@ -40,11 +41,13 @@ export default async function handler(req, res) {
         UPDATE gallery SET
           title = COALESCE(${updates.title}, title),
           description = COALESCE(${updates.description || updates.description === null ? updates.description : sql`description`}, description),
-          image_url = COALESCE(${updates.image_url || updates.imageUrl}, image_url),
+          url = COALESCE(${updates.url || updates.videoUrl}, url),
+          type = COALESCE(${updates.type}, type),
           category = COALESCE(${updates.category || updates.category === null ? updates.category : sql`category`}, category),
+          date = COALESCE(${updates.date}, date),
           updated_at = NOW()
         WHERE id = ${itemId}
-        RETURNING *
+        RETURNING id, title, description, url, type, category, date, created_at, updated_at
       `;
       return res.status(200).json(result);
     }
