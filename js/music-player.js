@@ -238,7 +238,6 @@ const MusicPlayer = {
     },
     
     startDrag(e) {
-        e.preventDefault();
         const player = document.getElementById('music-player');
         if (!player) return;
         
