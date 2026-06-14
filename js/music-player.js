@@ -8,6 +8,7 @@ const MusicPlayer = {
     isDragging: false,
     dragOffset: { x: 0, y: 0 },
     position: null,
+    currentVideoId: null,
     
     defaultTracks: [
         {
@@ -59,6 +60,18 @@ const MusicPlayer = {
                         <div class="music-placeholder">
                             <span>選擇音樂開始播放</span>
                         </div>
+                    </div>
+                    
+                    <div class="music-preview" id="music-preview" style="display: none;">
+                        <img id="music-thumbnail" class="music-thumbnail" alt="Video thumbnail">
+                        <button class="music-preview-play" id="music-preview-play">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </button>
+                        <a id="music-youtube-link" class="music-youtube-link" target="_blank" rel="noopener">
+                            在 YouTube 開啟
+                        </a>
                     </div>
                     
                     <div class="music-controls">
@@ -147,6 +160,12 @@ const MusicPlayer = {
                 }
             }
         });
+        
+        document.getElementById('music-preview-play')?.addEventListener('click', () => {
+            if (this.currentVideoId) {
+                this.playYouTube(this.currentVideoId, true);
+            }
+        });
     },
     
     toggle() {
@@ -171,24 +190,21 @@ const MusicPlayer = {
     
     play(url, type) {
         const container = document.getElementById('music-embed');
+        const preview = document.getElementById('music-preview');
         if (!container) return;
         
         this.playerType = type;
-        this.isPlaying = true;
         
         if (type === 'youtube') {
             const videoId = this.extractYouTubeId(url);
             if (videoId) {
-                container.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&volume=${Math.round(this.volume * 100)}"
-                        frameborder="0" 
-                        allow="autoplay; encrypted-media" 
-                        allowfullscreen
-                    ></iframe>
-                `;
+                this.currentVideoId = videoId;
+                this.showYouTubePreview(videoId);
             }
         } else if (type === 'soundcloud') {
+            if (preview) preview.style.display = 'none';
+            container.style.display = 'flex';
+            this.isPlaying = true;
             container.innerHTML = `
                 <iframe 
                     src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=true&volume=${this.volume}"
@@ -196,6 +212,40 @@ const MusicPlayer = {
                 ></iframe>
             `;
         }
+    },
+    
+    showYouTubePreview(videoId) {
+        const container = document.getElementById('music-embed');
+        const preview = document.getElementById('music-preview');
+        const thumbnail = document.getElementById('music-thumbnail');
+        const link = document.getElementById('music-youtube-link');
+        
+        if (!preview || !thumbnail || !link) return;
+        
+        container.style.display = 'none';
+        preview.style.display = 'block';
+        
+        thumbnail.src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+        link.href = `https://www.youtube.com/watch?v=${videoId}`;
+    },
+    
+    playYouTube(videoId, autoplay = false) {
+        const container = document.getElementById('music-embed');
+        const preview = document.getElementById('music-preview');
+        if (!container) return;
+        
+        if (preview) preview.style.display = 'none';
+        container.style.display = 'flex';
+        this.isPlaying = true;
+        
+        container.innerHTML = `
+            <iframe 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}"
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+            ></iframe>
+        `;
     },
     
     extractYouTubeId(url) {
