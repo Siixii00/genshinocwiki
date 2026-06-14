@@ -114,7 +114,7 @@ const Auth = {
         const desc = document.querySelector('#twofa-modal p');
         
         if (title) title.textContent = '設定二階段驗證';
-        if (desc) desc.textContent = '請用 Google Authenticator 扫描 QR Code';
+        if (desc) desc.textContent = '請用 Google Authenticator 掃描 QR Code';
         
         const qrContainer = document.getElementById('twofa-qrcode');
         if (qrContainer) {
@@ -134,7 +134,7 @@ const Auth = {
         const desc = document.querySelector('#twofa-modal p');
         
         if (title) title.textContent = '二階段驗證';
-        if (desc) desc.textContent = '請輸入 Google Authenticator 的 6位數驗證碼';
+        if (desc) desc.textContent = '請輸入 Google Authenticator 的 6 位數驗證碼';
         
         const qrContainer = document.getElementById('twofa-qrcode');
         if (qrContainer) qrContainer.style.display = 'none';
@@ -165,174 +165,80 @@ const Auth = {
         qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodedUrl}" alt="QR Code">`;
     },
     
-    verify2FA(code) {
+    async verify2FA(code) {
         if (!this.config.totpSecret) {
             return false;
         }
         
-        const validTOTP = this.generateTOTP(this.config.totpSecret);
-        const prevTOTP = this.generateTOTP(this.config.totpSecret, -1);
-        
-        if (code === validTOTP || code === prevTOTP) {
-            localStorage.setItem('genshin_totp_secret', this.config.totpSecret);
-            this.is2FAVerified = true;
-            this.hide2FADialog();
-            this.onLoginSuccess();
-            return true;
+        try {
+            const validTOTP = await this.generateTOTP(this.config.totpSecret);
+            const prevTOTP = await this.generateTOTP(this.config.totpSecret, -1);
+            
+            if (code === validTOTP || code === prevTOTP) {
+                localStorage.setItem('genshin_totp_secret', this.config.totpSecret);
+                this.is2FAVerified = true;
+                this.hide2FADialog();
+                this.onLoginSuccess();
+                return true;
+            }
+        } catch (e) {
+            console.error('TOTP verification error:', e);
         }
         
         this.showToast('驗證碼錯誤', 'error');
         return false;
     },
     
-    generateTOTP(secret, offset = 0) {
-        const key = this.base32ToHex(secret);
+    async generateTOTP(secret, offset = 0) {
+        const key = await this.base32ToKey(secret);
         const time = Math.floor((Date.now() / 1000) + (offset * 30));
-        const timeHex = this.leftPad(time.toString(16), 16, '0');
+        const timeBuffer = new ArrayBuffer(8);
+        const timeView = new DataView(timeBuffer);
+        timeView.setUint32(4, time, false);
         
-        const timeBytes = this.hexToBytes(timeHex);
-        const keyBytes = this.hexToBytes(key);
+        const hmacBuffer = await crypto.subtle.sign(
+            'HMAC',
+            key,
+            timeBuffer
+        );
         
-        const hmac = this.hmacSha1(keyBytes, timeBytes);
-        const offsetHex = hmac[hmac.length - 1] & 0x0f;
+        const hmac = new Uint8Array(hmacBuffer);
+        const offsetVal = hmac[hmac.length - 1] & 0x0f;
         
-        const codeHex = (
-            ((hmac[offsetHex] & 0x7f) << 24) |
-            ((hmac[offsetHex + 1] & 0xff) << 16) |
-            ((hmac[offsetHex + 2] & 0xff) << 8) |
-            (hmac[offsetHex + 3] & 0xff)
-        ).toString();
+        const code = (
+            ((hmac[offsetVal] & 0x7f) << 24) |
+            ((hmac[offsetVal + 1] & 0xff) << 16) |
+            ((hmac[offsetVal + 2] & 0xff) << 8) |
+            (hmac[offsetVal + 3] & 0xff)
+        ) % 1000000;
         
-        const code = parseInt(codeHex, 10);
-        return (code % 1000000).toString().padStart(6, '0');
+        return code.toString().padStart(6, '0');
     },
     
-    base32ToHex(base32) {
+    async base32ToKey(base32) {
         const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         let bits = '';
-        let hex = '';
         
         for (let i = 0; i < base32.length; i++) {
             const val = base32Chars.indexOf(base32.charAt(i).toUpperCase());
-            bits += this.leftPad(val.toString(2), 5, '0');
+            if (val === -1) continue;
+            bits += val.toString(2).padStart(5, '0');
         }
         
-        for (let i = 0; i + 4 <= bits.length; i += 4) {
-            const chunk = bits.substr(i, 4);
-            hex += parseInt(chunk, 2).toString(16);
-        }
-        
-        return hex;
-    },
-    
-    hexToBytes(hex) {
         const bytes = [];
-        for (let i = 0; i < hex.length; i += 2) {
-            bytes.push(parseInt(hex.substr(i, 2), 16));
-        }
-        return bytes;
-    },
-    
-    hmacSha1(keyBytes, messageBytes) {
-        const blockSize = 64;
-        const hashSize = 20;
-        
-        let key = keyBytes.slice();
-        if (key.length > blockSize) {
-            key = this.sha1(key);
-        }
-        if (key.length < blockSize) {
-            key = key.concat(Array(blockSize - key.length).fill(0));
+        for (let i = 0; i + 8 <= bits.length; i += 8) {
+            bytes.push(parseInt(bits.substr(i, 8), 2));
         }
         
-        const oKeyPad = key.map(b => b ^ 0x5c);
-        const iKeyPad = key.map(b => b ^ 0x36);
+        const keyBuffer = new Uint8Array(bytes).buffer;
         
-        const innerHash = this.sha1(iKeyPad.concat(messageBytes));
-        return this.sha1(oKeyPad.concat(innerHash));
-    },
-    
-    sha1(bytes) {
-        const h0 = 0x67452301;
-        const h1 = 0xEFCDAB89;
-        const h2 = 0x98BADCFE;
-        const h3 = 0x10325476;
-        const h4 = 0xC3D2E1F0;
-        
-        const ml = bytes.length * 8;
-        bytes.push(0x80);
-        
-        while ((bytes.length % 64) !== 56) {
-            bytes.push(0);
-        }
-        
-        const mlBytes = [];
-        for (let i = 7; i >= 0; i--) {
-            mlBytes.push((ml >>> (i * 8)) & 0xff);
-        }
-        bytes = bytes.concat(mlBytes);
-        
-        for (let i = 0; i < bytes.length; i += 64) {
-            const chunk = bytes.slice(i, i + 64);
-            
-            const w = [];
-            for (let j = 0; j < 16; j++) {
-                w[j] = (chunk[j * 4] << 24) | (chunk[j * 4 + 1] << 16) | (chunk[j * 4 + 2] << 8) | chunk[j * 4 + 3];
-            }
-            for (let j = 16; j < 80; j++) {
-                w[j] = this.leftRotate(w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1);
-            }
-            
-            let a = h0, b = h1, c = h2, d = h3, e = h4;
-            
-            for (let j = 0; j < 80; j++) {
-                let f, k;
-                
-                if (j < 20) {
-                    f = (b & c) | ((~b) & d);
-                    k = 0x5A827999;
-                } else if (j < 40) {
-                    f = b ^ c ^ d;
-                    k = 0x6ED9EBA1;
-                } else if (j < 60) {
-                    f = (b & c) | (b & d) | (c & d);
-                    k = 0x8F1BBCDC;
-                } else {
-                    f = b ^ c ^ d;
-                    k = 0xCA62C1D6;
-                }
-                
-                const temp = (this.leftRotate(a, 5) + f + e + k + w[j]) & 0xffffffff;
-                e = d;
-                d = c;
-                c = this.leftRotate(b, 30);
-                b = a;
-                a = temp;
-            }
-            
-            h0 = (h0 + a) & 0xffffffff;
-            h1 = (h1 + b) & 0xffffffff;
-            h2 = (h2 + c) & 0xffffffff;
-            h3 = (h3 + d) & 0xffffffff;
-            h4 = (h4 + e) & 0xffffffff;
-        }
-        
-        return [
-            (h0 >> 24) & 0xff, (h0 >> 16) & 0xff, (h0 >> 8) & 0xff, h0 & 0xff,
-            (h1 >> 24) & 0xff, (h1 >> 16) & 0xff, (h1 >> 8) & 0xff, h1 & 0xff,
-            (h2 >> 24) & 0xff, (h2 >> 16) & 0xff, (h2 >> 8) & 0xff, h2 & 0xff,
-            (h3 >> 24) & 0xff, (h3 >> 16) & 0xff, (h3 >> 8) & 0xff, h3 & 0xff,
-            (h4 >> 24) & 0xff, (h4 >> 16) & 0xff, (h4 >> 8) & 0xff, h4 & 0xff
-        ];
-    },
-    
-    leftRotate(value, shift) {
-        return ((value << shift) | (value >>> (32 - shift))) & 0xffffffff;
-    },
-    
-    leftPad(str, len, pad) {
-        if (str.length >= len) return str;
-        return Array(len - str.length + 1).join(pad) + str;
+        return await crypto.subtle.importKey(
+            'raw',
+            keyBuffer,
+            { name: 'HMAC', hash: 'SHA-1' },
+            false,
+            ['sign']
+        );
     },
     
     hide2FADialog() {
