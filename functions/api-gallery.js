@@ -1,3 +1,13 @@
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+};
+
+export async function onRequestOptions() {
+    return new Response(null, { headers: corsHeaders });
+}
+
 export async function onRequestGet(context) {
     const { env } = context;
     
@@ -6,7 +16,7 @@ export async function onRequestGet(context) {
             return new Response(JSON.stringify([]), {
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    ...corsHeaders
                 }
             });
         }
@@ -15,14 +25,14 @@ export async function onRequestGet(context) {
         return new Response(JSON.stringify(data || []), {
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     } catch (error) {
         return new Response(JSON.stringify([]), {
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     }
@@ -37,7 +47,7 @@ export async function onRequestPost(context) {
                 status: 503,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    ...corsHeaders
                 }
             });
         }
@@ -54,7 +64,7 @@ export async function onRequestPost(context) {
         return new Response(JSON.stringify(item), {
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     } catch (error) {
@@ -62,7 +72,7 @@ export async function onRequestPost(context) {
             status: 500,
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     }
@@ -77,7 +87,7 @@ export async function onRequestPut(context) {
                 status: 503,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    ...corsHeaders
                 }
             });
         }
@@ -91,7 +101,7 @@ export async function onRequestPut(context) {
                 status: 404,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    ...corsHeaders
                 }
             });
         }
@@ -102,7 +112,7 @@ export async function onRequestPut(context) {
         return new Response(JSON.stringify(data[index]), {
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     } catch (error) {
@@ -110,7 +120,7 @@ export async function onRequestPut(context) {
             status: 500,
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     }
@@ -125,7 +135,7 @@ export async function onRequestDelete(context) {
                 status: 503,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    ...corsHeaders
                 }
             });
         }
@@ -138,7 +148,7 @@ export async function onRequestDelete(context) {
                 status: 400,
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
+                    ...corsHeaders
                 }
             });
         }
@@ -151,7 +161,7 @@ export async function onRequestDelete(context) {
         return new Response(JSON.stringify({ success: true }), {
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     } catch (error) {
@@ -159,7 +169,7 @@ export async function onRequestDelete(context) {
             status: 500,
             headers: { 
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                ...corsHeaders
             }
         });
     }

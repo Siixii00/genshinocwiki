@@ -148,18 +148,30 @@ const GalleryUI = {
             return `https://img.youtube.com/vi/${youtubeMatch[1]}/mqdefault.jpg`;
         }
         
+        const bilibiliMatch = url.match(/bilibili\.com\/video\/(BV[a-zA-Z0-9]+)/);
+        if (bilibiliMatch) {
+            return null;
+        }
+        
         return null;
+    },
+    
+    extractYouTubeId(url) {
+        if (!url) return null;
+        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+        return match ? match[1] : null;
     },
     
     renderItem(item) {
         const categoryLabel = GalleryData.getCategoryName(item.category);
+        const videoUrl = item.videoUrl || item.url;
         
         let mediaHtml;
         if (item.type === 'video') {
-            const thumbnail = this.getVideoThumbnail(item.videoUrl || item.url);
-            if (thumbnail) {
+            const youtubeId = this.extractYouTubeId(videoUrl);
+            if (youtubeId) {
                 mediaHtml = `
-                    <div class="video-thumbnail" style="background-image: url('${thumbnail}')">
+                    <div class="video-thumbnail" style="background-image: url('https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg')">
                         <div class="video-play-overlay">
                             <span class="play-icon">▶</span>
                         </div>
@@ -253,11 +265,14 @@ const GalleryUI = {
         description.textContent = item.description || '';
         
         if (item.type === 'video') {
-            const embedUrl = this.getEmbedUrl(item.videoUrl || item.url);
+            const videoUrl = item.videoUrl || item.url;
+            const embedUrl = this.getEmbedUrl(videoUrl);
             if (embedUrl) {
-                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+                container.innerHTML = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            } else if (videoUrl) {
+                container.innerHTML = `<video src="${videoUrl}" controls autoplay style="max-width:100%;max-height:70vh;"></video>`;
             } else {
-                container.innerHTML = `<video src="${item.videoUrl || item.url}" controls autoplay></video>`;
+                container.innerHTML = `<div style="color:white;padding:2rem;text-align:center;">無法載入影片</div>`;
             }
         } else {
             container.innerHTML = `<img src="${item.url}" alt="${item.title}">`;
