@@ -1,4 +1,4 @@
-const { connectToDatabase } = require('../lib/mongodb');
+const { sql } = require('../lib/db');
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,52 +10,51 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { db } = await connectToDatabase();
-    const collection = db.collection('gallery');
-
     if (req.method === 'GET') {
-      const items = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      const items = await sql`
+        SELECT * FROM gallery 
+        ORDER BY created_at DESC
+      `;
       return res.status(200).json(items);
     }
 
     if (req.method === 'POST') {
-      const item = {
-        ...req.body,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      const result = await collection.insertOne(item);
-      return res.status(201).json({ ...item, _id: result.insertedId });
+      const item = req.body;
+      const [result] = await sql`
+        INSERT INTO gallery (title, description, image_url, category)
+        VALUES (${item.title}, ${item.description || null}, ${item.image_url || item.imageUrl}, ${item.category || null})
+        RETURNING *
+      `;
+      return res.status(201).json(result);
     }
 
     if (req.method === 'PUT') {
       const { id, _id, ...updates } = req.body;
-      const filter = id ? { id } : _id ? { _id } : null;
+      const itemId = id || _id;
 
-      if (!filter) {
-        return res.status(400).json({ error: 'Missing id or _id' });
+      if (!itemId) {
+        return res.status(400).json({ error: 'Missing id' });
       }
 
-      updates.updatedAt = new Date();
-      const result = await collection.updateOne(filter, { $set: updates });
-
-      if (result.matchedCount === 0) {
-        return res.status(404).json({ error: 'Gallery item not found' });
-      }
-
-      const updated = await collection.findOne(filter);
-      return res.status(200).json(updated);
+      const [result] = await sql`
+        UPDATE gallery SET
+          title = COALESCE(${updates.title}, title),
+          description = COALESCE(${updates.description || updates.description === null ? updates.description : sql`description`}, description),
+          image_url = COALESCE(${updates.image_url || updates.imageUrl}, image_url),
+          category = COALESCE(${updates.category || updates.category === null ? updates.category : sql`category`}, category),
+          updated_at = NOW()
+        WHERE id = ${itemId}
+        RETURNING *
+      `;
+      return res.status(200).json(result);
     }
 
     if (req.method === 'DELETE') {
-      const { id, _id } = req.query;
-      const filter = id ? { id } : _id ? { _id } : null;
-
-      if (!filter) {
-        return res.status(400).json({ error: 'Missing id or _id' });
+      const { id } = req.query;
+      if (!id) {
+        return res.status(400).json({ error: 'Missing id' });
       }
-
-      await collection.deleteOne(filter);
+      await sql`DELETE FROM gallery WHERE id = ${id}`;
       return res.status(200).json({ success: true });
     }
 
