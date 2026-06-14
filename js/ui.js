@@ -27,6 +27,10 @@ const UI = {
         
         if (!grid) return;
         
+        if (!characters || !Array.isArray(characters)) {
+            characters = [];
+        }
+        
         if (characters.length === 0) {
             grid.innerHTML = `
                 <div class="empty-state">

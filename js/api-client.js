@@ -4,7 +4,8 @@ const ApiClient = {
     async getCharacters() {
         try {
             const response = await fetch(`${this.baseUrl}/characters`);
-            return await response.json();
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
         } catch (error) {
             console.error('API Error:', error);
             return this.getFallbackCharacters();
@@ -59,7 +60,8 @@ const ApiClient = {
     async getGallery() {
         try {
             const response = await fetch(`${this.baseUrl}/gallery`);
-            return await response.json();
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
         } catch (error) {
             console.error('API Error:', error);
             return [];
