@@ -5,6 +5,9 @@ const MusicPlayer = {
     volume: 0.5,
     tracks: [],
     playerType: null,
+    isDragging: false,
+    dragOffset: { x: 0, y: 0 },
+    position: null,
     
     defaultTracks: [
         {
@@ -18,6 +21,7 @@ const MusicPlayer = {
     init(tracks = []) {
         this.tracks = tracks.length > 0 ? tracks : this.defaultTracks;
         this.volume = parseFloat(localStorage.getItem('genshin_music_volume')) || 0.5;
+        this.position = JSON.parse(localStorage.getItem('genshin_music_position')) || null;
         this.render();
         this.bindEvents();
     },
@@ -29,6 +33,14 @@ const MusicPlayer = {
         const player = document.createElement('div');
         player.id = 'music-player';
         player.className = 'music-player';
+        
+        if (this.position) {
+            player.style.left = this.position.left;
+            player.style.top = this.position.top;
+            player.style.right = 'auto';
+            player.style.bottom = 'auto';
+        }
+        
         player.innerHTML = `
             <button class="music-toggle-btn" id="music-toggle" title="音樂播放器">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -95,7 +107,22 @@ const MusicPlayer = {
     },
     
     bindEvents() {
-        document.getElementById('music-toggle')?.addEventListener('click', () => this.toggle());
+        const toggleBtn = document.getElementById('music-toggle');
+        
+        toggleBtn?.addEventListener('mousedown', (e) => this.startDrag(e));
+        toggleBtn?.addEventListener('touchstart', (e) => this.startDrag(e), { passive: false });
+        
+        document.addEventListener('mousemove', (e) => this.drag(e));
+        document.addEventListener('touchmove', (e) => this.drag(e), { passive: false });
+        
+        document.addEventListener('mouseup', () => this.endDrag());
+        document.addEventListener('touchend', () => this.endDrag());
+        
+        document.getElementById('music-toggle')?.addEventListener('click', (e) => {
+            if (!this.isDragging) {
+                this.toggle();
+            }
+        });
         document.getElementById('music-close')?.addEventListener('click', () => this.close());
         
         document.getElementById('music-play-btn')?.addEventListener('click', () => {
@@ -208,6 +235,75 @@ const MusicPlayer = {
         if (list) {
             list.innerHTML = this.renderTrackList();
         }
+    },
+    
+    startDrag(e) {
+        e.preventDefault();
+        const player = document.getElementById('music-player');
+        if (!player) return;
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const rect = player.getBoundingClientRect();
+        
+        this.isDragging = false;
+        this.dragOffset = {
+            x: clientX - rect.left,
+            y: clientY - rect.top
+        };
+        this.dragStartTime = Date.now();
+        this.dragStartPos = { x: clientX, y: clientY };
+    },
+    
+    drag(e) {
+        const player = document.getElementById('music-player');
+        if (!player || this.dragOffset.x === 0 && this.dragOffset.y === 0) return;
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        const dx = Math.abs(clientX - this.dragStartPos.x);
+        const dy = Math.abs(clientY - this.dragStartPos.y);
+        
+        if (dx > 5 || dy > 5) {
+            this.isDragging = true;
+        }
+        
+        if (!this.isDragging) return;
+        
+        e.preventDefault();
+        
+        const newX = clientX - this.dragOffset.x;
+        const newY = clientY - this.dragOffset.y;
+        
+        const maxX = window.innerWidth - player.offsetWidth;
+        const maxY = window.innerHeight - player.offsetHeight;
+        
+        const clampedX = Math.max(0, Math.min(newX, maxX));
+        const clampedY = Math.max(0, Math.min(newY, maxY));
+        
+        player.style.left = clampedX + 'px';
+        player.style.top = clampedY + 'px';
+        player.style.right = 'auto';
+        player.style.bottom = 'auto';
+    },
+    
+    endDrag() {
+        if (this.isDragging) {
+            const player = document.getElementById('music-player');
+            if (player) {
+                this.position = {
+                    left: player.style.left,
+                    top: player.style.top
+                };
+                localStorage.setItem('genshin_music_position', JSON.stringify(this.position));
+            }
+        }
+        
+        this.dragOffset = { x: 0, y: 0 };
+        setTimeout(() => {
+            this.isDragging = false;
+        }, 10);
     }
 };
 
