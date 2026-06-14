@@ -255,6 +255,8 @@ const GalleryUI = {
     },
     
     showPreview(item) {
+        console.log('showPreview item:', item);
+        
         const container = document.getElementById('preview-container');
         const title = document.getElementById('preview-title');
         const description = document.getElementById('preview-description');
@@ -266,7 +268,11 @@ const GalleryUI = {
         
         if (item.type === 'video') {
             const videoUrl = item.videoUrl || item.url;
+            console.log('videoUrl:', videoUrl);
+            
             const embedUrl = this.getEmbedUrl(videoUrl);
+            console.log('embedUrl:', embedUrl);
+            
             if (embedUrl) {
                 container.innerHTML = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
             } else if (videoUrl) {
@@ -430,12 +436,16 @@ const Gallery = {
             data[key] = value;
         }
         
+        console.log('Form data:', data);
+        
         if (data.type === 'video') {
-            data.videoUrl = data.videoUrl || '';
+            data.videoUrl = data.videoUrl || data.url || '';
             data.url = data.videoUrl;
         } else {
             delete data.videoUrl;
         }
+        
+        console.log('Processed data:', data);
         
         if (this.editMode && this.currentItemId) {
             const updated = await GalleryData.update(this.currentItemId, data);
