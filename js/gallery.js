@@ -436,16 +436,23 @@ const Gallery = {
             data[key] = value;
         }
         
-        console.log('Form data:', data);
-        
         if (data.type === 'video') {
-            data.videoUrl = data.videoUrl || data.url || '';
+            const videoInput = document.getElementById('media-video-url');
+            data.videoUrl = videoInput ? videoInput.value : (data.videoUrl || data.url || '');
             data.url = data.videoUrl;
+            console.log('Video URL from input:', data.videoUrl);
         } else {
+            const imageInput = document.getElementById('media-url');
+            data.url = imageInput ? imageInput.value : (data.url || '');
             delete data.videoUrl;
         }
         
         console.log('Processed data:', data);
+        
+        if (!data.url) {
+            GalleryUI.showToast('請輸入連結', 'error');
+            return;
+        }
         
         if (this.editMode && this.currentItemId) {
             const updated = await GalleryData.update(this.currentItemId, data);
