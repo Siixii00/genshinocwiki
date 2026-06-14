@@ -1,108 +1,148 @@
 const ApiClient = {
-    baseUrl: null,
+    baseUrl: '',
+    
+    init() {
+        this.baseUrl = window.location.origin;
+    },
+    
+    async request(endpoint, options = {}) {
+        try {
+            const response = await fetch(`${this.baseUrl}${endpoint}`, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            return null;
+        }
+    },
     
     async getCharacters() {
-        return this.getFallbackCharacters();
+        const data = await this.request('/api/characters');
+        return data || this.getFallbackCharacters();
     },
     
     async getCharacter(id) {
-        const characters = await this.getFallbackCharacters();
+        const characters = await this.getCharacters();
         return characters.find(c => c.id === id) || null;
     },
     
     async addCharacter(character) {
-        const characters = this.getFallbackCharacters();
-        character.id = Date.now().toString();
-        characters.push(character);
-        this.saveToLocal('genshin_characters', characters);
-        return character;
+        const formatted = this.formatCharacter(character);
+        const result = await this.request('/api/characters', {
+            method: 'POST',
+            body: JSON.stringify(formatted)
+        });
+        return result;
     },
     
     async updateCharacter(id, updates) {
-        const characters = this.getFallbackCharacters();
-        const index = characters.findIndex(c => c.id === id);
-        if (index !== -1) {
-            characters[index] = { ...characters[index], ...updates };
-            this.saveToLocal('genshin_characters', characters);
-            return characters[index];
-        }
-        return null;
+        const formatted = this.formatCharacter(updates);
+        const result = await this.request('/api/characters', {
+            method: 'PUT',
+            body: JSON.stringify({ id, ...formatted })
+        });
+        return result;
     },
     
     async deleteCharacter(id) {
-        let characters = this.getFallbackCharacters();
-        characters = characters.filter(c => c.id !== id);
-        this.saveToLocal('genshin_characters', characters);
-        return { success: true };
+        const result = await this.request(`/api/characters?id=${id}`, {
+            method: 'DELETE'
+        });
+        return result || { success: false };
     },
     
     async getGallery() {
-        const local = localStorage.getItem('genshin_gallery');
-        return local ? JSON.parse(local) : [];
+        const data = await this.request('/api/gallery');
+        return data || [];
     },
     
     async addGalleryItem(item) {
-        const gallery = await this.getGallery();
-        item.id = Date.now().toString();
-        gallery.push(item);
-        this.saveToLocal('genshin_gallery', gallery);
-        return item;
+        const result = await this.request('/api/gallery', {
+            method: 'POST',
+            body: JSON.stringify(item)
+        });
+        return result;
     },
     
     async updateGalleryItem(id, updates) {
-        const gallery = await this.getGallery();
-        const index = gallery.findIndex(g => g.id === id);
-        if (index !== -1) {
-            gallery[index] = { ...gallery[index], ...updates };
-            this.saveToLocal('genshin_gallery', gallery);
-            return gallery[index];
-        }
-        return null;
+        const result = await this.request('/api/gallery', {
+            method: 'PUT',
+            body: JSON.stringify({ id, ...updates })
+        });
+        return result;
     },
     
     async deleteGalleryItem(id) {
-        let gallery = await this.getGallery();
-        gallery = gallery.filter(g => g.id !== id);
-        this.saveToLocal('genshin_gallery', gallery);
-        return { success: true };
+        const result = await this.request(`/api/gallery?id=${id}`, {
+            method: 'DELETE'
+        });
+        return result || { success: false };
+    },
+    
+    formatCharacter(char) {
+        return {
+            name: char.name,
+            title: char.title || null,
+            fullname: char.fullname || null,
+            element: char.element,
+            weapon: char.weapon,
+            region: char.region,
+            rarity: parseInt(char.rarity),
+            gender: char.gender || null,
+            affiliation: char.affiliation || null,
+            constellation: char.constellation || null,
+            vision: char.vision || null,
+            dish: char.dish || null,
+            birthday: char.birthday || null,
+            va_cn: char.vaCn || null,
+            va_jp: char.vaJp || null,
+            description: char.description || null,
+            artwork: char.artwork || null,
+            artwork2: char.artwork2 || null,
+            portrait: char.portrait || null,
+            avatar: char.avatar || null,
+            skill_normal_name: char.skillNormalName || null,
+            skill_normal_desc: char.skillNormalDesc || null,
+            skill_elemental_name: char.skillElementalName || null,
+            skill_elemental_desc: char.skillElementalDesc || null,
+            skill_burst_name: char.skillBurstName || null,
+            skill_burst_desc: char.skillBurstDesc || null,
+            story: char.story || null
+        };
     },
     
     getFallbackCharacters() {
-        const local = localStorage.getItem('genshin_characters');
-        if (local) return JSON.parse(local);
-        
-        return [
-            {
-                id: '1',
-                name: '鍾離',
-                title: '塵世閒遊',
-                fullname: '摩拉克斯',
-                element: 'geo',
-                weapon: 'polearm',
-                region: 'liyue',
-                rarity: 5,
-                vision: '岩',
-                affiliation: '往生堂',
-                constellation: '岩王帝君座',
-                birthday: '12月31日',
-                vaCn: '彭博',
-                vaJp: '前野智昭',
-                description: '璃月港往生堂客卿，知識淵博的紳士。',
-                skills: {
-                    normal: { name: '岩雨', description: '進行至多六段的長柄武器攻擊。' },
-                    elemental: { name: '地心', description: '召喚岩脊造成岩元素傷害。' },
-                    burst: { name: '天星', description: '降下巨大的隕石造成大量岩元素傷害。' }
-                },
-                story: '身份神秘的客卿，似乎對璃月的一切都瞭若指掌...'
-            }
-        ];
-    },
-    
-    saveToLocal(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
+        return [{
+            id: '1',
+            name: '鍾離',
+            title: '塵世閒遊',
+            fullname: '摩拉克斯',
+            element: 'geo',
+            weapon: 'polearm',
+            region: 'liyue',
+            rarity: 5,
+            vision: '岩',
+            affiliation: '往生堂',
+            constellation: '岩王帝君座',
+            birthday: '12月31日',
+            va_cn: '彭博',
+            va_jp: '前野智昭',
+            description: '璃月港往生堂客卿，知識淵博的紳士。',
+            skill_normal_name: '岩雨',
+            skill_normal_desc: '進行至多六段的長柄武器攻擊。',
+            skill_elemental_name: '地心',
+            skill_elemental_desc: '召喚岩脊造成岩元素傷害。',
+            skill_burst_name: '天星',
+            skill_burst_desc: '降下巨大的隕石造成大量岩元素傷害。',
+            story: '身份神秘的客卿，似乎對璃月的一切都瞭若指掌...'
+        }];
     }
 };
 
 if (typeof window !== 'undefined') {
     window.ApiClient = ApiClient;
+    ApiClient.init();
 }

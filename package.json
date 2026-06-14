@@ -1,0 +1,7 @@
+{
+  "name": "genshin-character-wiki",
+  "version": "1.0.0",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}

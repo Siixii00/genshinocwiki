@@ -1,7 +1,3 @@
 node_modules/
-.DS_Store
 .env
-.env.*
-*.log
-.wrangler/
-dist/
+.vercel
