@@ -118,15 +118,21 @@ const ApiClient = {
             skills: {
                 normal: {
                     name: c.skill_normal_name || c.skillNormalName || null,
-                    desc: c.skill_normal_desc || c.skillNormalDesc || null
+                    desc: c.skill_normal_desc || c.skillNormalDesc || null,
+                    icon: c.skill_normal_icon || c.skillNormalIcon || null,
+                    table: this.parseJSON(c.skill_normal_table || c.skillNormalTable) || null
                 },
                 elemental: {
                     name: c.skill_elemental_name || c.skillElementalName || null,
-                    desc: c.skill_elemental_desc || c.skillElementalDesc || null
+                    desc: c.skill_elemental_desc || c.skillElementalDesc || null,
+                    icon: c.skill_elemental_icon || c.skillElementalIcon || null,
+                    table: this.parseJSON(c.skill_elemental_table || c.skillElementalTable) || null
                 },
                 burst: {
                     name: c.skill_burst_name || c.skillBurstName || null,
-                    desc: c.skill_burst_desc || c.skillBurstDesc || null
+                    desc: c.skill_burst_desc || c.skillBurstDesc || null,
+                    icon: c.skill_burst_icon || c.skillBurstIcon || null,
+                    table: this.parseJSON(c.skill_burst_table || c.skillBurstTable) || null
                 }
             },
             stories: {
@@ -191,10 +197,16 @@ const ApiClient = {
             avatarScale: char.avatarScale || null,
             skillNormalName: char.skills?.normal?.name || char.skillNormalName || null,
             skillNormalDesc: char.skills?.normal?.desc || char.skillNormalDesc || null,
+            skillNormalIcon: char.skills?.normal?.icon || char.skillNormalIcon || null,
+            skillNormalTable: char.skills?.normal?.table ? JSON.stringify(char.skills.normal.table) : null,
             skillElementalName: char.skills?.elemental?.name || char.skillElementalName || null,
             skillElementalDesc: char.skills?.elemental?.desc || char.skillElementalDesc || null,
+            skillElementalIcon: char.skills?.elemental?.icon || char.skillElementalIcon || null,
+            skillElementalTable: char.skills?.elemental?.table ? JSON.stringify(char.skills.elemental.table) : null,
             skillBurstName: char.skills?.burst?.name || char.skillBurstName || null,
             skillBurstDesc: char.skills?.burst?.desc || char.skillBurstDesc || null,
+            skillBurstIcon: char.skills?.burst?.icon || char.skillBurstIcon || null,
+            skillBurstTable: char.skills?.burst?.table ? JSON.stringify(char.skills.burst.table) : null,
             storyDetail: char.stories?.detail || char.storyDetail || null,
             story1: char.stories?.story1 || char.story1 || null,
             story2: char.stories?.story2 || char.story2 || null,

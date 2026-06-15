@@ -468,36 +468,100 @@
 
                 <div class="form-section">
                     <h4 class="form-section-title">技能</h4>
-                    <div class="skill-input-group">
-                        <div class="form-group">
-                            <label>普通攻擊名稱</label>
-                            <input type="text" id="edit-skill-normal-name" name="skillNormalName">
+                    
+                    <div class="skill-edit-block">
+                        <h5>普通攻擊</h5>
+                        <div class="skill-edit-row">
+                            <div class="skill-icon-upload">
+                                <div class="skill-icon-preview" id="skill-normal-icon-preview">
+                                    <span>圖標</span>
+                                </div>
+                                <input type="text" id="edit-skill-normal-icon" name="skillNormalIcon" placeholder="圖標 URL" class="skill-icon-url">
+                            </div>
+                            <div class="skill-edit-fields">
+                                <div class="form-group">
+                                    <label>名稱</label>
+                                    <input type="text" id="edit-skill-normal-name" name="skillNormalName">
+                                </div>
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <textarea id="edit-skill-normal-desc" name="skillNormalDesc" rows="2"></textarea>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>普通攻擊描述</label>
-                            <textarea id="edit-skill-normal-desc" name="skillNormalDesc" rows="2"></textarea>
+                            <label>技能數據表格（可選）</label>
+                            <div class="skill-table-controls">
+                                <button type="button" class="btn btn-sm btn-secondary" id="add-skill-normal-table">新增表格</button>
+                                <button type="button" class="btn btn-sm btn-secondary" id="clear-skill-normal-table" style="display:none;">清除表格</button>
+                            </div>
+                            <div id="skill-normal-table-container"></div>
+                            <input type="hidden" id="skill-normal-table-data" name="skillNormalTable">
                         </div>
                     </div>
-                    <div class="skill-input-group">
-                        <div class="form-group">
-                            <label>元素戰技名稱</label>
-                            <input type="text" id="edit-skill-elemental-name" name="skillElementalName">
+                    
+                    <div class="skill-edit-block">
+                        <h5>元素戰技</h5>
+                        <div class="skill-edit-row">
+                            <div class="skill-icon-upload">
+                                <div class="skill-icon-preview" id="skill-elemental-icon-preview">
+                                    <span>圖標</span>
+                                </div>
+                                <input type="text" id="edit-skill-elemental-icon" name="skillElementalIcon" placeholder="圖標 URL" class="skill-icon-url">
+                            </div>
+                            <div class="skill-edit-fields">
+                                <div class="form-group">
+                                    <label>名稱</label>
+                                    <input type="text" id="edit-skill-elemental-name" name="skillElementalName">
+                                </div>
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <textarea id="edit-skill-elemental-desc" name="skillElementalDesc" rows="2"></textarea>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>元素戰技描述</label>
-                            <textarea id="edit-skill-elemental-desc" name="skillElementalDesc" rows="2"></textarea>
+                            <label>技能數據表格（可選）</label>
+                            <div class="skill-table-controls">
+                                <button type="button" class="btn btn-sm btn-secondary" id="add-skill-elemental-table">新增表格</button>
+                                <button type="button" class="btn btn-sm btn-secondary" id="clear-skill-elemental-table" style="display:none;">清除表格</button>
+                            </div>
+                            <div id="skill-elemental-table-container"></div>
+                            <input type="hidden" id="skill-elemental-table-data" name="skillElementalTable">
                         </div>
                     </div>
-                    <div class="skill-input-group">
-                        <div class="form-group">
-                            <label>元素爆發名稱</label>
-                            <input type="text" id="edit-skill-burst-name" name="skillBurstName">
+                    
+                    <div class="skill-edit-block">
+                        <h5>元素爆發</h5>
+                        <div class="skill-edit-row">
+                            <div class="skill-icon-upload">
+                                <div class="skill-icon-preview" id="skill-burst-icon-preview">
+                                    <span>圖標</span>
+                                </div>
+                                <input type="text" id="edit-skill-burst-icon" name="skillBurstIcon" placeholder="圖標 URL" class="skill-icon-url">
+                            </div>
+                            <div class="skill-edit-fields">
+                                <div class="form-group">
+                                    <label>名稱</label>
+                                    <input type="text" id="edit-skill-burst-name" name="skillBurstName">
+                                </div>
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <textarea id="edit-skill-burst-desc" name="skillBurstDesc" rows="2"></textarea>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>元素爆發描述</label>
-                            <textarea id="edit-skill-burst-desc" name="skillBurstDesc" rows="2"></textarea>
+                            <label>技能數據表格（可選）</label>
+                            <div class="skill-table-controls">
+                                <button type="button" class="btn btn-sm btn-secondary" id="add-skill-burst-table">新增表格</button>
+                                <button type="button" class="btn btn-sm btn-secondary" id="clear-skill-burst-table" style="display:none;">清除表格</button>
+                            </div>
+                            <div id="skill-burst-table-container"></div>
+                            <input type="hidden" id="skill-burst-table-data" name="skillBurstTable">
                         </div>
                     </div>
+                    
                     <h5 style="margin-top: 1rem;">固有天賦</h5>
                     <div id="passives-list"></div>
                     <button type="button" class="btn btn-secondary" id="add-passive-btn">+ 新增天賦</button>

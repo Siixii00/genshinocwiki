@@ -91,6 +91,53 @@ const DetailPage = {
             }
         });
         
+        const skillIconFields = [
+            { input: 'edit-skill-normal-icon', preview: 'skill-normal-icon-preview' },
+            { input: 'edit-skill-elemental-icon', preview: 'skill-elemental-icon-preview' },
+            { input: 'edit-skill-burst-icon', preview: 'skill-burst-icon-preview' }
+        ];
+        
+        skillIconFields.forEach(({ input, preview }) => {
+            const inputEl = document.getElementById(input);
+            const previewEl = document.getElementById(preview);
+            
+            if (inputEl && previewEl) {
+                inputEl.addEventListener('input', () => {
+                    const url = inputEl.value.trim();
+                    if (url) {
+                        previewEl.innerHTML = `<img src="${url}" alt="技能圖標" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                    } else {
+                        previewEl.innerHTML = '<span>圖標</span>';
+                    }
+                });
+            }
+        });
+        
+        ['normal', 'elemental', 'burst'].forEach(skillType => {
+            const addBtn = document.getElementById(`add-skill-${skillType}-table`);
+            const clearBtn = document.getElementById(`clear-skill-${skillType}-table`);
+            const container = document.getElementById(`skill-${skillType}-table-container`);
+            
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    const tableData = UI.createDefaultSkillTable(skillType);
+                    UI.renderSkillTable(container, tableData, skillType);
+                    UI.saveSkillTableData(skillType, tableData);
+                    addBtn.style.display = 'none';
+                    if (clearBtn) clearBtn.style.display = 'inline-flex';
+                });
+            }
+            
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    container.innerHTML = '';
+                    UI.saveSkillTableData(skillType, '');
+                    clearBtn.style.display = 'none';
+                    if (addBtn) addBtn.style.display = 'inline-flex';
+                });
+            }
+        });
+        
         const addCustomBtn = document.getElementById('add-custom-image-btn');
         if (addCustomBtn) {
             addCustomBtn.addEventListener('click', () => {

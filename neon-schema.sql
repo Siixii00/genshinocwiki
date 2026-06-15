@@ -99,6 +99,13 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS passives JSONB;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS avatar_position TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS avatar_scale TEXT;
 
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_normal_icon TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_normal_table JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_elemental_icon TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_elemental_table JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_burst_icon TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_burst_table JSONB;
+
 -- 圖庫表
 CREATE TABLE IF NOT EXISTS gallery (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

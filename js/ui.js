@@ -141,18 +141,42 @@ const UI = {
         
         if (character.skills) {
             const skillFieldMap = {
-                'skillNormalName': character.skills.normal?.name,
-                'skillNormalDesc': character.skills.normal?.desc,
-                'skillElementalName': character.skills.elemental?.name,
-                'skillElementalDesc': character.skills.elemental?.desc,
-                'skillBurstName': character.skills.burst?.name,
-                'skillBurstDesc': character.skills.burst?.desc
+                'skill-normal-name': character.skills.normal?.name,
+                'skill-normal-desc': character.skills.normal?.desc,
+                'skill-normal-icon': character.skills.normal?.icon,
+                'skill-elemental-name': character.skills.elemental?.name,
+                'skill-elemental-desc': character.skills.elemental?.desc,
+                'skill-elemental-icon': character.skills.elemental?.icon,
+                'skill-burst-name': character.skills.burst?.name,
+                'skill-burst-desc': character.skills.burst?.desc,
+                'skill-burst-icon': character.skills.burst?.icon
             };
             
             Object.entries(skillFieldMap).forEach(([id, value]) => {
                 const el = document.getElementById(`edit-${id}`);
                 if (el) el.value = value || '';
             });
+            
+            const skillIconPreviews = {
+                'skill-normal-icon-preview': character.skills.normal?.icon,
+                'skill-elemental-icon-preview': character.skills.elemental?.icon,
+                'skill-burst-icon-preview': character.skills.burst?.icon
+            };
+            
+            Object.entries(skillIconPreviews).forEach(([id, url]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (url) {
+                        el.innerHTML = `<img src="${url}" alt="技能圖標">`;
+                    } else {
+                        el.innerHTML = '<span>圖標</span>';
+                    }
+                }
+            });
+            
+            this.populateSkillTable('normal', character.skills.normal?.table);
+            this.populateSkillTable('elemental', character.skills.elemental?.table);
+            this.populateSkillTable('burst', character.skills.burst?.table);
         }
         
         const imagePreviewMap = {
@@ -174,10 +198,133 @@ const UI = {
             }
         });
         
+        const modelTypeSelect = document.getElementById('edit-model-type');
+        if (modelTypeSelect && character.model?.type) {
+            modelTypeSelect.value = character.model.type;
+        }
+        
+        const modelUrlInput = document.getElementById('edit-model-url');
+        if (modelUrlInput && character.model?.url) {
+            modelUrlInput.value = character.model.url;
+        }
+        
         this.populateCustomImages(character.customImages || []);
         this.populateConstellationEdit(character.constellations);
         this.populatePassivesEdit(character.passives || []);
         this.populateVoiceEdit(character.voices?.normal || [], character.voices?.combat || []);
+    },
+    
+    populateSkillTable(skillType, tableData) {
+        const container = document.getElementById(`skill-${skillType}-table-container`);
+        const clearBtn = document.getElementById(`clear-skill-${skillType}-table`);
+        const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
+        
+        if (!container) return;
+        
+        if (tableData && tableData.rows && tableData.rows.length > 0) {
+            this.renderSkillTable(container, tableData, skillType);
+            if (clearBtn) clearBtn.style.display = 'inline-flex';
+            if (hiddenInput) hiddenInput.value = JSON.stringify(tableData);
+        } else {
+            container.innerHTML = '';
+            if (clearBtn) clearBtn.style.display = 'none';
+            if (hiddenInput) hiddenInput.value = '';
+        }
+    },
+    
+    renderSkillTable(container, tableData, skillType) {
+        const { rows = [], headers = [] } = tableData;
+        const rowCount = rows.length;
+        const colCount = headers.length || (rows[0]?.length || 13);
+        
+        let html = '<div class="skill-table-container"><table class="skill-table">';
+        
+        if (headers.length > 0) {
+            html += '<thead><tr>';
+            headers.forEach((h, i) => {
+                html += `<th><input type="text" value="${h}" data-skill="${skillType}" data-type="header" data-col="${i}" placeholder="標題"></th>`;
+            });
+            html += '</tr></thead>';
+        }
+        
+        html += '<tbody>';
+        rows.forEach((row, r) => {
+            html += '<tr>';
+            for (let c = 0; c < colCount; c++) {
+                const val = row[c] || '';
+                html += `<td><input type="text" value="${val}" data-skill="${skillType}" data-type="cell" data-row="${r}" data-col="${c}"></td>`;
+            }
+            html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        
+        html += `
+            <div class="skill-table-controls-row">
+                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.addSkillTableRow('${skillType}')">+ 新增列</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.addSkillTableCol('${skillType}')">+ 新增欄</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.removeSkillTableRow('${skillType}')">- 移除列</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.removeSkillTableCol('${skillType}')">- 移除欄</button>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    },
+    
+    createDefaultSkillTable(skillType) {
+        const defaultHeaders = ['等級', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'];
+        const defaultRows = [
+            ['', '', '', '', '', '', '', '', '', '', '', '', '', '']
+        ];
+        return { headers: defaultHeaders, rows: defaultRows };
+    },
+    
+    addSkillTableRow(skillType) {
+        const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
+        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        const colCount = tableData.headers?.length || tableData.rows[0]?.length || 14;
+        tableData.rows = tableData.rows || [];
+        tableData.rows.push(new Array(colCount).fill(''));
+        this.saveSkillTableData(skillType, tableData);
+        this.renderSkillTable(document.getElementById(`skill-${skillType}-table-container`), tableData, skillType);
+    },
+    
+    addSkillTableCol(skillType) {
+        const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
+        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        tableData.headers = tableData.headers || [];
+        tableData.headers.push('');
+        tableData.rows = tableData.rows || [[]];
+        tableData.rows.forEach(row => row.push(''));
+        this.saveSkillTableData(skillType, tableData);
+        this.renderSkillTable(document.getElementById(`skill-${skillType}-table-container`), tableData, skillType);
+    },
+    
+    removeSkillTableRow(skillType) {
+        const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
+        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        if (tableData.rows && tableData.rows.length > 1) {
+            tableData.rows.pop();
+            this.saveSkillTableData(skillType, tableData);
+            this.renderSkillTable(document.getElementById(`skill-${skillType}-table-container`), tableData, skillType);
+        }
+    },
+    
+    removeSkillTableCol(skillType) {
+        const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
+        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        if (tableData.headers && tableData.headers.length > 1) {
+            tableData.headers.pop();
+            tableData.rows?.forEach(row => row.pop());
+            this.saveSkillTableData(skillType, tableData);
+            this.renderSkillTable(document.getElementById(`skill-${skillType}-table-container`), tableData, skillType);
+        }
+    },
+    
+    saveSkillTableData(skillType, tableData) {
+        const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
+        if (hiddenInput) {
+            hiddenInput.value = JSON.stringify(tableData);
+        }
     },
     
     populateConstellationEdit(constellations) {
