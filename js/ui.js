@@ -3,9 +3,8 @@ const UI = {
         const rarityClass = character.rarity === 5 ? 'rarity-5' : 'rarity-4';
         const elementName = CharacterData.getElementName(character.element);
         const idcard = character.images?.idcard || character.idcard;
-        const avatar = character.images?.avatar || character.avatar;
         const portrait = character.images?.portrait || character.portrait;
-        const cardImage = idcard || avatar || portrait;
+        const cardImage = idcard || portrait;
         const cardImageHtml = cardImage
             ? `<img src="${cardImage}" alt="${character.name}">`
             : `<div style="width:100%;height:100%;background:var(--color-bg-secondary);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:600;">${character.name[0]}</div>`;
@@ -105,11 +104,11 @@ const UI = {
         if (character.skills) {
             const skillFieldMap = {
                 'skillNormalName': character.skills.normal?.name,
-                'skillNormalDesc': character.skills.normal?.description,
+                'skillNormalDesc': character.skills.normal?.desc,
                 'skillElementalName': character.skills.elemental?.name,
-                'skillElementalDesc': character.skills.elemental?.description,
+                'skillElementalDesc': character.skills.elemental?.desc,
                 'skillBurstName': character.skills.burst?.name,
-                'skillBurstDesc': character.skills.burst?.description
+                'skillBurstDesc': character.skills.burst?.desc
             };
             
             Object.entries(skillFieldMap).forEach(([id, value]) => {
@@ -121,7 +120,6 @@ const UI = {
         const imagePreviewMap = {
             'edit-artwork-preview': character.images?.artwork,
             'edit-portrait-preview': character.images?.portrait,
-            'edit-avatar-preview': character.images?.avatar,
             'edit-idcard-preview': character.images?.idcard
         };
         
@@ -604,7 +602,7 @@ const UI = {
         
         const portraitImg = document.getElementById('portrait-image');
         if (portraitImg) {
-            portraitImg.src = character.images?.portrait || character.images?.avatar || '';
+            portraitImg.src = character.images?.idcard || character.images?.portrait || '';
         }
         
         const galleryArtwork = document.getElementById('gallery-artwork');
@@ -615,11 +613,6 @@ const UI = {
         const galleryPortrait = document.getElementById('gallery-portrait');
         if (galleryPortrait) {
             galleryPortrait.src = character.images?.portrait || '';
-        }
-        
-        const galleryAvatar = document.getElementById('gallery-avatar');
-        if (galleryAvatar) {
-            galleryAvatar.src = character.images?.avatar || '';
         }
         
         const galleryIdcard = document.getElementById('gallery-idcard');
@@ -774,11 +767,6 @@ const UI = {
             }
         });
         
-        if (!character.images?.avatar) {
-            const avatarItem = document.getElementById('gallery-avatar')?.closest('.gallery-item');
-            if (avatarItem) avatarItem.style.display = 'none';
-        }
-        
         if (!character.images?.idcard) {
             const idcardItem = document.getElementById('gallery-idcard')?.closest('.gallery-item');
             if (idcardItem) idcardItem.style.display = 'none';
@@ -867,7 +855,6 @@ const UI = {
         const galleryImages = [
             { id: 'gallery-artwork', url: character.images?.artwork },
             { id: 'gallery-portrait', url: character.images?.portrait },
-            { id: 'gallery-avatar', url: character.images?.avatar },
             { id: 'gallery-idcard', url: character.images?.idcard },
             { id: 'artwork-image', url: character.images?.idcard || character.images?.artwork }
         ];
