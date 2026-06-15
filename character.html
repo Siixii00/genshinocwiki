@@ -11,6 +11,19 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        body:not(.edit-mode) {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        body:not(.edit-mode) img {
+            pointer-events: none;
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
@@ -471,19 +484,45 @@
                             <textarea id="edit-skill-burst-desc" name="skillBurstDesc" rows="2"></textarea>
                         </div>
                     </div>
+                    <h5 style="margin-top: 1rem;">固有天賦</h5>
+                    <div id="passives-list"></div>
+                    <button type="button" class="btn btn-secondary" id="add-passive-btn">+ 新增天賦</button>
                 </div>
 
                 <div class="form-section">
                     <h4 class="form-section-title">角色故事</h4>
                     <div class="form-group">
-                        <textarea id="edit-story" name="story" rows="4" placeholder="輸入角色背景故事..."></textarea>
+                        <label for="edit-story-detail">角色詳細</label>
+                        <textarea id="edit-story-detail" name="storyDetail" rows="3"></textarea>
                     </div>
-                </div>
-
-                <div class="form-section">
-                    <h4 class="form-section-title">固有天賦</h4>
-                    <div id="passives-list"></div>
-                    <button type="button" class="btn btn-secondary" id="add-passive-btn">+ 新增天賦</button>
+                    <div class="form-group">
+                        <label for="edit-story-1">角色故事1</label>
+                        <textarea id="edit-story-1" name="story1" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-story-2">角色故事2</label>
+                        <textarea id="edit-story-2" name="story2" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-story-3">角色故事3</label>
+                        <textarea id="edit-story-3" name="story3" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-story-4">角色故事4</label>
+                        <textarea id="edit-story-4" name="story4" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-story-5">角色故事5</label>
+                        <textarea id="edit-story-5" name="story5" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-story-vision">神之眼</label>
+                        <textarea id="edit-story-vision" name="storyVision" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-story-extra">額外故事（可選）</label>
+                        <textarea id="edit-story-extra" name="storyExtra" rows="2"></textarea>
+                    </div>
                 </div>
 
                 <div class="form-section">
@@ -525,11 +564,22 @@
         </div>
     </div>
 
+    <script src="js/auth.js"></script>
     <script src="js/api-client.js"></script>
     <script src="js/character-data.js"></script>
     <script src="js/filter.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Auth.init({
+                clientId: document.body.dataset.googleClientId || null,
+                adminEmails: JSON.parse(document.body.dataset.adminEmails || '[]'),
+                twoFactorEnabled: true
+            });
+            Auth.updateUI();
+        });
+    </script>
     <script src="js/detail.js"></script>
 </body>
 </html>

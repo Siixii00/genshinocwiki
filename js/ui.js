@@ -89,8 +89,7 @@ const UI = {
         const textFields = [
             'name', 'title', 'fullname', 'element', 'weapon', 'region', 'rarity',
             'gender', 'affiliation', 'constellation', 'vision', 'dish', 'birthday',
-            'vaCn', 'vaJp', 'description', 'story',
-            'modelType', 'modelUrl'
+            'vaCn', 'vaJp', 'description'
         ];
         
         textFields.forEach(field => {
@@ -98,6 +97,22 @@ const UI = {
             if (input && character[field] !== undefined) {
                 input.value = character[field];
             }
+        });
+        
+        const storyFields = [
+            { id: 'edit-story-detail', value: character.stories?.detail || character.storyDetail },
+            { id: 'edit-story-1', value: character.stories?.story1 || character.story1 },
+            { id: 'edit-story-2', value: character.stories?.story2 || character.story2 },
+            { id: 'edit-story-3', value: character.stories?.story3 || character.story3 },
+            { id: 'edit-story-4', value: character.stories?.story4 || character.story4 },
+            { id: 'edit-story-5', value: character.stories?.story5 || character.story5 },
+            { id: 'edit-story-vision', value: character.stories?.vision || character.storyVision },
+            { id: 'edit-story-extra', value: character.stories?.extra || character.storyExtra }
+        ];
+        
+        storyFields.forEach(({ id, value }) => {
+            const el = document.getElementById(id);
+            if (el) el.value = value || '';
         });
         
         const imageFields = {
@@ -449,10 +464,36 @@ const UI = {
             idcard: data.idcard || null
         };
         
+        data.model = {
+            type: data.modelType || null,
+            url: data.modelUrl || null
+        };
+        
+        data.stories = {
+            detail: data.storyDetail || null,
+            story1: data.story1 || null,
+            story2: data.story2 || null,
+            story3: data.story3 || null,
+            story4: data.story4 || null,
+            story5: data.story5 || null,
+            vision: data.storyVision || null,
+            extra: data.storyExtra || null
+        };
+        
         delete data.artwork;
         delete data.portrait;
         delete data.avatar;
         delete data.idcard;
+        delete data.modelType;
+        delete data.modelUrl;
+        delete data.storyDetail;
+        delete data.story1;
+        delete data.story2;
+        delete data.story3;
+        delete data.story4;
+        delete data.story5;
+        delete data.storyVision;
+        delete data.storyExtra;
         
         return data;
     },

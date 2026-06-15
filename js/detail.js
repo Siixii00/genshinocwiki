@@ -21,8 +21,39 @@ const DetailPage = {
         }
         
         UI.updateDetailPage(character);
+        this.setupContentProtection();
         this.setupAllImageUploads();
         this.bindEvents();
+        this.updateEditButtons();
+    },
+    
+    setupContentProtection() {
+        if (!Auth.isLoggedIn()) {
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+            document.addEventListener('selectstart', (e) => e.preventDefault());
+            document.addEventListener('copy', (e) => e.preventDefault());
+            document.addEventListener('cut', (e) => e.preventDefault());
+            document.body.style.userSelect = 'none';
+            document.body.style.webkitUserSelect = 'none';
+            
+            document.querySelectorAll('img').forEach(img => {
+                img.setAttribute('draggable', 'false');
+                img.setAttribute('oncontextmenu', 'return false;');
+            });
+        }
+    },
+    
+    updateEditButtons() {
+        const isLoggedIn = Auth.isLoggedIn();
+        const editBtn = document.getElementById('edit-character-btn');
+        const deleteBtn = document.getElementById('delete-character-btn');
+        
+        if (editBtn) {
+            editBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+        }
+        if (deleteBtn) {
+            deleteBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+        }
     },
     
     setupAllImageUploads() {
@@ -91,6 +122,10 @@ const DetailPage = {
         const editBtn = document.getElementById('edit-character-btn');
         if (editBtn) {
             editBtn.addEventListener('click', () => {
+                if (!Auth.isLoggedIn()) {
+                    UI.showToast('請先登入', 'error');
+                    return;
+                }
                 this.showEditModal();
             });
         }
@@ -98,6 +133,10 @@ const DetailPage = {
         const deleteBtn = document.getElementById('delete-character-btn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', () => {
+                if (!Auth.isLoggedIn()) {
+                    UI.showToast('請先登入', 'error');
+                    return;
+                }
                 this.handleDelete();
             });
         }
@@ -141,6 +180,11 @@ const DetailPage = {
     },
     
     showEditModal: async function() {
+        if (!Auth.isLoggedIn()) {
+            UI.showToast('請先登入並完成二階段驗證', 'error');
+            return;
+        }
+        
         const character = await CharacterData.getById(this.currentCharacterId);
         if (!character) return;
         
@@ -153,6 +197,11 @@ const DetailPage = {
     },
     
     handleEditSubmit: async function(form) {
+        if (!Auth.isLoggedIn()) {
+            UI.showToast('請先登入', 'error');
+            return;
+        }
+        
         const formData = UI.getFormData(form);
         const id = this.currentCharacterId;
         
@@ -168,6 +217,11 @@ const DetailPage = {
     },
     
     handleDelete: async function() {
+        if (!Auth.isLoggedIn()) {
+            UI.showToast('請先登入', 'error');
+            return;
+        }
+        
         if (confirm('確定要刪除這個角色嗎？此操作無法恢復。')) {
             const deleted = await CharacterData.delete(this.currentCharacterId);
             

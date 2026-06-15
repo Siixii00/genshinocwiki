@@ -127,6 +127,16 @@ const ApiClient = {
                     desc: c.skill_burst_desc || c.skillBurstDesc || null
                 }
             },
+            stories: {
+                detail: c.story_detail || c.storyDetail || null,
+                story1: c.story_1 || c.story1 || null,
+                story2: c.story_2 || c.story2 || null,
+                story3: c.story_3 || c.story3 || null,
+                story4: c.story_4 || c.story4 || null,
+                story5: c.story_5 || c.story5 || null,
+                vision: c.story_vision || c.storyVision || null,
+                extra: c.story_extra || c.storyExtra || null
+            },
             constellations: this.parseJSON(c.constellations) || [],
             customImages: this.parseJSON(c.custom_images) || this.parseJSON(c.customImages) || [],
             passives: this.parseJSON(c.passives) || [],
@@ -181,6 +191,14 @@ const ApiClient = {
             skillElementalDesc: char.skills?.elemental?.desc || char.skillElementalDesc || null,
             skillBurstName: char.skills?.burst?.name || char.skillBurstName || null,
             skillBurstDesc: char.skills?.burst?.desc || char.skillBurstDesc || null,
+            storyDetail: char.stories?.detail || char.storyDetail || null,
+            story1: char.stories?.story1 || char.story1 || null,
+            story2: char.stories?.story2 || char.story2 || null,
+            story3: char.stories?.story3 || char.story3 || null,
+            story4: char.stories?.story4 || char.story4 || null,
+            story5: char.stories?.story5 || char.story5 || null,
+            storyVision: char.stories?.vision || char.storyVision || null,
+            storyExtra: char.stories?.extra || char.storyExtra || null,
             constellations: Array.isArray(constellations) && constellations.length > 0 ? JSON.stringify(constellations) : null,
             customImages: Array.isArray(customImages) && customImages.length > 0 ? JSON.stringify(customImages) : null,
             normalVoices: Array.isArray(normalVoices) && normalVoices.length > 0 ? JSON.stringify(normalVoices) : null,
