@@ -99,6 +99,8 @@ const ApiClient = {
             vision: c.vision || null,
             dish: c.dish || null,
             description: c.description || null,
+            avatarPosition: c.avatar_position || c.avatarPosition || null,
+            avatarScale: c.avatar_scale || c.avatarScale || null,
             va: {
                 cn: c.va_cn || c.vaCn || null,
                 jp: c.va_jp || c.vaJp || null
@@ -185,6 +187,8 @@ const ApiClient = {
             portrait: char.images?.portrait || char.portrait || null,
             avatar: char.images?.avatar || char.avatar || null,
             gachaImage: char.images?.idcard || char.idcard || null,
+            avatarPosition: char.avatarPosition || null,
+            avatarScale: char.avatarScale || null,
             skillNormalName: char.skills?.normal?.name || char.skillNormalName || null,
             skillNormalDesc: char.skills?.normal?.desc || char.skillNormalDesc || null,
             skillElementalName: char.skills?.elemental?.name || char.skillElementalName || null,

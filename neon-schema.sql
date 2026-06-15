@@ -96,6 +96,8 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS combat_voices JSONB;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS model_type TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS model_url TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS passives JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS avatar_position TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS avatar_scale TEXT;
 
 -- 圖庫表
 CREATE TABLE IF NOT EXISTS gallery (

@@ -89,7 +89,7 @@ const UI = {
         const textFields = [
             'name', 'title', 'fullname', 'element', 'weapon', 'region', 'rarity',
             'gender', 'affiliation', 'constellation', 'vision', 'dish', 'birthday',
-            'vaCn', 'vaJp', 'description'
+            'vaCn', 'vaJp', 'description', 'avatarPosition', 'avatarScale'
         ];
         
         textFields.forEach(field => {
@@ -114,6 +114,16 @@ const UI = {
             const el = document.getElementById(id);
             if (el) el.value = value || '';
         });
+        
+        const avatarPositionInput = document.getElementById('edit-avatar-position');
+        if (avatarPositionInput) {
+            avatarPositionInput.value = character.avatarPosition || '';
+        }
+        
+        const avatarScaleInput = document.getElementById('edit-avatar-scale');
+        if (avatarScaleInput) {
+            avatarScaleInput.value = character.avatarScale || '';
+        }
         
         const imageFields = {
             'artwork': character.images?.artwork,
@@ -664,12 +674,18 @@ const UI = {
         
         const artworkImg = document.getElementById('artwork-image');
         if (artworkImg) {
-            artworkImg.src = character.images?.idcard || character.images?.portrait || character.images?.artwork || '';
+            artworkImg.src = character.images?.portrait || character.images?.artwork || character.images?.idcard || '';
         }
         
         const portraitImg = document.getElementById('portrait-image');
         if (portraitImg) {
-            portraitImg.src = character.images?.portrait || character.images?.idcard || '';
+            portraitImg.src = character.images?.idcard || character.images?.portrait || '';
+            if (character.avatarPosition) {
+                portraitImg.style.objectPosition = character.avatarPosition;
+            }
+            if (character.avatarScale) {
+                portraitImg.style.transform = `scale(${character.avatarScale})`;
+            }
         }
         
         const galleryArtwork = document.getElementById('gallery-artwork');
