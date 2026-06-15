@@ -396,6 +396,7 @@ const Gallery = {
             if (card) {
                 const item = await GalleryData.getById(card.dataset.id);
                 if (item) {
+                    this.currentItemId = item.id;
                     GalleryUI.showPreview(item);
                 }
             }
