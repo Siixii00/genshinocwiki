@@ -599,7 +599,7 @@ const UI = {
         
         const artworkImg = document.getElementById('artwork-image');
         if (artworkImg) {
-            artworkImg.src = character.images?.artwork || '';
+            artworkImg.src = character.images?.idcard || character.images?.portrait || character.images?.artwork || '';
         }
         
         const portraitImg = document.getElementById('portrait-image');
@@ -626,6 +626,8 @@ const UI = {
         if (galleryIdcard) {
             galleryIdcard.src = character.images?.idcard || '';
         }
+        
+        this.setupGalleryLightbox(character);
         
         document.getElementById('char-name').textContent = character.name;
         document.getElementById('char-title').textContent = character.title || '';
@@ -859,6 +861,68 @@ const UI = {
         document.querySelectorAll('.tab-panel').forEach(panel => {
             panel.classList.toggle('active', panel.id === `${tabName}-panel`);
         });
+    },
+    
+    setupGalleryLightbox(character) {
+        const galleryImages = [
+            { id: 'gallery-artwork', url: character.images?.artwork },
+            { id: 'gallery-portrait', url: character.images?.portrait },
+            { id: 'gallery-avatar', url: character.images?.avatar },
+            { id: 'gallery-idcard', url: character.images?.idcard },
+            { id: 'artwork-image', url: character.images?.idcard || character.images?.artwork }
+        ];
+        
+        galleryImages.forEach(({ id, url }) => {
+            const img = document.getElementById(id);
+            if (img && url) {
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', () => {
+                    this.showLightbox(url);
+                });
+            }
+        });
+        
+        const lightboxModal = document.getElementById('lightbox-modal');
+        const lightboxClose = document.getElementById('lightbox-close');
+        
+        if (lightboxModal) {
+            lightboxModal.addEventListener('click', (e) => {
+                if (e.target === lightboxModal) {
+                    this.hideLightbox();
+                }
+            });
+        }
+        
+        if (lightboxClose) {
+            lightboxClose.addEventListener('click', () => {
+                this.hideLightbox();
+            });
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.hideLightbox();
+            }
+        });
+    },
+    
+    showLightbox(url) {
+        const lightboxModal = document.getElementById('lightbox-modal');
+        const lightboxImage = document.getElementById('lightbox-image');
+        
+        if (lightboxModal && lightboxImage && url) {
+            lightboxImage.src = url;
+            lightboxModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    },
+    
+    hideLightbox() {
+        const lightboxModal = document.getElementById('lightbox-modal');
+        if (lightboxModal) {
+            lightboxModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 };
 
