@@ -147,6 +147,11 @@ const ApiClient = {
     },
     
     formatCharacter(char) {
+        const constellations = char.constellations || [];
+        const customImages = char.customImages || [];
+        const normalVoices = char.voices?.normal || char.normalVoices || [];
+        const combatVoices = char.voices?.combat || char.combatVoices || [];
+        
         return {
             name: char.name,
             title: char.title || null,
@@ -154,7 +159,7 @@ const ApiClient = {
             element: char.element,
             weapon: char.weapon,
             region: char.region,
-            rarity: parseInt(char.rarity),
+            rarity: parseInt(char.rarity) || null,
             gender: char.gender || null,
             affiliation: char.affiliation || null,
             birthday: char.birthday || null,
@@ -174,10 +179,10 @@ const ApiClient = {
             skillElementalDesc: char.skills?.elemental?.desc || char.skillElementalDesc || null,
             skillBurstName: char.skills?.burst?.name || char.skillBurstName || null,
             skillBurstDesc: char.skills?.burst?.desc || char.skillBurstDesc || null,
-            constellations: char.constellations || [],
-            customImages: char.customImages || [],
-            normalVoices: char.voices?.normal || char.normalVoices || [],
-            combatVoices: char.voices?.combat || char.combatVoices || [],
+            constellations: Array.isArray(constellations) && constellations.length > 0 ? JSON.stringify(constellations) : null,
+            customImages: Array.isArray(customImages) && customImages.length > 0 ? JSON.stringify(customImages) : null,
+            normalVoices: Array.isArray(normalVoices) && normalVoices.length > 0 ? JSON.stringify(normalVoices) : null,
+            combatVoices: Array.isArray(combatVoices) && combatVoices.length > 0 ? JSON.stringify(combatVoices) : null,
             modelType: char.model?.type || char.modelType || null,
             modelUrl: char.model?.url || char.modelUrl || null
         };
