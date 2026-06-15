@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS characters (
   va_jp TEXT,
   description TEXT,
   artwork TEXT,
-  artwork2 TEXT,
+  gacha_image TEXT,
   portrait TEXT,
   avatar TEXT,
   skill_normal_name TEXT,
@@ -51,10 +51,43 @@ CREATE TABLE IF NOT EXISTS characters (
   skill_elemental_desc TEXT,
   skill_burst_name TEXT,
   skill_burst_desc TEXT,
-  story TEXT,
+  passive_1_name TEXT,
+  passive_1_desc TEXT,
+  passive_2_name TEXT,
+  passive_2_desc TEXT,
+  passive_3_name TEXT,
+  passive_3_desc TEXT,
+  passive_extra_name TEXT,
+  passive_extra_desc TEXT,
+  story_detail TEXT,
+  story_1 TEXT,
+  story_2 TEXT,
+  story_3 TEXT,
+  story_4 TEXT,
+  story_5 TEXT,
+  story_vision TEXT,
+  story_extra TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS gacha_image TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_1_name TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_1_desc TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_2_name TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_2_desc TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_3_name TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_3_desc TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_extra_name TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS passive_extra_desc TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_detail TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_1 TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_2 TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_3 TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_4 TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_5 TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_vision TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_extra TEXT;
 
 -- 圖庫表
 CREATE TABLE IF NOT EXISTS gallery (
