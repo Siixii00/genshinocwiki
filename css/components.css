@@ -132,7 +132,10 @@
 
 .character-grid-section {
     flex: 1;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    min-height: calc(100vh - var(--header-height) - 120px);
 }
 
 .section-header {
