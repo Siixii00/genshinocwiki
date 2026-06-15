@@ -40,10 +40,9 @@ const ApiClient = {
     
     async updateCharacter(id, updates) {
         const formatted = this.formatCharacter(updates);
-        formatted.id = id;
         const result = await this.request('/api/characters', {
             method: 'PUT',
-            body: JSON.stringify(formatted)
+            body: JSON.stringify({ id, ...formatted })
         });
         return result ? this.parseCharacter(result) : null;
     },
