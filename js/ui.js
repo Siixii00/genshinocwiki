@@ -97,6 +97,7 @@ const UI = {
             const input = form.elements[field];
             if (input && character[field] !== undefined) {
                 input.value = character[field];
+            }
         });
         
         const imageFields = {
