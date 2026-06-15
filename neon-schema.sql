@@ -10,6 +10,7 @@ ALTER TABLE gallery ADD COLUMN IF NOT EXISTS url TEXT;
 ALTER TABLE gallery ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'image';
 ALTER TABLE gallery ADD COLUMN IF NOT EXISTS date TEXT;
 ALTER TABLE gallery ADD COLUMN IF NOT EXISTS image_position INTEGER DEFAULT 50;
+ALTER TABLE gallery ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
 
 -- 遷移舊的 image_url 到 url
 UPDATE gallery SET url = image_url WHERE url IS NULL AND image_url IS NOT NULL;
@@ -64,6 +65,8 @@ CREATE TABLE IF NOT EXISTS gallery (
   type TEXT DEFAULT 'image',
   category TEXT,
   date TEXT,
+  image_position INTEGER DEFAULT 50,
+  sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

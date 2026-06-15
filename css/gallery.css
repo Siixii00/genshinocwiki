@@ -92,6 +92,24 @@
     transition: all var(--transition-normal);
 }
 
+.gallery-card[draggable="true"] {
+    cursor: grab;
+}
+
+.gallery-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.gallery-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.edit-mode .gallery-card[draggable="true"] {
+    cursor: grab;
+}
+
 .gallery-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);

@@ -113,6 +113,28 @@ const GalleryData = {
         return this.saveAllLocal(filtered);
     },
     
+    async updateSortOrder(id, sortOrder) {
+        try {
+            await fetch('/api/gallery', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, sortOrder })
+            });
+            await this.loadFromApi();
+        } catch (e) {
+            console.error('Failed to update sort order:', e);
+        }
+    },
+    
+    async loadFromApi() {
+        try {
+            const response = await fetch('/api/gallery');
+            this.cachedGallery = await response.json();
+        } catch (e) {
+            console.error('Failed to load gallery:', e);
+        }
+    },
+    
     async filter(filters = {}) {
         let items = await this.getAll();
         
@@ -191,7 +213,7 @@ const GalleryUI = {
         }
         
         return `
-            <article class="gallery-card" data-id="${item.id}" data-type="${item.type}">
+            <article class="gallery-card" data-id="${item.id}" data-type="${item.type}" draggable="true">
                 <div class="gallery-card-media">
                     ${mediaHtml}
                 </div>
@@ -221,6 +243,59 @@ const GalleryUI = {
         } else {
             grid.innerHTML = items.map(item => this.renderItem(item)).join('');
         }
+        
+        this.setupDragAndDrop();
+    },
+    
+    setupDragAndDrop() {
+        const grid = document.getElementById('gallery-grid');
+        if (!grid) return;
+        
+        let draggedItem = null;
+        
+        grid.querySelectorAll('.gallery-card').forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                if (!Auth.isLoggedIn()) return;
+                draggedItem = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                draggedItem = null;
+            });
+            
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (!draggedItem || draggedItem === card) return;
+                
+                const rect = card.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                
+                if (e.clientY < midY) {
+                    card.parentNode.insertBefore(draggedItem, card);
+                } else {
+                    card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                }
+            });
+            
+            card.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                if (!Auth.isLoggedIn()) return;
+                
+                const newOrder = [...grid.querySelectorAll('.gallery-card')].map((c, i) => ({
+                    id: c.dataset.id,
+                    sortOrder: i
+                }));
+                
+                for (const item of newOrder) {
+                    await GalleryData.updateSortOrder(item.id, item.sortOrder);
+                }
+                
+                GalleryUI.showToast('順序已更新');
+            });
+        });
     },
     
     showModal(modalId) {

@@ -12,19 +12,22 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const items = await sql`
-        SELECT id, title, description, url, type, category, date, image_position, created_at, updated_at 
+        SELECT id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at 
         FROM gallery 
-        ORDER BY created_at DESC
+        ORDER BY sort_order ASC, created_at DESC
       `;
       return res.status(200).json(items);
     }
 
     if (req.method === 'POST') {
       const item = req.body;
+      const maxOrder = await sql`SELECT COALESCE(MAX(sort_order), -1) as max FROM gallery`;
+      const sortOrder = (maxOrder[0]?.max ?? -1) + 1;
+      
       const [result] = await sql`
-        INSERT INTO gallery (title, description, url, type, category, date, image_position)
-        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null}, ${item.imagePosition || 50})
-        RETURNING id, title, description, url, type, category, date, image_position, created_at, updated_at
+        INSERT INTO gallery (title, description, url, type, category, date, image_position, sort_order)
+        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null}, ${item.imagePosition || 50}, ${sortOrder})
+        RETURNING id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at
       `;
       return res.status(201).json(result);
     }
@@ -35,6 +38,11 @@ export default async function handler(req, res) {
 
       if (!itemId) {
         return res.status(400).json({ error: 'Missing id' });
+      }
+
+      if (updates.sortOrder !== undefined) {
+        await sql`UPDATE gallery SET sort_order = ${updates.sortOrder} WHERE id = ${itemId}`;
+        return res.status(200).json({ success: true });
       }
 
       const [result] = await sql`
@@ -48,7 +56,7 @@ export default async function handler(req, res) {
           image_position = COALESCE(${updates.imagePosition || updates.image_position}, image_position),
           updated_at = NOW()
         WHERE id = ${itemId}
-        RETURNING id, title, description, url, type, category, date, image_position, created_at, updated_at
+        RETURNING id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at
       `;
       return res.status(200).json(result);
     }
