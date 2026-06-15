@@ -568,12 +568,38 @@
 
     <footer class="footer">
         <p>原神角色 Wiki &copy; 2026</p>
+        <div class="footer-actions">
+            <div id="user-info" class="user-info" style="display:none;"></div>
+            <button id="login-btn" class="edit-toggle-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                登入編輯
+            </button>
+            <button id="logout-btn" class="edit-toggle-btn" style="display:none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                登出
+            </button>
+        </div>
     </footer>
 
     <div class="lightbox-modal" id="lightbox-modal">
         <button class="lightbox-close" id="lightbox-close">&times;</button>
         <div class="lightbox-content">
             <img src="" alt="放大圖片" id="lightbox-image">
+        </div>
+    </div>
+
+    <div class="twofa-modal" id="twofa-modal">
+        <div class="twofa-content">
+            <h3>二階段驗證</h3>
+            <p>請輸入 6 位數驗證碼</p>
+            <div id="twofa-qrcode" class="twofa-qrcode"></div>
+            <div id="twofa-secret-display" class="twofa-secret-display"></div>
+            <input type="text" id="twofa-code" class="twofa-input" maxlength="6" placeholder="000000">
+            <button id="twofa-submit" class="twofa-submit">驗證</button>
         </div>
     </div>
 
@@ -586,8 +612,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             await Auth.init({
-                clientId: document.body.dataset.googleClientId || null,
-                adminEmails: JSON.parse(document.body.dataset.adminEmails || '[]'),
+                clientId: '807013160344-7u52pcr2s2cplmck6jdq0nija2nu0dks.apps.googleusercontent.com',
+                adminEmails: ['yaninlin@gmail.com'],
                 twoFactorEnabled: true
             });
             Auth.updateUI();
