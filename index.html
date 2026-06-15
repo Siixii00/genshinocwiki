@@ -199,6 +199,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>角色方卡</label>
+                        <div class="image-upload-row">
+                            <div class="image-upload-item">
+                                <div class="image-preview-square" id="char-portrait-preview">
+                                    <span>方卡</span>
+                                </div>
+                                <input type="file" id="char-portrait-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary" id="upload-portrait-btn">選擇</button>
+                                <input type="hidden" id="char-portrait" name="portrait">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="form-section">
                     <h4 class="form-section-title">詳細資訊</h4>
@@ -326,36 +340,6 @@
                     <button type="submit" class="btn btn-primary">儲存</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <p>原神角色 Wiki &copy; 2026</p>
-        <div class="footer-actions">
-            <div id="user-info" class="user-info" style="display:none;"></div>
-            <button id="login-btn" class="edit-toggle-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                登入編輯
-            </button>
-            <button id="logout-btn" class="edit-toggle-btn" style="display:none;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-                </svg>
-                登出
-            </button>
-        </div>
-    </footer>
-
-    <div class="twofa-modal" id="twofa-modal">
-        <div class="twofa-content">
-            <h3>二階段驗證</h3>
-            <p>請輸入 6 位數驗證碼</p>
-            <div id="twofa-qrcode" class="twofa-qrcode"></div>
-            <div id="twofa-secret-display" class="twofa-secret-display"></div>
-            <input type="text" id="twofa-code" class="twofa-input" maxlength="6" placeholder="000000">
-            <button id="twofa-submit" class="twofa-submit">驗證</button>
         </div>
     </div>
 
