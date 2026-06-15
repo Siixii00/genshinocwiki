@@ -563,6 +563,16 @@ const UI = {
         return items;
     },
     
+    parseJSON(str) {
+        if (!str) return null;
+        if (typeof str === 'object') return str;
+        try {
+            return JSON.parse(str);
+        } catch (e) {
+            return null;
+        }
+    },
+    
     getFormData(form) {
         const formData = new FormData(form);
         const data = {};
@@ -578,24 +588,36 @@ const UI = {
         data.skills = {
             normal: {
                 name: data.skillNormalName || '',
-                desc: data.skillNormalDesc || ''
+                desc: data.skillNormalDesc || '',
+                icon: data.skillNormalIcon || null,
+                table: this.parseJSON(data.skillNormalTable) || null
             },
             elemental: {
                 name: data.skillElementalName || '',
-                desc: data.skillElementalDesc || ''
+                desc: data.skillElementalDesc || '',
+                icon: data.skillElementalIcon || null,
+                table: this.parseJSON(data.skillElementalTable) || null
             },
             burst: {
                 name: data.skillBurstName || '',
-                desc: data.skillBurstDesc || ''
+                desc: data.skillBurstDesc || '',
+                icon: data.skillBurstIcon || null,
+                table: this.parseJSON(data.skillBurstTable) || null
             }
         };
         
         delete data.skillNormalName;
         delete data.skillNormalDesc;
+        delete data.skillNormalIcon;
+        delete data.skillNormalTable;
         delete data.skillElementalName;
         delete data.skillElementalDesc;
+        delete data.skillElementalIcon;
+        delete data.skillElementalTable;
         delete data.skillBurstName;
         delete data.skillBurstDesc;
+        delete data.skillBurstIcon;
+        delete data.skillBurstTable;
         
         data.constellations = [];
         for (let i = 1; i <= 6; i++) {
@@ -900,6 +922,10 @@ const UI = {
             document.getElementById('skill-elemental-desc').textContent = character.skills.elemental?.desc || '暫無資料';
             document.getElementById('skill-burst-name').textContent = character.skills.burst?.name || '-';
             document.getElementById('skill-burst-desc').textContent = character.skills.burst?.desc || '暫無資料';
+            
+            this.renderSkillTableDisplay('normal', character.skills.normal?.table);
+            this.renderSkillTableDisplay('elemental', character.skills.elemental?.table);
+            this.renderSkillTableDisplay('burst', character.skills.burst?.table);
         }
         
         const constellationList = document.getElementById('constellation-list');
@@ -920,7 +946,37 @@ const UI = {
         
         const storyContent = document.getElementById('story-content');
         if (storyContent) {
-            storyContent.innerHTML = character.story ? `<p>${character.story}</p>` : '<p class="empty-message">暫無故事資料</p>';
+            const stories = character.stories || {};
+            const storySections = [];
+            
+            if (stories.detail) {
+                storySections.push(`<div class="story-section"><h4>角色詳細</h4><p>${stories.detail}</p></div>`);
+            }
+            if (stories.story1) {
+                storySections.push(`<div class="story-section"><h4>角色故事1</h4><p>${stories.story1}</p></div>`);
+            }
+            if (stories.story2) {
+                storySections.push(`<div class="story-section"><h4>角色故事2</h4><p>${stories.story2}</p></div>`);
+            }
+            if (stories.story3) {
+                storySections.push(`<div class="story-section"><h4>角色故事3</h4><p>${stories.story3}</p></div>`);
+            }
+            if (stories.story4) {
+                storySections.push(`<div class="story-section"><h4>角色故事4</h4><p>${stories.story4}</p></div>`);
+            }
+            if (stories.story5) {
+                storySections.push(`<div class="story-section"><h4>角色故事5</h4><p>${stories.story5}</p></div>`);
+            }
+            if (stories.vision) {
+                storySections.push(`<div class="story-section"><h4>神之眼</h4><p>${stories.vision}</p></div>`);
+            }
+            if (stories.extra) {
+                storySections.push(`<div class="story-section"><h4>額外故事</h4><p>${stories.extra}</p></div>`);
+            }
+            
+            storyContent.innerHTML = storySections.length > 0 
+                ? storySections.join('') 
+                : '<p class="empty-message">暫無故事資料</p>';
         }
         
         const modelContent = document.getElementById('model-content');
@@ -1063,6 +1119,40 @@ const UI = {
                 combatContainer.innerHTML = '<p class="empty-message">暫無語音資料</p>';
             }
         }
+    },
+    
+    renderSkillTableDisplay(skillType, tableData) {
+        const container = document.getElementById(`skill-${skillType}-table-display`);
+        if (!container) return;
+        
+        if (!tableData || !tableData.rows || tableData.rows.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        const { rows = [], headers = [] } = tableData;
+        
+        let html = '<div class="skill-table-container"><table class="skill-table skill-table-readonly">';
+        
+        if (headers.length > 0) {
+            html += '<thead><tr>';
+            headers.forEach(h => {
+                html += `<th>${h}</th>`;
+            });
+            html += '</tr></thead>';
+        }
+        
+        html += '<tbody>';
+        rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td>${cell || ''}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        
+        container.innerHTML = html;
     },
     
     renderVoiceItem(voice) {

@@ -20,14 +20,48 @@ const MusicPlayer = {
         }
     ],
     
-    init(tracks = []) {
-        this.tracks = tracks.length > 0 ? tracks : this.defaultTracks;
+    async init(tracks = []) {
+        if (tracks.length > 0) {
+            this.tracks = tracks;
+        } else {
+            await this.loadTracks();
+        }
         this.volume = parseFloat(localStorage.getItem('genshin_music_volume')) || 0.5;
         this.position = JSON.parse(localStorage.getItem('genshin_music_position')) || null;
         this.autoPlayEnabled = localStorage.getItem('genshin_music_autoplay') !== 'false';
         this.render();
         this.bindEvents();
         this.bindAutoPlayToggle();
+    },
+    
+    async loadTracks() {
+        try {
+            const response = await fetch('/api/music-tracks');
+            if (response.ok) {
+                const data = await response.json();
+                this.tracks = data.tracks || this.defaultTracks;
+            } else {
+                const saved = localStorage.getItem('genshin_music_tracks');
+                this.tracks = saved ? JSON.parse(saved) : this.defaultTracks;
+            }
+        } catch (e) {
+            const saved = localStorage.getItem('genshin_music_tracks');
+            this.tracks = saved ? JSON.parse(saved) : this.defaultTracks;
+        }
+    },
+    
+    async saveTracks() {
+        localStorage.setItem('genshin_music_tracks', JSON.stringify(this.tracks));
+        
+        try {
+            await fetch('/api/music-tracks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tracks: this.tracks })
+            });
+        } catch (e) {
+            console.warn('Failed to save tracks to server');
+        }
     },
     
     bindAutoPlayToggle() {
@@ -127,8 +161,27 @@ const MusicPlayer = {
         
         return this.tracks.map(track => `
             <div class="music-track-item" data-id="${track.id}">
-                <span class="track-title">${track.title}</span>
-                <span class="track-type">${track.type}</span>
+                <div class="track-info">
+                    <span class="track-title">${track.title}</span>
+                    <span class="track-type">${track.type}</span>
+                </div>
+                <div class="track-actions">
+                    <button class="track-play-btn" data-action="play" title="播放">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                    <button class="track-edit-btn" data-action="edit" title="編輯">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                    </button>
+                    <button class="track-delete-btn" data-action="delete" title="刪除">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         `).join('');
     },
@@ -157,6 +210,10 @@ const MusicPlayer = {
             const source = document.getElementById('music-source-select').value;
             if (url && source) {
                 this.play(url, source);
+                const title = prompt('請輸入音樂標題（留空則不自動加入播放清單）:');
+                if (title && title.trim()) {
+                    this.addTrack(title.trim(), url, source);
+                }
             }
         });
         
@@ -166,11 +223,22 @@ const MusicPlayer = {
         });
         
         document.getElementById('music-tracks-list')?.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
             const item = e.target.closest('.music-track-item');
-            if (item) {
-                const track = this.tracks.find(t => t.id === item.dataset.id);
-                if (track) {
+            
+            if (btn && item) {
+                const action = btn.dataset.action;
+                const trackId = item.dataset.id;
+                const track = this.tracks.find(t => t.id === trackId);
+                
+                if (action === 'play' && track) {
                     this.play(track.url, track.type);
+                } else if (action === 'edit' && track) {
+                    this.showEditDialog(track);
+                } else if (action === 'delete') {
+                    if (confirm('確定要刪除這首音樂嗎？')) {
+                        this.removeTrack(trackId);
+                    }
                 }
             }
         });
@@ -180,6 +248,18 @@ const MusicPlayer = {
                 this.playYouTube(this.currentVideoId, true);
             }
         });
+    },
+    
+    showEditDialog(track) {
+        const newTitle = prompt('音樂標題:', track.title);
+        if (newTitle === null) return;
+        
+        const newUrl = prompt('音樂 URL:', track.url);
+        if (newUrl === null) return;
+        
+        if (newTitle && newUrl) {
+            this.editTrack(track.id, newTitle, newUrl);
+        }
     },
     
     toggle() {
@@ -292,6 +372,23 @@ const MusicPlayer = {
         };
         this.tracks.push(track);
         this.updateTrackList();
+        this.saveTracks();
+    },
+    
+    removeTrack(id) {
+        this.tracks = this.tracks.filter(t => t.id !== id);
+        this.updateTrackList();
+        this.saveTracks();
+    },
+    
+    editTrack(id, newTitle, newUrl) {
+        const track = this.tracks.find(t => t.id === id);
+        if (track) {
+            track.title = newTitle;
+            track.url = newUrl;
+            this.updateTrackList();
+            this.saveTracks();
+        }
     },
     
     updateTrackList() {

@@ -203,6 +203,7 @@
                         </div>
                         <div class="skill-content">
                             <p class="skill-description" id="skill-normal-desc">暫無資料</p>
+                            <div class="skill-table-display" id="skill-normal-table-display"></div>
                         </div>
                     </div>
                     <div class="skill-card">
@@ -215,6 +216,7 @@
                         </div>
                         <div class="skill-content">
                             <p class="skill-description" id="skill-elemental-desc">暫無資料</p>
+                            <div class="skill-table-display" id="skill-elemental-table-display"></div>
                         </div>
                     </div>
                     <div class="skill-card">
@@ -227,6 +229,7 @@
                         </div>
                         <div class="skill-content">
                             <p class="skill-description" id="skill-burst-desc">暫無資料</p>
+                            <div class="skill-table-display" id="skill-burst-table-display"></div>
                         </div>
                     </div>
                 </div>
@@ -669,6 +672,7 @@
     </div>
 
     <script src="js/auth.js"></script>
+    <script src="js/music-player.js"></script>
     <script src="js/api-client.js"></script>
     <script src="js/character-data.js"></script>
     <script src="js/filter.js"></script>
@@ -682,6 +686,7 @@
                 twoFactorEnabled: true
             });
             Auth.updateUI();
+            MusicPlayer.init();
         });
     </script>
     <script src="js/detail.js"></script>

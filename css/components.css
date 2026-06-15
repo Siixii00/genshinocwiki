@@ -1557,3 +1557,30 @@
     gap: var(--spacing-xs);
     margin-top: var(--spacing-xs);
 }
+
+.skill-table-readonly th,
+.skill-table-readonly td {
+    background: var(--color-bg-primary);
+}
+
+.skill-table-display {
+    margin-top: var(--spacing-md);
+}
+
+.story-section {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius-md);
+}
+
+.story-section h4 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-accent-gold);
+    font-size: 1rem;
+}
+
+.story-section p {
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
