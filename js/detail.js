@@ -25,6 +25,16 @@ const DetailPage = {
         this.setupAllImageUploads();
         this.bindEvents();
         this.updateEditButtons();
+        
+        document.addEventListener('auth:login', () => {
+            this.updateEditButtons();
+            this.setupContentProtection();
+        });
+        
+        document.addEventListener('auth:logout', () => {
+            this.updateEditButtons();
+            this.setupContentProtection();
+        });
     },
     
     setupContentProtection() {
