@@ -129,8 +129,8 @@ const Auth = {
         }
     },
     
-    showTOTPSetup() {
-        const secret = this.generateTOTPSecret();
+    async showTOTPSetup() {
+        const secret = await this.generateTOTPSecret();
         this.config.totpSecret = secret;
         
         const title = document.querySelector('#twofa-modal h3');
@@ -184,12 +184,11 @@ const Auth = {
         const qrContainer = document.getElementById('twofa-qrcode');
         if (!qrContainer) return;
         
-        const email = this.user?.email || 'admin';
-        const issuer = 'GenshinWiki';
+        const email = encodeURIComponent(this.user?.email || 'admin');
+        const issuer = encodeURIComponent('GenshinWiki');
         const otpauthUrl = `otpauth://totp/${issuer}:${email}?secret=${secret}&issuer=${issuer}&digits=6&period=30`;
         
-        const encodedUrl = encodeURIComponent(otpauthUrl);
-        qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodedUrl}" alt="QR Code">`;
+        qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthUrl)}" alt="QR Code" style="background: white; padding: 16px; border-radius: 8px;">`;
     },
     
     async verify2FA(code) {
