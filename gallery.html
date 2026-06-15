@@ -32,7 +32,16 @@
     <main class="main-content gallery-page">
         <div class="gallery-header">
             <h2>活動圖片</h2>
-            <button class="btn btn-primary" id="add-media-btn">新增媒體</button>
+            <div class="gallery-header-actions">
+                <button class="btn btn-primary" id="add-media-btn" style="display:none;">新增媒體</button>
+            </div>
+        </div>
+        
+        <div class="music-control-panel" id="music-control-panel" style="display:none;">
+            <label class="music-toggle-label">
+                <input type="checkbox" id="music-autoplay-toggle" checked>
+                <span>自動播放 SoundCloud</span>
+            </label>
         </div>
 
         <div class="gallery-filters">
@@ -182,13 +191,6 @@
             document.getElementById('twofa-submit')?.addEventListener('click', () => {
                 const code = document.getElementById('twofa-code').value;
                 Auth.verify2FA(code);
-            });
-            
-            document.getElementById('add-media-btn')?.addEventListener('click', (e) => {
-                if (!Auth.isLoggedIn()) {
-                    Auth.showToast('請先登入', 'error');
-                    e.stopPropagation();
-                }
             });
         });
     </script>

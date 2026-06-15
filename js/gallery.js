@@ -325,7 +325,21 @@ const Gallery = {
     },
     
     bindEvents() {
+        document.addEventListener('auth:login', () => {
+            this.updateEditButtons(true);
+        });
+        
+        document.addEventListener('auth:logout', () => {
+            this.updateEditButtons(false);
+        });
+        
+        this.updateEditButtons(Auth.isLoggedIn());
+        
         document.getElementById('add-media-btn')?.addEventListener('click', () => {
+            if (!Auth.isLoggedIn()) {
+                GalleryUI.showToast('請先登入', 'error');
+                return;
+            }
             this.editMode = false;
             document.getElementById('media-modal-title').textContent = '新增媒體';
             document.getElementById('media-form').reset();
@@ -400,6 +414,10 @@ const Gallery = {
         });
         
         document.getElementById('preview-delete')?.addEventListener('click', async () => {
+            if (!Auth.isLoggedIn()) {
+                GalleryUI.showToast('請先登入', 'error');
+                return;
+            }
             if (this.currentItemId && confirm('確定要刪除此媒體嗎？')) {
                 await GalleryData.delete(this.currentItemId);
                 GalleryUI.hideModal('preview-modal');
@@ -410,6 +428,10 @@ const Gallery = {
         });
         
         document.getElementById('preview-edit')?.addEventListener('click', async () => {
+            if (!Auth.isLoggedIn()) {
+                GalleryUI.showToast('請先登入', 'error');
+                return;
+            }
             const item = await GalleryData.getById(this.currentItemId);
             if (item) {
                 this.editMode = true;
@@ -494,6 +516,24 @@ const Gallery = {
         }
         
         this.currentItemId = item.id;
+    },
+    
+    updateEditButtons(isLoggedIn) {
+        const previewActions = document.querySelector('.preview-actions');
+        const addBtn = document.getElementById('add-media-btn');
+        const musicControl = document.getElementById('music-control-panel');
+        
+        if (previewActions) {
+            previewActions.style.display = isLoggedIn ? 'flex' : 'none';
+        }
+        
+        if (addBtn) {
+            addBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+        }
+        
+        if (musicControl) {
+            musicControl.style.display = isLoggedIn ? 'flex' : 'none';
+        }
     }
 };
 

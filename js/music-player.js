@@ -9,6 +9,7 @@ const MusicPlayer = {
     dragOffset: { x: 0, y: 0 },
     position: null,
     currentVideoId: null,
+    autoPlayEnabled: true,
     
     defaultTracks: [
         {
@@ -23,8 +24,21 @@ const MusicPlayer = {
         this.tracks = tracks.length > 0 ? tracks : this.defaultTracks;
         this.volume = parseFloat(localStorage.getItem('genshin_music_volume')) || 0.5;
         this.position = JSON.parse(localStorage.getItem('genshin_music_position')) || null;
+        this.autoPlayEnabled = localStorage.getItem('genshin_music_autoplay') !== 'false';
         this.render();
         this.bindEvents();
+        this.bindAutoPlayToggle();
+    },
+    
+    bindAutoPlayToggle() {
+        const toggle = document.getElementById('music-autoplay-toggle');
+        if (toggle) {
+            toggle.checked = this.autoPlayEnabled;
+            toggle.addEventListener('change', (e) => {
+                this.autoPlayEnabled = e.target.checked;
+                localStorage.setItem('genshin_music_autoplay', this.autoPlayEnabled);
+            });
+        }
     },
     
     render() {

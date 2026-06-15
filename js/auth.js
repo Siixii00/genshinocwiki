@@ -9,17 +9,40 @@ const Auth = {
     user: null,
     is2FAVerified: false,
     
-    init(config = {}) {
+    async init(config = {}) {
         this.config = { ...this.config, ...config };
         this.loadSession();
         this.setupGoogleSDK();
-        this.loadTOTPSecret();
+        await this.loadTOTPSecret();
     },
     
-    loadTOTPSecret() {
-        const secret = localStorage.getItem('genshin_totp_secret');
-        if (secret) {
-            this.config.totpSecret = secret;
+    async loadTOTPSecret() {
+        try {
+            const response = await fetch('/api/2fa');
+            const data = await response.json();
+            if (data.secret) {
+                this.config.totpSecret = data.secret;
+            }
+        } catch (e) {
+            console.warn('Failed to load TOTP secret from server, using localStorage fallback');
+            const secret = localStorage.getItem('genshin_totp_secret');
+            if (secret) {
+                this.config.totpSecret = secret;
+            }
+        }
+    },
+    
+    async saveTOTPSecret(secret) {
+        localStorage.setItem('genshin_totp_secret', secret);
+        
+        try {
+            await fetch('/api/2fa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ secret })
+            });
+        } catch (e) {
+            console.warn('Failed to save TOTP secret to server');
         }
     },
     
@@ -147,13 +170,13 @@ const Auth = {
         if (secretDisplay) secretDisplay.style.display = 'none';
     },
     
-    generateTOTPSecret() {
+    async generateTOTPSecret() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
         let secret = '';
         for (let i = 0; i < 16; i++) {
             secret += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        localStorage.setItem('genshin_totp_secret', secret);
+        await this.saveTOTPSecret(secret);
         return secret;
     },
     
@@ -179,7 +202,7 @@ const Auth = {
             const prevTOTP = await this.generateTOTP(this.config.totpSecret, -1);
             
             if (code === validTOTP || code === prevTOTP) {
-                localStorage.setItem('genshin_totp_secret', this.config.totpSecret);
+                await this.saveTOTPSecret(this.config.totpSecret);
                 this.is2FAVerified = true;
                 this.hide2FADialog();
                 this.onLoginSuccess();
