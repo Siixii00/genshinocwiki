@@ -93,24 +93,46 @@ const ApiClient = {
             rarity: parseInt(char.rarity),
             gender: char.gender || null,
             affiliation: char.affiliation || null,
+            birthday: char.birthday || null,
             constellation: char.constellation || null,
             vision: char.vision || null,
             dish: char.dish || null,
-            birthday: char.birthday || null,
-            va_cn: char.vaCn || null,
-            va_jp: char.vaJp || null,
             description: char.description || null,
-            artwork: char.artwork || null,
-            artwork2: char.artwork2 || null,
-            portrait: char.portrait || null,
-            avatar: char.avatar || null,
-            skill_normal_name: char.skillNormalName || null,
-            skill_normal_desc: char.skillNormalDesc || null,
-            skill_elemental_name: char.skillElementalName || null,
-            skill_elemental_desc: char.skillElementalDesc || null,
-            skill_burst_name: char.skillBurstName || null,
-            skill_burst_desc: char.skillBurstDesc || null,
-            story: char.story || null
+            story: char.story || null,
+            va: {
+                cn: char.vaCn || null,
+                jp: char.vaJp || null
+            },
+            images: {
+                artwork: char.artwork || null,
+                portrait: char.portrait || null,
+                avatar: char.avatar || null,
+                idcard: char.idcard || null
+            },
+            model: {
+                type: char.modelType || null,
+                url: char.modelUrl || null
+            },
+            skills: {
+                normal: {
+                    name: char.skillNormalName || null,
+                    desc: char.skillNormalDesc || null
+                },
+                elemental: {
+                    name: char.skillElementalName || null,
+                    desc: char.skillElementalDesc || null
+                },
+                burst: {
+                    name: char.skillBurstName || null,
+                    desc: char.skillBurstDesc || null
+                }
+            },
+            constellations: char.constellations || [],
+            customImages: char.customImages || [],
+            voices: {
+                normal: char.normalVoices || [],
+                combat: char.combatVoices || []
+            }
         };
     },
     

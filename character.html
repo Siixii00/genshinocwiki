@@ -126,8 +126,10 @@
 
         <nav class="detail-tabs">
             <button class="detail-tab active" data-tab="gallery">立繪/方卡</button>
+            <button class="detail-tab" data-tab="model">模型展示</button>
             <button class="detail-tab" data-tab="skills">天賦</button>
             <button class="detail-tab" data-tab="constellation">命之座</button>
+            <button class="detail-tab" data-tab="voice">角色語音</button>
             <button class="detail-tab" data-tab="story">角色故事</button>
         </nav>
 
@@ -137,15 +139,9 @@
                     <h3>角色立繪</h3>
                     <div class="gallery-grid" id="artwork-gallery">
                         <div class="gallery-item">
-                            <img src="" alt="立繪" id="gallery-artwork-1">
+                            <img src="" alt="立繪" id="gallery-artwork">
                             <div class="gallery-placeholder">
                                 <span>立繪</span>
-                            </div>
-                        </div>
-                        <div class="gallery-item">
-                            <img src="" alt="立繪二" id="gallery-artwork-2">
-                            <div class="gallery-placeholder">
-                                <span>立繪二</span>
                             </div>
                         </div>
                     </div>
@@ -159,23 +155,29 @@
                                 <span>方卡</span>
                             </div>
                         </div>
+                        <div class="gallery-item portrait-item">
+                            <img src="" alt="頭像" id="gallery-avatar">
+                            <div class="gallery-placeholder">
+                                <span>頭像</span>
+                            </div>
+                        </div>
+                        <div class="gallery-item portrait-item">
+                            <img src="" alt="證件照" id="gallery-idcard">
+                            <div class="gallery-placeholder">
+                                <span>證件照</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="gallery-section">
-                    <h3>其他圖片</h3>
-                    <div class="gallery-grid" id="extra-gallery">
-                        <div class="gallery-item">
-                            <img src="" alt="其他圖片" id="gallery-extra-1">
-                            <div class="gallery-placeholder">
-                                <span>其他</span>
-                            </div>
-                        </div>
-                        <div class="gallery-item">
-                            <img src="" alt="其他圖片" id="gallery-extra-2">
-                            <div class="gallery-placeholder">
-                                <span>其他</span>
-                            </div>
-                        </div>
+                <div class="gallery-section" id="custom-gallery-section">
+                </div>
+            </section>
+
+            <section class="tab-panel" id="model-panel">
+                <div class="model-section">
+                    <h3>模型渲染展示</h3>
+                    <div class="model-content" id="model-content">
+                        <p class="empty-message">暫無模型展示資料</p>
                     </div>
                 </div>
             </section>
@@ -223,6 +225,21 @@
 
             <section class="tab-panel" id="constellation-panel">
                 <div class="constellation-grid" id="constellation-list">
+                </div>
+            </section>
+
+            <section class="tab-panel" id="voice-panel">
+                <div class="voice-section">
+                    <h3>一般語音</h3>
+                    <div class="voice-list" id="normal-voice-list">
+                        <p class="empty-message">暫無語音資料</p>
+                    </div>
+                </div>
+                <div class="voice-section">
+                    <h3>戰鬥語音</h3>
+                    <div class="voice-list" id="combat-voice-list">
+                        <p class="empty-message">暫無語音資料</p>
+                    </div>
                 </div>
             </section>
 
@@ -366,62 +383,57 @@
                                 <div class="image-preview-large" id="edit-artwork-preview">
                                     <span>立繪</span>
                                 </div>
-                                <input type="file" id="edit-artwork-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-artwork">選擇</button>
-                                <input type="hidden" id="edit-artwork" name="artwork">
-                            </div>
-                            <div class="image-upload-item">
-                                <div class="image-preview-large" id="edit-artwork2-preview">
-                                    <span>立繪二</span>
-                                </div>
-                                <input type="file" id="edit-artwork2-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-artwork2">選擇</button>
-                                <input type="hidden" id="edit-artwork2" name="artwork2">
+                                <input type="text" id="edit-artwork" name="artwork" placeholder="圖床 URL" class="image-url-input">
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>角色方卡（頭像）</label>
+                        <label>角色方卡</label>
                         <div class="image-upload-row">
                             <div class="image-upload-item">
                                 <div class="image-preview-square" id="edit-portrait-preview">
                                     <span>方卡</span>
                                 </div>
-                                <input type="file" id="edit-portrait-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-portrait">選擇</button>
-                                <input type="hidden" id="edit-portrait" name="portrait">
+                                <input type="text" id="edit-portrait" name="portrait" placeholder="圖床 URL" class="image-url-input">
                             </div>
                             <div class="image-upload-item">
                                 <div class="image-preview-square" id="edit-avatar-preview">
                                     <span>頭像</span>
                                 </div>
-                                <input type="file" id="edit-avatar-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-avatar">選擇</button>
-                                <input type="hidden" id="edit-avatar" name="avatar">
+                                <input type="text" id="edit-avatar" name="avatar" placeholder="圖床 URL" class="image-url-input">
+                            </div>
+                            <div class="image-upload-item">
+                                <div class="image-preview-square" id="edit-idcard-preview">
+                                    <span>證件照</span>
+                                </div>
+                                <input type="text" id="edit-idcard" name="idcard" placeholder="圖床 URL" class="image-url-input">
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>其他圖片</label>
-                        <div class="image-upload-row">
-                            <div class="image-upload-item">
-                                <div class="image-preview" id="edit-extra1-preview">
-                                    <span>其他1</span>
-                                </div>
-                                <input type="file" id="edit-extra1-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-extra1">選擇</button>
-                                <input type="hidden" id="edit-extra1" name="extraImage1">
+                        <label>模型渲染展示</label>
+                        <div class="model-upload-section">
+                            <div class="form-group">
+                                <label>展示類型</label>
+                                <select id="edit-model-type" name="modelType">
+                                    <option value="">無</option>
+                                    <option value="video">影片</option>
+                                    <option value="gif">GIF</option>
+                                    <option value="image">圖片</option>
+                                </select>
                             </div>
-                            <div class="image-upload-item">
-                                <div class="image-preview" id="edit-extra2-preview">
-                                    <span>其他2</span>
-                                </div>
-                                <input type="file" id="edit-extra2-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary upload-btn" data-target="edit-extra2">選擇</button>
-                                <input type="hidden" id="edit-extra2" name="extraImage2">
+                            <div class="form-group">
+                                <label>展示 URL</label>
+                                <input type="text" id="edit-model-url" name="modelUrl" placeholder="影片/圖片/GIF URL">
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">自定義圖片</h4>
+                    <div id="custom-images-list"></div>
+                    <button type="button" class="btn btn-secondary" id="add-custom-image-btn">+ 新增圖片區</button>
                 </div>
 
                 <div class="form-section">
@@ -470,6 +482,26 @@
                     <h4 class="form-section-title">角色故事</h4>
                     <div class="form-group">
                         <textarea id="edit-story" name="story" rows="4" placeholder="輸入角色背景故事..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">命之座</h4>
+                    <div class="constellation-edit-list" id="constellation-edit-list">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="form-section-title">角色語音</h4>
+                    <div class="voice-edit-section">
+                        <h5>一般語音</h5>
+                        <div id="normal-voice-edit-list"></div>
+                        <button type="button" class="btn btn-secondary" id="add-normal-voice-btn">+ 新增一般語音</button>
+                    </div>
+                    <div class="voice-edit-section">
+                        <h5>戰鬥語音</h5>
+                        <div id="combat-voice-edit-list"></div>
+                        <button type="button" class="btn btn-secondary" id="add-combat-voice-btn">+ 新增戰鬥語音</button>
                     </div>
                 </div>
 

@@ -88,7 +88,8 @@ const UI = {
             'name', 'title', 'fullname', 'element', 'weapon', 'region', 'rarity',
             'gender', 'affiliation', 'constellation', 'vision', 'dish', 'birthday',
             'vaCn', 'vaJp', 'description', 'story',
-            'artwork', 'artwork2', 'portrait', 'avatar', 'extraImage1', 'extraImage2'
+            'artwork', 'portrait', 'avatar', 'idcard',
+            'modelType', 'modelUrl'
         ];
         
         textFields.forEach(field => {
@@ -115,20 +116,263 @@ const UI = {
         }
         
         const imagePreviewMap = {
-            'edit-artwork-preview': character.artwork,
-            'edit-artwork2-preview': character.artwork2,
-            'edit-portrait-preview': character.portrait || character.avatar,
-            'edit-avatar-preview': character.avatar,
-            'edit-extra1-preview': character.extraImage1,
-            'edit-extra2-preview': character.extraImage2
+            'edit-artwork-preview': character.images?.artwork,
+            'edit-portrait-preview': character.images?.portrait,
+            'edit-avatar-preview': character.images?.avatar,
+            'edit-idcard-preview': character.images?.idcard
         };
         
         Object.entries(imagePreviewMap).forEach(([id, url]) => {
             const el = document.getElementById(id);
-            if (el && url) {
-                el.innerHTML = `<img src="${url}" alt="預覽">`;
+            if (el) {
+                if (url) {
+                    el.innerHTML = `<img src="${url}" alt="預覽">`;
+                } else {
+                    const label = el.closest('.image-upload-item')?.querySelector('span')?.textContent || '預覽';
+                    el.innerHTML = `<span>${label}</span>`;
+                }
             }
         });
+        
+        this.populateCustomImages(character.customImages || []);
+        this.populateConstellationEdit(character.constellations);
+        this.populateVoiceEdit(character.voices?.normal || [], character.voices?.combat || []);
+    },
+    
+    populateConstellationEdit(constellations) {
+        const container = document.getElementById('constellation-edit-list');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= 6; i++) {
+            const c = constellations?.find(c => c.level === i) || { level: i, name: '', desc: '', icon: '' };
+            container.innerHTML += `
+                <div class="constellation-edit-item" data-level="${i}">
+                    <div class="constellation-edit-header">
+                        <span class="constellation-edit-level">第${i}層</span>
+                    </div>
+                    <div class="constellation-edit-body">
+                        <div class="constellation-icon-upload">
+                            <div class="constellation-icon-preview" id="constellation-icon-${i}">
+                                ${c.icon ? `<img src="${c.icon}" alt="命之座圖標">` : '<span>圖標</span>'}
+                            </div>
+                            <input type="text" id="constellation-icon-url-${i}" placeholder="圖標 URL" value="${c.icon || ''}" class="constellation-icon-url">
+                            <input type="hidden" id="constellation-icon-hidden-${i}" value="${c.icon || ''}" name="constellationIcon${i}">
+                        </div>
+                        <div class="constellation-edit-fields">
+                            <div class="form-group">
+                                <label>命之座名稱</label>
+                                <input type="text" id="constellation-name-${i}" name="constellationName${i}" value="${c.name || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>命之座描述</label>
+                                <textarea id="constellation-desc-${i}" name="constellationDesc${i}" rows="2">${c.desc || ''}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        for (let i = 1; i <= 6; i++) {
+            const urlInput = document.getElementById(`constellation-icon-url-${i}`);
+            const preview = document.getElementById(`constellation-icon-${i}`);
+            const hiddenInput = document.getElementById(`constellation-icon-hidden-${i}`);
+            
+            if (urlInput && preview && hiddenInput) {
+                urlInput.addEventListener('input', () => {
+                    const url = urlInput.value.trim();
+                    hiddenInput.value = url;
+                    if (url) {
+                        preview.innerHTML = `<img src="${url}" alt="命之座圖標" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                    } else {
+                        preview.innerHTML = '<span>圖標</span>';
+                    }
+                });
+            }
+        }
+    },
+    
+    populateVoiceEdit(normalVoices, combatVoices) {
+        const normalContainer = document.getElementById('normal-voice-edit-list');
+        const combatContainer = document.getElementById('combat-voice-edit-list');
+        
+        if (normalContainer) {
+            normalContainer.innerHTML = '';
+            if (normalVoices && normalVoices.length > 0) {
+                normalVoices.forEach((voice, index) => {
+                    this.addVoiceEditItem(normalContainer, voice.title, voice.content, voice.audioUrl, index, 'normal');
+                });
+            }
+        }
+        
+        if (combatContainer) {
+            combatContainer.innerHTML = '';
+            if (combatVoices && combatVoices.length > 0) {
+                combatVoices.forEach((voice, index) => {
+                    this.addVoiceEditItem(combatContainer, voice.title, voice.content, voice.audioUrl, index, 'combat');
+                });
+            }
+        }
+    },
+    
+    addVoiceEditItem(container, title = '', content = '', audioUrl = '', index = null, type = 'normal') {
+        if (!container) return;
+        
+        const itemIndex = index !== null ? index : container.children.length;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'voice-edit-item';
+        itemDiv.dataset.index = itemIndex;
+        itemDiv.dataset.type = type;
+        
+        itemDiv.innerHTML = `
+            <div class="voice-edit-header">
+                <input type="text" class="voice-title-input" value="${title}" placeholder="語音標題">
+                <button type="button" class="btn btn-sm btn-danger remove-voice-btn">刪除</button>
+            </div>
+            <div class="voice-edit-body">
+                <div class="form-group">
+                    <label>語音內容</label>
+                    <textarea class="voice-content-input" rows="2" placeholder="語音文字內容">${content}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>音檔 URL（選填）</label>
+                    <input type="text" class="voice-audio-input" value="${audioUrl}" placeholder="MP3 URL">
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(itemDiv);
+        
+        const removeBtn = itemDiv.querySelector('.remove-voice-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => itemDiv.remove());
+        }
+    },
+    
+    getVoicesData(type) {
+        const container = document.getElementById(`${type}-voice-edit-list`);
+        if (!container) return [];
+        
+        const voices = [];
+        container.querySelectorAll('.voice-edit-item').forEach(item => {
+            const title = item.querySelector('.voice-title-input')?.value || '';
+            const content = item.querySelector('.voice-content-input')?.value || '';
+            const audioUrl = item.querySelector('.voice-audio-input')?.value || '';
+            if (title || content) {
+                voices.push({ title, content, audioUrl });
+            }
+        });
+        return voices;
+    },
+    
+    populateCustomImages(customImages) {
+        const container = document.getElementById('custom-images-list');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (customImages && customImages.length > 0) {
+            customImages.forEach((img, index) => {
+                this.addCustomImageItem(img.title, img.images || [], index);
+            });
+        }
+    },
+    
+    addCustomImageItem(title = '', images = [], index = null) {
+        const container = document.getElementById('custom-images-list');
+        if (!container) return;
+        
+        const itemIndex = index !== null ? index : container.children.length;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'custom-image-item';
+        itemDiv.dataset.index = itemIndex;
+        
+        let imagesHtml = '';
+        if (images.length > 0) {
+            images.forEach((url, imgIndex) => {
+                imagesHtml += `
+                    <div class="custom-image-entry" data-img-index="${imgIndex}">
+                        <input type="text" class="custom-image-url" value="${url}" placeholder="圖片 URL">
+                        <button type="button" class="btn btn-sm btn-danger remove-custom-image-btn">移除</button>
+                    </div>
+                `;
+            });
+        }
+        
+        itemDiv.innerHTML = `
+            <div class="custom-image-header">
+                <input type="text" class="custom-image-title" value="${title}" placeholder="標題（例如：活動圖片、網頁活動等）">
+                <button type="button" class="btn btn-sm btn-danger remove-custom-section-btn">刪除區塊</button>
+            </div>
+            <div class="custom-image-entries">
+                ${imagesHtml || `
+                    <div class="custom-image-entry" data-img-index="0">
+                        <input type="text" class="custom-image-url" value="" placeholder="圖片 URL">
+                        <button type="button" class="btn btn-sm btn-danger remove-custom-image-btn">移除</button>
+                    </div>
+                `}
+            </div>
+            <button type="button" class="btn btn-sm btn-secondary add-custom-image-entry-btn">+ 新增圖片</button>
+        `;
+        
+        container.appendChild(itemDiv);
+        this.bindCustomImageEvents(itemDiv);
+    },
+    
+    bindCustomImageEvents(itemDiv) {
+        const removeSectionBtn = itemDiv.querySelector('.remove-custom-section-btn');
+        if (removeSectionBtn) {
+            removeSectionBtn.addEventListener('click', () => itemDiv.remove());
+        }
+        
+        const addImageBtn = itemDiv.querySelector('.add-custom-image-entry-btn');
+        if (addImageBtn) {
+            addImageBtn.addEventListener('click', () => {
+                const entriesContainer = itemDiv.querySelector('.custom-image-entries');
+                const newIndex = entriesContainer.children.length;
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'custom-image-entry';
+                entryDiv.dataset.imgIndex = newIndex;
+                entryDiv.innerHTML = `
+                    <input type="text" class="custom-image-url" value="" placeholder="圖片 URL">
+                    <button type="button" class="btn btn-sm btn-danger remove-custom-image-btn">移除</button>
+                `;
+                entriesContainer.appendChild(entryDiv);
+                this.bindCustomImageEntryEvents(entryDiv);
+            });
+        }
+        
+        itemDiv.querySelectorAll('.custom-image-entry').forEach(entry => {
+            this.bindCustomImageEntryEvents(entry);
+        });
+    },
+    
+    bindCustomImageEntryEvents(entryDiv) {
+        const removeBtn = entryDiv.querySelector('.remove-custom-image-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => entryDiv.remove());
+        }
+    },
+    
+    getCustomImagesData() {
+        const container = document.getElementById('custom-images-list');
+        if (!container) return [];
+        
+        const items = [];
+        container.querySelectorAll('.custom-image-item').forEach(itemDiv => {
+            const title = itemDiv.querySelector('.custom-image-title')?.value || '';
+            const images = [];
+            itemDiv.querySelectorAll('.custom-image-url').forEach(input => {
+                const url = input.value.trim();
+                if (url) images.push(url);
+            });
+            if (title || images.length > 0) {
+                items.push({ title, images });
+            }
+        });
+        return items;
     },
     
     getFormData(form) {
@@ -146,15 +390,15 @@ const UI = {
         data.skills = {
             normal: {
                 name: data.skillNormalName || '',
-                description: data.skillNormalDesc || ''
+                desc: data.skillNormalDesc || ''
             },
             elemental: {
                 name: data.skillElementalName || '',
-                description: data.skillElementalDesc || ''
+                desc: data.skillElementalDesc || ''
             },
             burst: {
                 name: data.skillBurstName || '',
-                description: data.skillBurstDesc || ''
+                desc: data.skillBurstDesc || ''
             }
         };
         
@@ -164,6 +408,21 @@ const UI = {
         delete data.skillElementalDesc;
         delete data.skillBurstName;
         delete data.skillBurstDesc;
+        
+        data.constellations = [];
+        for (let i = 1; i <= 6; i++) {
+            const name = document.getElementById(`constellation-name-${i}`)?.value || '';
+            const desc = document.getElementById(`constellation-desc-${i}`)?.value || '';
+            const icon = document.getElementById(`constellation-icon-hidden-${i}`)?.value || '';
+            data.constellations.push({ level: i, name, desc, icon });
+        }
+        
+        data.customImages = this.getCustomImagesData();
+        
+        data.voices = {
+            normal: this.getVoicesData('normal'),
+            combat: this.getVoicesData('combat')
+        };
         
         return data;
     },
@@ -228,37 +487,32 @@ const UI = {
         
         const artworkImg = document.getElementById('artwork-image');
         if (artworkImg) {
-            artworkImg.src = character.artwork || '';
+            artworkImg.src = character.images?.artwork || '';
         }
         
         const portraitImg = document.getElementById('portrait-image');
         if (portraitImg) {
-            portraitImg.src = character.portrait || character.avatar || '';
+            portraitImg.src = character.images?.portrait || character.images?.avatar || '';
         }
         
-        const galleryArtwork1 = document.getElementById('gallery-artwork-1');
-        if (galleryArtwork1) {
-            galleryArtwork1.src = character.artwork || '';
-        }
-        
-        const galleryArtwork2 = document.getElementById('gallery-artwork-2');
-        if (galleryArtwork2) {
-            galleryArtwork2.src = character.artwork2 || '';
+        const galleryArtwork = document.getElementById('gallery-artwork');
+        if (galleryArtwork) {
+            galleryArtwork.src = character.images?.artwork || '';
         }
         
         const galleryPortrait = document.getElementById('gallery-portrait');
         if (galleryPortrait) {
-            galleryPortrait.src = character.portrait || character.avatar || '';
+            galleryPortrait.src = character.images?.portrait || '';
         }
         
-        const galleryExtra1 = document.getElementById('gallery-extra-1');
-        if (galleryExtra1) {
-            galleryExtra1.src = character.extraImage1 || '';
+        const galleryAvatar = document.getElementById('gallery-avatar');
+        if (galleryAvatar) {
+            galleryAvatar.src = character.images?.avatar || '';
         }
         
-        const galleryExtra2 = document.getElementById('gallery-extra-2');
-        if (galleryExtra2) {
-            galleryExtra2.src = character.extraImage2 || '';
+        const galleryIdcard = document.getElementById('gallery-idcard');
+        if (galleryIdcard) {
+            galleryIdcard.src = character.images?.idcard || '';
         }
         
         document.getElementById('char-name').textContent = character.name;
@@ -291,8 +545,8 @@ const UI = {
             'info-constellation': character.constellation,
             'info-vision': character.vision,
             'info-dish': character.dish,
-            'info-va-cn': character.vaCn,
-            'info-va-jp': character.vaJp
+            'info-va-cn': character.va?.cn,
+            'info-va-jp': character.va?.jp
         };
         
         Object.entries(infoFields).forEach(([id, value]) => {
@@ -304,11 +558,11 @@ const UI = {
         
         if (character.skills) {
             document.getElementById('skill-normal-name').textContent = character.skills.normal?.name || '-';
-            document.getElementById('skill-normal-desc').textContent = character.skills.normal?.description || '暫無資料';
+            document.getElementById('skill-normal-desc').textContent = character.skills.normal?.desc || '暫無資料';
             document.getElementById('skill-elemental-name').textContent = character.skills.elemental?.name || '-';
-            document.getElementById('skill-elemental-desc').textContent = character.skills.elemental?.description || '暫無資料';
+            document.getElementById('skill-elemental-desc').textContent = character.skills.elemental?.desc || '暫無資料';
             document.getElementById('skill-burst-name').textContent = character.skills.burst?.name || '-';
-            document.getElementById('skill-burst-desc').textContent = character.skills.burst?.description || '暫無資料';
+            document.getElementById('skill-burst-desc').textContent = character.skills.burst?.desc || '暫無資料';
         }
         
         const constellationList = document.getElementById('constellation-list');
@@ -316,9 +570,10 @@ const UI = {
             if (character.constellations && character.constellations.length > 0) {
                 constellationList.innerHTML = character.constellations.map(c => `
                     <div class="constellation-card">
+                        ${c.icon ? `<div class="constellation-icon"><img src="${c.icon}" alt="${c.name}"></div>` : ''}
                         <span class="constellation-level">第${c.level}層</span>
-                        <h4 class="constellation-name">${c.name}</h4>
-                        <p class="constellation-desc">${c.desc}</p>
+                        <h4 class="constellation-name">${c.name || '-'}</h4>
+                        <p class="constellation-desc">${c.desc || '暫無資料'}</p>
                     </div>
                 `).join('');
             } else {
@@ -331,10 +586,140 @@ const UI = {
             storyContent.innerHTML = character.story ? `<p>${character.story}</p>` : '<p class="empty-message">暫無故事資料</p>';
         }
         
+        const modelContent = document.getElementById('model-content');
+        if (modelContent) {
+            if (character.model?.type && character.model?.url) {
+                if (character.model.type === 'video') {
+                    modelContent.innerHTML = `
+                        <div class="model-video-wrapper">
+                            <video controls autoplay loop muted playsinline>
+                                <source src="${character.model.url}" type="video/mp4">
+                                您的瀏覽器不支援影片播放
+                            </video>
+                        </div>
+                    `;
+                } else if (character.model.type === 'gif' || character.model.type === 'image') {
+                    modelContent.innerHTML = `
+                        <div class="model-image-wrapper">
+                            <img src="${character.model.url}" alt="模型展示">
+                        </div>
+                    `;
+                } else {
+                    modelContent.innerHTML = '<p class="empty-message">暫無模型展示資料</p>';
+                }
+            } else {
+                modelContent.innerHTML = '<p class="empty-message">暫無模型展示資料</p>';
+            }
+        }
+        
+        this.hideEmptyInfoRows(character);
+        this.renderVoices(character.voices?.normal || [], character.voices?.combat || []);
+        
         const editForm = document.getElementById('edit-form');
         if (editForm) {
             UI.populateForm(editForm, character);
         }
+    },
+    
+    hideEmptyInfoRows(character) {
+        const rowMap = {
+            'info-fullname': character.fullname,
+            'info-affiliation': character.affiliation,
+            'info-birthday': character.birthday,
+            'info-constellation': character.constellation,
+            'info-vision': character.vision,
+            'info-dish': character.dish,
+            'info-va-cn': character.va?.cn,
+            'info-va-jp': character.va?.jp
+        };
+        
+        Object.entries(rowMap).forEach(([id, value]) => {
+            const el = document.getElementById(id);
+            if (el) {
+                const row = el.closest('tr');
+                if (row) {
+                    row.style.display = value ? '' : 'none';
+                }
+            }
+        });
+        
+        if (!character.images?.avatar) {
+            const avatarItem = document.getElementById('gallery-avatar')?.closest('.gallery-item');
+            if (avatarItem) avatarItem.style.display = 'none';
+        }
+        
+        if (!character.images?.idcard) {
+            const idcardItem = document.getElementById('gallery-idcard')?.closest('.gallery-item');
+            if (idcardItem) idcardItem.style.display = 'none';
+        }
+        
+        this.renderCustomGallery(character.customImages || []);
+    },
+    
+    renderCustomGallery(customImages) {
+        const container = document.getElementById('custom-gallery-section');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (!customImages || customImages.length === 0) return;
+        
+        customImages.forEach(section => {
+            if (!section.images || section.images.length === 0) return;
+            
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'gallery-section';
+            sectionDiv.innerHTML = `
+                <h3>${section.title || '其他圖片'}</h3>
+                <div class="gallery-grid">
+                    ${section.images.map(url => `
+                        <div class="gallery-item">
+                            <img src="${url}" alt="${section.title || '圖片'}">
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(sectionDiv);
+        });
+    },
+    
+    renderVoices(normalVoices, combatVoices) {
+        const normalContainer = document.getElementById('normal-voice-list');
+        const combatContainer = document.getElementById('combat-voice-list');
+        
+        if (normalContainer) {
+            if (normalVoices && normalVoices.length > 0) {
+                normalContainer.innerHTML = normalVoices.map(v => this.renderVoiceItem(v)).join('');
+            } else {
+                normalContainer.innerHTML = '<p class="empty-message">暫無語音資料</p>';
+            }
+        }
+        
+        if (combatContainer) {
+            if (combatVoices && combatVoices.length > 0) {
+                combatContainer.innerHTML = combatVoices.map(v => this.renderVoiceItem(v)).join('');
+            } else {
+                combatContainer.innerHTML = '<p class="empty-message">暫無語音資料</p>';
+            }
+        }
+    },
+    
+    renderVoiceItem(voice) {
+        const audioHtml = voice.audioUrl ? `
+            <div class="voice-audio">
+                <audio controls src="${voice.audioUrl}">您的瀏覽器不支援音訊播放</audio>
+            </div>
+        ` : '';
+        
+        return `
+            <div class="voice-item">
+                <div class="voice-info">
+                    <h4 class="voice-title">${voice.title || '未命名'}</h4>
+                    <p class="voice-content">${voice.content || ''}</p>
+                </div>
+                ${audioHtml}
+            </div>
+        `;
     },
     
     switchTab(tabName) {

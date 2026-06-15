@@ -26,43 +26,52 @@ const DetailPage = {
     },
     
     setupAllImageUploads() {
-        const uploadConfigs = [
-            { btnClass: 'upload-btn', prefix: 'edit-artwork' },
-            { btnClass: 'upload-btn', prefix: 'edit-artwork2' },
-            { btnClass: 'upload-btn', prefix: 'edit-portrait' },
-            { btnClass: 'upload-btn', prefix: 'edit-avatar' },
-            { btnClass: 'upload-btn', prefix: 'edit-extra1' },
-            { btnClass: 'upload-btn', prefix: 'edit-extra2' }
+        const imageFields = [
+            { input: 'edit-artwork', preview: 'edit-artwork-preview' },
+            { input: 'edit-portrait', preview: 'edit-portrait-preview' },
+            { input: 'edit-avatar', preview: 'edit-avatar-preview' },
+            { input: 'edit-idcard', preview: 'edit-idcard-preview' }
         ];
         
-        document.querySelectorAll('.upload-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = btn.dataset.target;
-                const fileInput = document.getElementById(`${target}-file`);
-                if (fileInput) fileInput.click();
-            });
-        });
-        
-        ['artwork', 'artwork2', 'portrait', 'avatar', 'extra1', 'extra2'].forEach(field => {
-            const fileInput = document.getElementById(`edit-${field}-file`);
-            const hiddenInput = document.getElementById(`edit-${field}`);
-            const preview = document.getElementById(`edit-${field}-preview`);
+        imageFields.forEach(({ input, preview }) => {
+            const inputEl = document.getElementById(input);
+            const previewEl = document.getElementById(preview);
             
-            if (fileInput && hiddenInput && preview) {
-                fileInput.addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            const base64 = event.target.result;
-                            hiddenInput.value = base64;
-                            preview.innerHTML = `<img src="${base64}" alt="預覽">`;
-                        };
-                        reader.readAsDataURL(file);
+            if (inputEl && previewEl) {
+                inputEl.addEventListener('input', () => {
+                    const url = inputEl.value.trim();
+                    if (url) {
+                        previewEl.innerHTML = `<img src="${url}" alt="預覽" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                    } else {
+                        const label = previewEl.closest('.image-upload-item').querySelector('span')?.textContent || '預覽';
+                        previewEl.innerHTML = `<span>${label}</span>`;
                     }
                 });
             }
         });
+        
+        const addCustomBtn = document.getElementById('add-custom-image-btn');
+        if (addCustomBtn) {
+            addCustomBtn.addEventListener('click', () => {
+                UI.addCustomImageItem('', []);
+            });
+        }
+        
+        const addNormalVoiceBtn = document.getElementById('add-normal-voice-btn');
+        if (addNormalVoiceBtn) {
+            addNormalVoiceBtn.addEventListener('click', () => {
+                const container = document.getElementById('normal-voice-edit-list');
+                UI.addVoiceEditItem(container, '', '', '');
+            });
+        }
+        
+        const addCombatVoiceBtn = document.getElementById('add-combat-voice-btn');
+        if (addCombatVoiceBtn) {
+            addCombatVoiceBtn.addEventListener('click', () => {
+                const container = document.getElementById('combat-voice-edit-list');
+                UI.addVoiceEditItem(container, '', '', '');
+            });
+        }
     },
     
     bindEvents() {
