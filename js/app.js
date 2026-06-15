@@ -93,6 +93,30 @@ const App = {
                 });
             }
         });
+        
+        const avatarBtn = document.getElementById('upload-avatar-btn');
+        const avatarFileInput = document.getElementById('char-avatar-file');
+        const avatarHiddenInput = document.getElementById('char-avatar');
+        const avatarPreview = document.getElementById('avatar-preview');
+        
+        if (avatarBtn && avatarFileInput && avatarHiddenInput && avatarPreview) {
+            avatarBtn.addEventListener('click', () => {
+                avatarFileInput.click();
+            });
+            
+            avatarFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const base64 = event.target.result;
+                        avatarHiddenInput.value = base64;
+                        avatarPreview.innerHTML = `<img src="${base64}" alt="預覽">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
     },
     
     bindModalEvents() {
