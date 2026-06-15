@@ -83,3 +83,14 @@ CREATE TRIGGER update_characters_updated_at
 CREATE TRIGGER update_gallery_updated_at
   BEFORE UPDATE ON gallery
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- 設定表（存儲 TOTP 密鑰等）
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TRIGGER update_settings_updated_at
+  BEFORE UPDATE ON settings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
