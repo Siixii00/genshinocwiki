@@ -880,8 +880,6 @@ const UI = {
                 img.addEventListener('click', () => {
                     this.showLightbox(url);
                 });
-            });
-        });
             }
         });
         
