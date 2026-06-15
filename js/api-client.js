@@ -129,6 +129,7 @@ const ApiClient = {
             },
             constellations: this.parseJSON(c.constellations) || [],
             customImages: this.parseJSON(c.custom_images) || this.parseJSON(c.customImages) || [],
+            passives: this.parseJSON(c.passives) || [],
             voices: {
                 normal: this.parseJSON(c.normal_voices) || this.parseJSON(c.normalVoices) || [],
                 combat: this.parseJSON(c.combat_voices) || this.parseJSON(c.combatVoices) || []
@@ -151,6 +152,7 @@ const ApiClient = {
         const customImages = char.customImages || [];
         const normalVoices = char.voices?.normal || char.normalVoices || [];
         const combatVoices = char.voices?.combat || char.combatVoices || [];
+        const passives = char.passives || [];
         
         return {
             name: char.name,
@@ -183,6 +185,7 @@ const ApiClient = {
             customImages: Array.isArray(customImages) && customImages.length > 0 ? JSON.stringify(customImages) : null,
             normalVoices: Array.isArray(normalVoices) && normalVoices.length > 0 ? JSON.stringify(normalVoices) : null,
             combatVoices: Array.isArray(combatVoices) && combatVoices.length > 0 ? JSON.stringify(combatVoices) : null,
+            passives: Array.isArray(passives) && passives.length > 0 ? JSON.stringify(passives) : null,
             modelType: char.model?.type || char.modelType || null,
             modelUrl: char.model?.url || char.modelUrl || null
         };

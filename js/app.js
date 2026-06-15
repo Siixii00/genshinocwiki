@@ -29,6 +29,7 @@ const App = {
         
         this.setupAllImageUploads();
         this.bindModalEvents();
+        this.bindPassiveButton();
         this.bindCharacterGridEvents();
         await this.refreshCharacterList();
     },
@@ -211,6 +212,15 @@ const App = {
             } else {
                 UI.showToast('刪除失敗', 'error');
             }
+        }
+    },
+    
+    bindPassiveButton() {
+        const addPassiveBtn = document.getElementById('add-passive-btn');
+        if (addPassiveBtn) {
+            addPassiveBtn.addEventListener('click', () => {
+                UI.addPassiveEditItem('', '', '');
+            });
         }
     }
 };

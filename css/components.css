@@ -1310,3 +1310,98 @@
 .voice-edit-body .form-group:last-child {
     margin-bottom: 0;
 }
+
+.passive-edit-item {
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+    overflow: hidden;
+}
+
+.passive-edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.passive-number {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--color-accent-gold-dark);
+}
+
+.passive-edit-body {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+}
+
+.passive-icon-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.passive-icon-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--border-radius-md);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.passive-icon-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.passive-icon-preview span {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.passive-icon-url {
+    width: 120px;
+    padding: var(--spacing-xs);
+    font-size: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    background: var(--color-bg-primary);
+}
+
+.passive-edit-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.model-video-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.model-video-wrapper video {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+}
+
+.model-video-wrapper iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--border-radius-md);
+}

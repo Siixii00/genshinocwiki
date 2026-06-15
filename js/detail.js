@@ -57,6 +57,13 @@ const DetailPage = {
             });
         }
         
+        const addPassiveBtn = document.getElementById('add-passive-btn');
+        if (addPassiveBtn) {
+            addPassiveBtn.addEventListener('click', () => {
+                UI.addPassiveEditItem('', '', '');
+            });
+        }
+        
         const addNormalVoiceBtn = document.getElementById('add-normal-voice-btn');
         if (addNormalVoiceBtn) {
             addNormalVoiceBtn.addEventListener('click', () => {

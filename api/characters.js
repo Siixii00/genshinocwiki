@@ -1,6 +1,5 @@
 const { sql } = require('../lib/db');
 
-const PASSIVE_FIELDS = ['passive_1_name', 'passive_1_desc', 'passive_2_name', 'passive_2_desc', 'passive_3_name', 'passive_3_desc', 'passive_extra_name', 'passive_extra_desc'];
 const STORY_FIELDS = ['story_detail', 'story_1', 'story_2', 'story_3', 'story_4', 'story_5', 'story_vision', 'story_extra'];
 
 function getCharacterFields() {
@@ -10,7 +9,7 @@ function getCharacterFields() {
     'va_cn', 'va_jp', 'description', 'artwork', 'gacha_image', 'portrait', 'avatar',
     'skill_normal_name', 'skill_normal_desc', 'skill_elemental_name', 'skill_elemental_desc', 'skill_burst_name', 'skill_burst_desc',
     'constellations', 'custom_images', 'normal_voices', 'combat_voices', 'model_type', 'model_url',
-    ...PASSIVE_FIELDS,
+    'passives',
     ...STORY_FIELDS
   ];
 }
@@ -49,14 +48,7 @@ function normalizeCharacter(c) {
     combat_voices: c.combatVoices || c.combat_voices || null,
     model_type: c.modelType || c.model_type || null,
     model_url: c.modelUrl || c.model_url || null,
-    passive_1_name: c.passive1Name || c.passive_1_name || null,
-    passive_1_desc: c.passive1Desc || c.passive_1_desc || null,
-    passive_2_name: c.passive2Name || c.passive_2_name || null,
-    passive_2_desc: c.passive2Desc || c.passive_2_desc || null,
-    passive_3_name: c.passive3Name || c.passive_3_name || null,
-    passive_3_desc: c.passive3Desc || c.passive_3_desc || null,
-    passive_extra_name: c.passiveExtraName || c.passive_extra_name || null,
-    passive_extra_desc: c.passiveExtraDesc || c.passive_extra_desc || null,
+    passives: c.passives && Array.isArray(c.passives) && c.passives.length > 0 ? JSON.stringify(c.passives) : null,
     story_detail: c.storyDetail || c.story_detail || null,
     story_1: c.story1 || c.story_1 || null,
     story_2: c.story2 || c.story_2 || null,
@@ -97,7 +89,7 @@ export default async function handler(req, res) {
           skill_elemental_name, skill_elemental_desc,
           skill_burst_name, skill_burst_desc,
           constellations, custom_images, normal_voices, combat_voices, model_type, model_url,
-          passive_1_name, passive_1_desc, passive_2_name, passive_2_desc, passive_3_name, passive_3_desc, passive_extra_name, passive_extra_desc,
+          passives,
           story_detail, story_1, story_2, story_3, story_4, story_5, story_vision, story_extra
         ) VALUES (
           ${c.name}, ${c.title}, ${c.fullname},
@@ -110,7 +102,7 @@ export default async function handler(req, res) {
           ${c.skill_elemental_name}, ${c.skill_elemental_desc},
           ${c.skill_burst_name}, ${c.skill_burst_desc},
           ${c.constellations}, ${c.custom_images}, ${c.normal_voices}, ${c.combat_voices}, ${c.model_type}, ${c.model_url},
-          ${c.passive_1_name}, ${c.passive_1_desc}, ${c.passive_2_name}, ${c.passive_2_desc}, ${c.passive_3_name}, ${c.passive_3_desc}, ${c.passive_extra_name}, ${c.passive_extra_desc},
+          ${c.passives},
           ${c.story_detail}, ${c.story_1}, ${c.story_2}, ${c.story_3}, ${c.story_4}, ${c.story_5}, ${c.story_vision}, ${c.story_extra}
         ) RETURNING *
       `;
@@ -161,14 +153,7 @@ export default async function handler(req, res) {
           combat_voices = COALESCE(${c.combat_voices}, combat_voices),
           model_type = COALESCE(${c.model_type}, model_type),
           model_url = COALESCE(${c.model_url}, model_url),
-          passive_1_name = COALESCE(${c.passive_1_name}, passive_1_name),
-          passive_1_desc = COALESCE(${c.passive_1_desc}, passive_1_desc),
-          passive_2_name = COALESCE(${c.passive_2_name}, passive_2_name),
-          passive_2_desc = COALESCE(${c.passive_2_desc}, passive_2_desc),
-          passive_3_name = COALESCE(${c.passive_3_name}, passive_3_name),
-          passive_3_desc = COALESCE(${c.passive_3_desc}, passive_3_desc),
-          passive_extra_name = COALESCE(${c.passive_extra_name}, passive_extra_name),
-          passive_extra_desc = COALESCE(${c.passive_extra_desc}, passive_extra_desc),
+          passives = COALESCE(${c.passives}, passives),
           story_detail = COALESCE(${c.story_detail}, story_detail),
           story_1 = COALESCE(${c.story_1}, story_1),
           story_2 = COALESCE(${c.story_2}, story_2),

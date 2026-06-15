@@ -136,6 +136,7 @@ const UI = {
         
         this.populateCustomImages(character.customImages || []);
         this.populateConstellationEdit(character.constellations);
+        this.populatePassivesEdit(character.passives || []);
         this.populateVoiceEdit(character.voices?.normal || [], character.voices?.combat || []);
     },
     
@@ -419,12 +420,120 @@ const UI = {
         
         data.customImages = this.getCustomImagesData();
         
+        data.passives = this.getPassivesData();
+        
         data.voices = {
             normal: this.getVoicesData('normal'),
             combat: this.getVoicesData('combat')
         };
         
         return data;
+    },
+    
+    populatePassivesEdit(passives) {
+        const container = document.getElementById('passives-list');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (passives && passives.length > 0) {
+            passives.forEach((p, index) => {
+                this.addPassiveEditItem(p.name, p.desc, p.icon, index);
+            });
+        }
+    },
+    
+    addPassiveEditItem(name = '', desc = '', icon = '', index = null) {
+        const container = document.getElementById('passives-list');
+        if (!container) return;
+        
+        const itemIndex = index !== null ? index : container.children.length;
+        if (itemIndex >= 7) return;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'passive-edit-item';
+        itemDiv.dataset.index = itemIndex;
+        
+        itemDiv.innerHTML = `
+            <div class="passive-edit-header">
+                <span class="passive-number">天賦 ${itemIndex + 1}</span>
+                <button type="button" class="btn btn-sm btn-danger remove-passive-btn">刪除</button>
+            </div>
+            <div class="passive-edit-body">
+                <div class="passive-icon-upload">
+                    <div class="passive-icon-preview" id="passive-icon-preview-${itemIndex}">
+                        ${icon ? `<img src="${icon}" alt="天賦圖標">` : '<span>圖標</span>'}
+                    </div>
+                    <input type="text" class="passive-icon-url" placeholder="圖標 URL" value="${icon}">
+                </div>
+                <div class="passive-edit-fields">
+                    <div class="form-group">
+                        <label>天賦名稱</label>
+                        <input type="text" class="passive-name-input" value="${name}" placeholder="天賦名稱">
+                    </div>
+                    <div class="form-group">
+                        <label>天賦描述</label>
+                        <textarea class="passive-desc-input" rows="2" placeholder="天賦描述">${desc}</textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(itemDiv);
+        
+        const removeBtn = itemDiv.querySelector('.remove-passive-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                itemDiv.remove();
+                this.renumberPassives();
+            });
+        }
+        
+        const iconUrlInput = itemDiv.querySelector('.passive-icon-url');
+        const iconPreview = itemDiv.querySelector('.passive-icon-preview');
+        if (iconUrlInput && iconPreview) {
+            iconUrlInput.addEventListener('input', () => {
+                const url = iconUrlInput.value.trim();
+                if (url) {
+                    iconPreview.innerHTML = `<img src="${url}" alt="天賦圖標" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                } else {
+                    iconPreview.innerHTML = '<span>圖標</span>';
+                }
+            });
+        }
+    },
+    
+    renumberPassives() {
+        const container = document.getElementById('passives-list');
+        if (!container) return;
+        
+        container.querySelectorAll('.passive-edit-item').forEach((item, index) => {
+            item.dataset.index = index;
+            const numberSpan = item.querySelector('.passive-number');
+            if (numberSpan) {
+                numberSpan.textContent = `天賦 ${index + 1}`;
+            }
+            const iconPreview = item.querySelector('.passive-icon-preview');
+            if (iconPreview) {
+                iconPreview.id = `passive-icon-preview-${index}`;
+            }
+        });
+    },
+    
+    getPassivesData() {
+        const container = document.getElementById('passives-list');
+        if (!container) return [];
+        
+        const passives = [];
+        container.querySelectorAll('.passive-edit-item').forEach(item => {
+            const name = item.querySelector('.passive-name-input')?.value || '';
+            const desc = item.querySelector('.passive-desc-input')?.value || '';
+            const icon = item.querySelector('.passive-icon-url')?.value || '';
+            if (name || desc) {
+                passives.push({ name, desc, icon });
+            }
+        });
+        return passives;
     },
     
     setupAvatarUpload() {
@@ -590,14 +699,31 @@ const UI = {
         if (modelContent) {
             if (character.model?.type && character.model?.url) {
                 if (character.model.type === 'video') {
-                    modelContent.innerHTML = `
-                        <div class="model-video-wrapper">
-                            <video controls autoplay loop muted playsinline>
-                                <source src="${character.model.url}" type="video/mp4">
-                                您的瀏覽器不支援影片播放
-                            </video>
-                        </div>
-                    `;
+                    const videoUrl = character.model.url;
+                    const youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+                    if (youtubeMatch) {
+                        modelContent.innerHTML = `
+                            <div class="model-video-wrapper">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=1&playlist=${youtubeMatch[1]}" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        `;
+                    } else {
+                        modelContent.innerHTML = `
+                            <div class="model-video-wrapper">
+                                <video controls loop muted playsinline>
+                                    <source src="${videoUrl}" type="video/mp4">
+                                    <source src="${videoUrl}" type="video/webm">
+                                    <source src="${videoUrl}" type="video/ogg">
+                                    您的瀏覽器不支援影片播放
+                                </video>
+                            </div>
+                        `;
+                    }
                 } else if (character.model.type === 'gif' || character.model.type === 'image') {
                     modelContent.innerHTML = `
                         <div class="model-image-wrapper">
