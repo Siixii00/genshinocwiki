@@ -781,7 +781,9 @@ const UI = {
             if (character.model?.type && character.model?.url) {
                 if (character.model.type === 'video') {
                     const videoUrl = character.model.url;
-                    const youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+                    const youtubeMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+                    const bilibiliMatch = videoUrl.match(/bilibili\.com\/video\/(BV[^/?]+)/);
+                    
                     if (youtubeMatch) {
                         modelContent.innerHTML = `
                             <div class="model-video-wrapper">
@@ -793,10 +795,20 @@ const UI = {
                                 </iframe>
                             </div>
                         `;
+                    } else if (bilibiliMatch) {
+                        modelContent.innerHTML = `
+                            <div class="model-video-wrapper">
+                                <iframe 
+                                    src="https://player.bilibili.com/player.html?bvid=${bilibiliMatch[1]}&autoplay=0" 
+                                    frameborder="0" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        `;
                     } else {
                         modelContent.innerHTML = `
                             <div class="model-video-wrapper">
-                                <video controls loop muted playsinline>
+                                <video controls loop playsinline preload="auto" style="max-width: 100%; max-height: 500px;">
                                     <source src="${videoUrl}" type="video/mp4">
                                     <source src="${videoUrl}" type="video/webm">
                                     <source src="${videoUrl}" type="video/ogg">
