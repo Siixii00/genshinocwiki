@@ -165,6 +165,7 @@ const GalleryUI = {
     renderItem(item) {
         const categoryLabel = GalleryData.getCategoryName(item.category);
         const videoUrl = item.videoUrl || item.url;
+        const imagePosition = item.image_position || 50;
         
         let mediaHtml;
         if (item.type === 'video') {
@@ -186,7 +187,7 @@ const GalleryUI = {
                 `;
             }
         } else {
-            mediaHtml = `<img src="${item.url}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=\\'video-placeholder\\'><span>圖片載入失敗</span></div>'">`;
+            mediaHtml = `<img src="${item.url}" alt="${item.title}" style="object-position: center ${imagePosition}%" onerror="this.parentElement.innerHTML='<div class=\\'video-placeholder\\'><span>圖片載入失敗</span></div>'">`;
         }
         
         return `
@@ -464,9 +465,11 @@ const Gallery = {
         if (type === 'video') {
             const videoInput = document.getElementById('media-video-url');
             data.url = videoInput ? videoInput.value : '';
+            document.getElementById('image-position-group').style.display = 'none';
         } else {
             const imageInput = document.getElementById('media-url');
             data.url = imageInput ? imageInput.value : '';
+            data.imagePosition = parseInt(document.getElementById('media-image-position')?.value || 50);
         }
         
         delete data.videoUrl;
@@ -510,11 +513,14 @@ const Gallery = {
         if (item.type === 'video') {
             document.getElementById('image-url-group').style.display = 'none';
             document.getElementById('video-url-group').style.display = 'block';
+            document.getElementById('image-position-group').style.display = 'none';
             document.getElementById('media-video-url').value = item.url || item.videoUrl || '';
         } else {
             document.getElementById('image-url-group').style.display = 'block';
             document.getElementById('video-url-group').style.display = 'none';
+            document.getElementById('image-position-group').style.display = 'block';
             document.getElementById('media-url').value = item.url || '';
+            document.getElementById('media-image-position').value = item.image_position || 50;
         }
         
         this.currentItemId = item.id;

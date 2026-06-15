@@ -92,23 +92,26 @@ const ShopUI = {
         if (!track || items.length === 0) return;
         
         const marqueeItems = items.slice(0, 10);
-        const content = marqueeItems.map(item => `
+        const content = marqueeItems.map(item => {
+            const imagePosition = item.image_position || 50;
+            return `
             <div class="marquee-item" data-id="${item.id}">
-                <img src="${item.main_image}" alt="${item.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22>No Image</text></svg>'">
+                <img src="${item.main_image}" alt="${item.name}" style="object-position: center ${imagePosition}%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22>No Image</text></svg>'">
                 <span class="marquee-item-name">${item.name}</span>
             </div>
-        `).join('');
+        `}).join('');
         
         track.innerHTML = content + content;
     },
     
     renderItem(item) {
         const categoryLabel = ShopData.getCategoryName(item.category);
+        const imagePosition = item.image_position || 50;
         
         return `
             <article class="shop-card" data-id="${item.id}">
                 <div class="shop-card-image">
-                    <img src="${item.main_image}" alt="${item.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22>No Image</text></svg>'">
+                    <img src="${item.main_image}" alt="${item.name}" style="object-position: center ${imagePosition}%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22>No Image</text></svg>'">
                 </div>
                 <div class="shop-card-info">
                     <h3 class="shop-card-name">${item.name}</h3>
@@ -351,6 +354,8 @@ const Shop = {
             data[key] = value;
         }
         
+        data.imagePosition = parseInt(document.getElementById('product-image-position')?.value || 50);
+        
         if (!data.name || !data.mainImage) {
             ShopUI.showToast('請填寫必要欄位', 'error');
             return;
@@ -385,6 +390,7 @@ const Shop = {
         document.getElementById('product-main-image').value = item.main_image || '';
         document.getElementById('product-description').value = item.description || '';
         document.getElementById('product-link').value = item.link || '';
+        document.getElementById('product-image-position').value = item.image_position || 50;
         
         const images = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
         document.getElementById('product-images').value = (images || []).join('\n');

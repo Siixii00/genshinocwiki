@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const items = await sql`
-        SELECT id, title, description, url, type, category, date, created_at, updated_at 
+        SELECT id, title, description, url, type, category, date, image_position, created_at, updated_at 
         FROM gallery 
         ORDER BY created_at DESC
       `;
@@ -22,9 +22,9 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const item = req.body;
       const [result] = await sql`
-        INSERT INTO gallery (title, description, url, type, category, date)
-        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null})
-        RETURNING id, title, description, url, type, category, date, created_at, updated_at
+        INSERT INTO gallery (title, description, url, type, category, date, image_position)
+        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null}, ${item.imagePosition || 50})
+        RETURNING id, title, description, url, type, category, date, image_position, created_at, updated_at
       `;
       return res.status(201).json(result);
     }
@@ -45,9 +45,10 @@ export default async function handler(req, res) {
           type = COALESCE(${updates.type}, type),
           category = COALESCE(${updates.category || updates.category === null ? updates.category : sql`category`}, category),
           date = COALESCE(${updates.date}, date),
+          image_position = COALESCE(${updates.imagePosition || updates.image_position}, image_position),
           updated_at = NOW()
         WHERE id = ${itemId}
-        RETURNING id, title, description, url, type, category, date, created_at, updated_at
+        RETURNING id, title, description, url, type, category, date, image_position, created_at, updated_at
       `;
       return res.status(200).json(result);
     }
