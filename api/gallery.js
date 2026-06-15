@@ -21,12 +21,11 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const item = req.body;
-      const maxOrder = await sql`SELECT COALESCE(MAX(sort_order), -1) as max FROM gallery`;
-      const sortOrder = (maxOrder[0]?.max ?? -1) + 1;
+      await sql`UPDATE gallery SET sort_order = sort_order + 1`;
       
       const [result] = await sql`
         INSERT INTO gallery (title, description, url, type, category, date, image_position, sort_order)
-        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null}, ${item.imagePosition || 50}, ${sortOrder})
+        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null}, ${item.imagePosition || 50}, 0)
         RETURNING id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at
       `;
       return res.status(201).json(result);

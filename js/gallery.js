@@ -293,6 +293,7 @@ const GalleryUI = {
                     await GalleryData.updateSortOrder(item.id, item.sortOrder);
                 }
                 
+                await GalleryData.loadFromApi();
                 GalleryUI.showToast('順序已更新');
             });
         });
