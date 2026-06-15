@@ -90,7 +90,6 @@ const UI = {
             'name', 'title', 'fullname', 'element', 'weapon', 'region', 'rarity',
             'gender', 'affiliation', 'constellation', 'vision', 'dish', 'birthday',
             'vaCn', 'vaJp', 'description', 'story',
-            'artwork', 'portrait', 'avatar', 'idcard',
             'modelType', 'modelUrl'
         ];
         
@@ -98,6 +97,19 @@ const UI = {
             const input = form.elements[field];
             if (input && character[field] !== undefined) {
                 input.value = character[field];
+        });
+        
+        const imageFields = {
+            'artwork': character.images?.artwork,
+            'portrait': character.images?.portrait,
+            'avatar': character.images?.avatar,
+            'idcard': character.images?.idcard
+        };
+        
+        Object.entries(imageFields).forEach(([field, url]) => {
+            const input = form.elements[field];
+            if (input && url) {
+                input.value = url;
             }
         });
         
@@ -120,6 +132,7 @@ const UI = {
         const imagePreviewMap = {
             'edit-artwork-preview': character.images?.artwork,
             'edit-portrait-preview': character.images?.portrait,
+            'edit-avatar-preview': character.images?.avatar,
             'edit-idcard-preview': character.images?.idcard
         };
         
@@ -866,6 +879,8 @@ const UI = {
                 img.addEventListener('click', () => {
                     this.showLightbox(url);
                 });
+            });
+        });
             }
         });
         
