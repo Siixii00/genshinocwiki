@@ -291,7 +291,7 @@ const GalleryUI = {
     getEmbedUrl(url) {
         if (!url) return null;
         
-        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/);
         if (youtubeMatch) {
             return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
         }
