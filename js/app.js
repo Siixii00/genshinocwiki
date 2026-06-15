@@ -27,7 +27,7 @@ const App = {
         this.setupAllImageUploads();
         this.bindModalEvents();
         this.bindCharacterGridEvents();
-        this.refreshCharacterList();
+        await this.refreshCharacterList();
     },
     
     bindAuthEvents() {
@@ -66,6 +66,36 @@ const App = {
     },
     
     setupAllImageUploads() {
+        const uploadFields = ['artwork', 'artwork2', 'portrait', 'avatar'];
+        
+        uploadFields.forEach(field => {
+            const btn = document.getElementById(`upload-${field}-btn`);
+            const fileInput = document.getElementById(`char-${field}-file`);
+            const hiddenInput = document.getElementById(`char-${field}`);
+            const preview = document.getElementById(`char-${field}-preview`);
+            
+            if (btn && fileInput && hiddenInput && preview) {
+                btn.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const base64 = event.target.result;
+                            hiddenInput.value = base64;
+                            preview.innerHTML = `<img src="${base64}" alt="預覽">`;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    },
+    
+    bindModalEvents() {
         const addBtn = document.getElementById('add-character-btn');
         if (addBtn) {
             addBtn.addEventListener('click', (e) => {
