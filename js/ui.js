@@ -2,16 +2,19 @@ const UI = {
     renderCharacterCard(character) {
         const rarityClass = character.rarity === 5 ? 'rarity-5' : 'rarity-4';
         const elementName = CharacterData.getElementName(character.element);
-        const portrait = character.portrait || character.avatar;
-        const portraitHtml = portrait 
-            ? `<img src="${portrait}" alt="${character.name}">`
+        const idcard = character.images?.idcard || character.idcard;
+        const avatar = character.images?.avatar || character.avatar;
+        const portrait = character.images?.portrait || character.portrait;
+        const cardImage = idcard || avatar || portrait;
+        const cardImageHtml = cardImage
+            ? `<img src="${cardImage}" alt="${character.name}">`
             : `<div style="width:100%;height:100%;background:var(--color-bg-secondary);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:600;">${character.name[0]}</div>`;
         
         return `
             <article class="character-card ${rarityClass}" data-id="${character.id}">
                 <div class="character-avatar">
                     <div class="avatar-ring">
-                        ${portraitHtml}
+                        ${cardImageHtml}
                     </div>
                     <span class="element-icon" style="color: var(--element-${character.element});">${elementName}</span>
                 </div>
