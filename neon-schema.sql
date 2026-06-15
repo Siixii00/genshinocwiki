@@ -89,6 +89,13 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_5 TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_vision TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS story_extra TEXT;
 
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS constellations JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS custom_images JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS normal_voices JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS combat_voices JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS model_type TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS model_url TEXT;
+
 -- 圖庫表
 CREATE TABLE IF NOT EXISTS gallery (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
