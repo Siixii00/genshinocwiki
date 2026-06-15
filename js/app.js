@@ -1,5 +1,21 @@
 const App = {
+    config: {
+        googleClientId: '807013160344-7u52pcr2s2cplmck6jdq0nija2nu0dks.apps.googleusercontent.com',
+        adminEmails: ['yaninlin@gmail.com'],
+        twoFactorEnabled: true
+    },
+    
     async init() {
+        Auth.init({
+            clientId: this.config.googleClientId,
+            adminEmails: this.config.adminEmails,
+            twoFactorEnabled: this.config.twoFactorEnabled
+        });
+        
+        MusicPlayer.init();
+        
+        this.bindAuthEvents();
+        
         await CharacterData.init();
         Filter.init();
         Filter.bindEvents();
@@ -11,7 +27,37 @@ const App = {
         this.setupAllImageUploads();
         this.bindModalEvents();
         this.bindCharacterGridEvents();
-        this.refreshCharacterList();
+        await this.refreshCharacterList();
+    },
+    
+    bindAuthEvents() {
+        document.getElementById('login-btn')?.addEventListener('click', () => {
+            Auth.login();
+        });
+        
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            Auth.logout();
+        });
+        
+        document.getElementById('twofa-submit')?.addEventListener('click', () => {
+            const code = document.getElementById('twofa-code').value;
+            Auth.verify2FA(code);
+        });
+        
+        document.getElementById('twofa-code')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const code = document.getElementById('twofa-code').value;
+                Auth.verify2FA(code);
+            }
+        });
+        
+        document.addEventListener('auth:login', () => {
+            this.refreshCharacterList(Filter.getFilters());
+        });
+        
+        document.addEventListener('auth:logout', () => {
+            this.refreshCharacterList(Filter.getFilters());
+        });
     },
     
     async refreshCharacterList(filters = {}) {
@@ -20,7 +66,7 @@ const App = {
     },
     
     setupAllImageUploads() {
-        const uploadFields = ['artwork', 'artwork2', 'portrait', 'avatar'];
+        const uploadFields = ['artwork', 'gacha-image', 'portrait', 'avatar'];
         
         uploadFields.forEach(field => {
             const btn = document.getElementById(`upload-${field}-btn`);
@@ -49,16 +95,15 @@ const App = {
         });
     },
     
-    refreshCharacterList(filters = {}) {
-        const characters = CharacterData.filter(filters);
-        UI.renderCharacterGrid(characters);
-    },
-    
     bindModalEvents() {
         const addBtn = document.getElementById('add-character-btn');
         if (addBtn) {
             addBtn.addEventListener('click', (e) => {
                 e.preventDefault();
+                if (!Auth.isLoggedIn()) {
+                    Auth.showToast('請先登入', 'error');
+                    return;
+                }
                 UI.showCharacterModal();
             });
         }
@@ -90,6 +135,12 @@ const App = {
         if (characterForm) {
             characterForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                
+                if (!Auth.isLoggedIn()) {
+                    Auth.showToast('請先登入', 'error');
+                    return;
+                }
+                
                 const formData = UI.getFormData(characterForm);
                 
                 if (characterForm.dataset.editId) {
@@ -138,10 +189,18 @@ const App = {
     },
     
     handleEdit(character) {
+        if (!Auth.isLoggedIn()) {
+            Auth.showToast('請先登入', 'error');
+            return;
+        }
         UI.showCharacterModal(true, character);
     },
     
     handleDelete(id) {
+        if (!Auth.isLoggedIn()) {
+            Auth.showToast('請先登入', 'error');
+            return;
+        }
         if (confirm('確定要刪除這個角色嗎？')) {
             if (CharacterData.delete(id)) {
                 UI.showToast('角色已刪除');

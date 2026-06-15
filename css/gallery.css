@@ -12,6 +12,39 @@
     margin-bottom: var(--spacing-lg);
 }
 
+.gallery-header-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.music-control-panel {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.music-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+}
+
+.music-toggle-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-accent-gold);
+}
+
+.music-toggle-label span {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
 .gallery-filters {
     display: flex;
     flex-wrap: wrap;
@@ -59,6 +92,24 @@
     transition: all var(--transition-normal);
 }
 
+.gallery-card[draggable="true"] {
+    cursor: grab;
+}
+
+.gallery-card[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.gallery-card.dragging {
+    opacity: 0.5;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.edit-mode .gallery-card[draggable="true"] {
+    cursor: grab;
+}
+
 .gallery-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
@@ -97,6 +148,42 @@
     font-size: 0.875rem;
     padding: 0 var(--spacing-sm);
     text-align: center;
+}
+
+.video-thumbnail {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.video-play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast);
+}
+
+.gallery-card:hover .video-play-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.video-play-overlay .play-icon {
+    font-size: 3rem;
+    color: white;
+    opacity: 0.9;
+    transition: transform var(--transition-fast);
+}
+
+.gallery-card:hover .video-play-overlay .play-icon {
+    transform: scale(1.1);
 }
 
 .gallery-card-info {

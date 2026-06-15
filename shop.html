@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>活動圖片 - 原神角色 Wiki</title>
+    <title>商品目錄 - 原神角色 Wiki</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/gallery.css">
+    <link rel="stylesheet" href="css/shop.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/music-player.css">
 </head>
@@ -24,109 +24,97 @@
             </div>
             <nav class="main-nav">
                 <a href="/" class="nav-tab">角色列表</a>
-                <a href="/gallery" class="nav-tab active">活動圖片</a>
-                <a href="/shop" class="nav-tab">商品目錄</a>
+                <a href="/gallery" class="nav-tab">活動圖片</a>
+                <a href="/shop" class="nav-tab active">商品目錄</a>
             </nav>
         </div>
     </header>
 
-    <main class="main-content gallery-page">
-        <div class="gallery-header">
-            <h2>活動圖片</h2>
-            <div class="gallery-header-actions">
-                <button class="btn btn-primary" id="add-media-btn" style="display:none;">新增媒體</button>
-            </div>
-        </div>
-        
-        <div class="music-control-panel" id="music-control-panel" style="display:none;">
-            <label class="music-toggle-label">
-                <input type="checkbox" id="music-autoplay-toggle" checked>
-                <span>自動播放 SoundCloud</span>
-            </label>
+    <main class="main-content shop-page">
+        <div class="shop-header">
+            <h2>商品目錄</h2>
+            <button class="btn btn-primary" id="add-product-btn" style="display:none;">新增商品</button>
         </div>
 
-        <div class="gallery-filters">
+        <div class="marquee-section" id="marquee-section">
+            <div class="marquee-container">
+                <div class="marquee-track" id="marquee-track">
+                </div>
+            </div>
+        </div>
+
+        <div class="shop-filters">
             <button class="filter-btn active" data-category="all">全部</button>
-            <button class="filter-btn" data-category="official">官方活動</button>
-            <button class="filter-btn" data-category="festival">節日賀圖</button>
-            <button class="filter-btn" data-category="pv">宣傳PV</button>
-            <button class="filter-btn" data-category="wallpaper">桌布</button>
+            <button class="filter-btn" data-category="figure">模型</button>
+            <button class="filter-btn" data-category="merch">周邊</button>
+            <button class="filter-btn" data-category="plush">玩偶</button>
+            <button class="filter-btn" data-category="accessory">配件</button>
             <button class="filter-btn" data-category="other">其他</button>
         </div>
 
-        <div class="gallery-tabs">
-            <button class="gallery-tab active" data-type="all">全部</button>
-            <button class="gallery-tab" data-type="image">圖片</button>
-            <button class="gallery-tab" data-type="video">影片</button>
-        </div>
-
-        <div class="gallery-grid" id="gallery-grid">
+        <div class="shop-grid" id="shop-grid">
         </div>
     </main>
 
-    <div class="modal" id="media-modal">
+    <div class="modal" id="product-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="media-modal-title">新增媒體</h2>
-                <button class="modal-close" id="media-modal-close">&times;</button>
+                <h2 id="product-modal-title">新增商品</h2>
+                <button class="modal-close" id="product-modal-close">&times;</button>
             </div>
-            <form id="media-form" class="character-form">
+            <form id="product-form" class="character-form">
                 <div class="form-group">
-                    <label for="media-title">標題 *</label>
-                    <input type="text" id="media-title" name="title" required>
+                    <label for="product-name">商品名稱 *</label>
+                    <input type="text" id="product-name" name="name" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="media-type">類型 *</label>
-                    <select id="media-type" name="type" required>
-                        <option value="">選擇類型</option>
-                        <option value="image">圖片</option>
-                        <option value="video">影片</option>
-                    </select>
-                </div>
-
-                <div class="form-group" id="image-url-group">
-                    <label for="media-url">圖片連結 *</label>
-                    <input type="url" id="media-url" name="url" placeholder="https://...">
-                    <p class="form-hint">支援 jpg、png、gif、webp 等圖片格式</p>
-                </div>
-
-                <div class="form-group" id="video-url-group" style="display:none">
-                    <label for="media-video-url">影片連結 *</label>
-                    <input type="url" id="media-video-url" name="videoUrl" placeholder="YouTube / Bilibili / mp4連結">
-                    <p class="form-hint">支援 YouTube、Bilibili 連結或 mp4 直接連結</p>
+                    <label for="product-price">價格</label>
+                    <input type="text" id="product-price" name="price" placeholder="例如: ¥1200">
                 </div>
 
                 <div class="form-group">
-                    <label for="media-category">分類 *</label>
-                    <select id="media-category" name="category" required>
+                    <label for="product-category">分類 *</label>
+                    <select id="product-category" name="category" required>
                         <option value="">選擇分類</option>
-                        <option value="official">官方活動</option>
-                        <option value="festival">節日賀圖</option>
-                        <option value="pv">宣傳PV</option>
-                        <option value="wallpaper">桌布</option>
+                        <option value="figure">模型</option>
+                        <option value="merch">周邊</option>
+                        <option value="plush">玩偶</option>
+                        <option value="accessory">配件</option>
                         <option value="other">其他</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="media-description">描述</label>
-                    <textarea id="media-description" name="description" rows="2"></textarea>
+                    <label for="product-main-image">主圖連結 *</label>
+                    <input type="url" id="product-main-image" name="mainImage" placeholder="https://..." required>
+                    <p class="form-hint">商品主要展示圖片</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="media-date">日期</label>
-                    <input type="date" id="media-date" name="date">
+                    <label for="product-images">相簿圖片連結</label>
+                    <textarea id="product-images" name="images" rows="3" placeholder="每行一個連結，例如:&#10;https://...&#10;https://..."></textarea>
+                    <p class="form-hint">可輸入多個圖片連結，每行一個</p>
                 </div>
 
-                <div class="form-group" id="image-position-group">
-                    <label for="media-image-position">圖片位置調整</label>
-                    <input type="range" id="media-image-position" name="imagePosition" min="0" max="100" value="50">
+                <div class="form-group">
+                    <label for="product-description">描述</label>
+                    <textarea id="product-description" name="description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-link">購買連結</label>
+                    <input type="url" id="product-link" name="link" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-image-position">主圖位置調整</label>
+                    <input type="range" id="product-image-position" name="imagePosition" min="0" max="100" value="50">
                     <p class="form-hint">調整縮圖的垂直位置 (0=頂部, 50=置中, 100=底部)</p>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="media-cancel">取消</button>
+                    <button type="button" class="btn btn-secondary" id="product-cancel">取消</button>
                     <button type="submit" class="btn btn-primary">儲存</button>
                 </div>
             </form>
@@ -140,8 +128,11 @@
             </div>
             <div class="preview-info">
                 <h3 id="preview-title"></h3>
+                <p id="preview-price"></p>
                 <p id="preview-description"></p>
+                <div class="preview-gallery" id="preview-gallery"></div>
                 <div class="preview-actions">
+                    <a id="preview-link" class="btn btn-primary" target="_blank" rel="noopener" style="display:none;">購買連結</a>
                     <button class="btn btn-secondary" id="preview-edit">編輯</button>
                     <button class="btn btn-danger" id="preview-delete">刪除</button>
                 </div>
@@ -182,8 +173,7 @@
     <script src="js/auth.js"></script>
     <script src="js/music-player.js"></script>
     <script src="js/api-client.js"></script>
-    <script src="js/character-data.js"></script>
-    <script src="js/gallery.js"></script>
+    <script src="js/shop.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             Auth.init({

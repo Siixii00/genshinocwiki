@@ -12,21 +12,20 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const items = await sql`
-        SELECT id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at 
-        FROM gallery 
-        ORDER BY sort_order ASC, created_at DESC
+        SELECT * FROM products 
+        ORDER BY created_at DESC
       `;
       return res.status(200).json(items);
     }
 
     if (req.method === 'POST') {
       const item = req.body;
-      await sql`UPDATE gallery SET sort_order = sort_order + 1`;
+      const images = Array.isArray(item.images) ? item.images : (item.images ? item.images.split('\n').filter(Boolean) : []);
       
       const [result] = await sql`
-        INSERT INTO gallery (title, description, url, type, category, date, image_position, sort_order)
-        VALUES (${item.title}, ${item.description || null}, ${item.url || item.videoUrl}, ${item.type || 'image'}, ${item.category || null}, ${item.date || null}, ${item.imagePosition || 50}, 0)
-        RETURNING id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at
+        INSERT INTO products (name, price, category, main_image, images, description, link, image_position)
+        VALUES (${item.name}, ${item.price || null}, ${item.category}, ${item.mainImage || item.main_image}, ${JSON.stringify(images)}, ${item.description || null}, ${item.link || null}, ${item.imagePosition || 50})
+        RETURNING *
       `;
       return res.status(201).json(result);
     }
@@ -39,23 +38,21 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing id' });
       }
 
-      if (updates.sortOrder !== undefined) {
-        await sql`UPDATE gallery SET sort_order = ${updates.sortOrder} WHERE id = ${itemId}`;
-        return res.status(200).json({ success: true });
-      }
+      const images = Array.isArray(updates.images) ? updates.images : (updates.images ? updates.images.split('\n').filter(Boolean) : []);
 
       const [result] = await sql`
-        UPDATE gallery SET
-          title = COALESCE(${updates.title}, title),
+        UPDATE products SET
+          name = COALESCE(${updates.name}, name),
+          price = COALESCE(${updates.price || updates.price === null ? updates.price : sql`price`}, price),
+          category = COALESCE(${updates.category}, category),
+          main_image = COALESCE(${updates.mainImage || updates.main_image}, main_image),
+          images = COALESCE(${JSON.stringify(images)}, images),
           description = COALESCE(${updates.description || updates.description === null ? updates.description : sql`description`}, description),
-          url = COALESCE(${updates.url || updates.videoUrl}, url),
-          type = COALESCE(${updates.type}, type),
-          category = COALESCE(${updates.category || updates.category === null ? updates.category : sql`category`}, category),
-          date = COALESCE(${updates.date}, date),
+          link = COALESCE(${updates.link || updates.link === null ? updates.link : sql`link`}, link),
           image_position = COALESCE(${updates.imagePosition || updates.image_position}, image_position),
           updated_at = NOW()
         WHERE id = ${itemId}
-        RETURNING id, title, description, url, type, category, date, image_position, sort_order, created_at, updated_at
+        RETURNING *
       `;
       return res.status(200).json(result);
     }
@@ -65,7 +62,7 @@ export default async function handler(req, res) {
       if (!id) {
         return res.status(400).json({ error: 'Missing id' });
       }
-      await sql`DELETE FROM gallery WHERE id = ${id}`;
+      await sql`DELETE FROM products WHERE id = ${id}`;
       return res.status(200).json({ success: true });
     }
 

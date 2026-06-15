@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>原神角色 Wiki</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/music-player.css">
 </head>
 <body>
     <header class="header">
@@ -18,8 +20,9 @@
                 <h1>原神角色 Wiki</h1>
             </div>
             <nav class="main-nav">
-                <a href="index.html" class="nav-tab active">角色列表</a>
-                <a href="gallery.html" class="nav-tab">活動圖片</a>
+                <a href="/" class="nav-tab active">角色列表</a>
+                <a href="/gallery" class="nav-tab">活動圖片</a>
+                <a href="/shop" class="nav-tab">商品目錄</a>
                 <a href="#" class="nav-tab" id="add-character-btn">新增角色</a>
             </nav>
         </div>
@@ -187,17 +190,17 @@
                                 <input type="hidden" id="char-artwork" name="artwork">
                             </div>
                             <div class="image-upload-item">
-                                <div class="image-preview-large" id="char-artwork2-preview">
-                                    <span>立繪二</span>
+                                <div class="image-preview-large" id="char-gacha-image-preview">
+                                    <span>抽卡介面</span>
                                 </div>
-                                <input type="file" id="char-artwork2-file" accept="image/*" style="display:none">
-                                <button type="button" class="btn btn-sm btn-secondary" id="upload-artwork2-btn">選擇</button>
-                                <input type="hidden" id="char-artwork2" name="artwork2">
+                                <input type="file" id="char-gacha-image-file" accept="image/*" style="display:none">
+                                <button type="button" class="btn btn-sm btn-secondary" id="upload-gacha-image-btn">選擇</button>
+                                <input type="hidden" id="char-gacha-image" name="gachaImage">
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>角色方卡（頭像）</label>
+                        <label>角色圖片</label>
                         <div class="image-upload-row">
                             <div class="image-upload-item">
                                 <div class="image-preview-square" id="char-portrait-preview">
@@ -208,8 +211,8 @@
                                 <input type="hidden" id="char-portrait" name="portrait">
                             </div>
                             <div class="image-upload-item">
-                                <div class="image-preview-square" id="avatar-preview">
-                                    <span>頭像</span>
+                                <div class="image-preview-circle" id="char-avatar-preview">
+                                    <span>大頭貼</span>
                                 </div>
                                 <input type="file" id="char-avatar-file" accept="image/*" style="display:none">
                                 <button type="button" class="btn btn-sm btn-secondary" id="upload-avatar-btn">選擇</button>
@@ -299,9 +302,82 @@
                 </div>
 
                 <div class="form-section">
+                    <h4 class="form-section-title">固有天賦</h4>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>固有天賦1名稱</label>
+                            <input type="text" id="passive-1-name" name="passive1Name">
+                        </div>
+                        <div class="form-group">
+                            <label>固有天賦1描述</label>
+                            <textarea id="passive-1-desc" name="passive1Desc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>固有天賦2名稱</label>
+                            <input type="text" id="passive-2-name" name="passive2Name">
+                        </div>
+                        <div class="form-group">
+                            <label>固有天賦2描述</label>
+                            <textarea id="passive-2-desc" name="passive2Desc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group">
+                        <div class="form-group">
+                            <label>固有天賦3名稱</label>
+                            <input type="text" id="passive-3-name" name="passive3Name">
+                        </div>
+                        <div class="form-group">
+                            <label>固有天賦3描述</label>
+                            <textarea id="passive-3-desc" name="passive3Desc" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="skill-input-group" id="passive-extra-group">
+                        <div class="form-group">
+                            <label>額外天賦名稱（可選）</label>
+                            <input type="text" id="passive-extra-name" name="passiveExtraName">
+                        </div>
+                        <div class="form-group">
+                            <label>額外天賦描述</label>
+                            <textarea id="passive-extra-desc" name="passiveExtraDesc" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
                     <h4 class="form-section-title">角色故事</h4>
                     <div class="form-group">
-                        <textarea id="char-story" name="story" rows="4" placeholder="輸入角色背景故事..."></textarea>
+                        <label for="char-story-detail">角色詳細</label>
+                        <textarea id="char-story-detail" name="storyDetail" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-1">角色故事1</label>
+                        <textarea id="char-story-1" name="story1" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-2">角色故事2</label>
+                        <textarea id="char-story-2" name="story2" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-3">角色故事3</label>
+                        <textarea id="char-story-3" name="story3" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-4">角色故事4</label>
+                        <textarea id="char-story-4" name="story4" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-5">角色故事5</label>
+                        <textarea id="char-story-5" name="story5" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-vision">神之眼</label>
+                        <textarea id="char-story-vision" name="storyVision" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="char-story-extra">額外故事（可選）</label>
+                        <textarea id="char-story-extra" name="storyExtra" rows="2"></textarea>
                     </div>
                 </div>
 
@@ -315,8 +391,36 @@
 
     <footer class="footer">
         <p>原神角色 Wiki &copy; 2026</p>
+        <div class="footer-actions">
+            <div id="user-info" class="user-info" style="display:none;"></div>
+            <button id="login-btn" class="edit-toggle-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                登入編輯
+            </button>
+            <button id="logout-btn" class="edit-toggle-btn" style="display:none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                登出
+            </button>
+        </div>
     </footer>
 
+    <div class="twofa-modal" id="twofa-modal">
+        <div class="twofa-content">
+            <h3>二階段驗證</h3>
+            <p>請輸入 6 位數驗證碼</p>
+            <div id="twofa-qrcode" class="twofa-qrcode"></div>
+            <div id="twofa-secret-display" class="twofa-secret-display"></div>
+            <input type="text" id="twofa-code" class="twofa-input" maxlength="6" placeholder="000000">
+            <button id="twofa-submit" class="twofa-submit">驗證</button>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/music-player.js"></script>
     <script src="js/api-client.js"></script>
     <script src="js/character-data.js"></script>
     <script src="js/filter.js"></script>

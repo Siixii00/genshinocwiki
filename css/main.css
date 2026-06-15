@@ -181,9 +181,17 @@ h4 { font-size: 1.125rem; }
     background: var(--color-bg-secondary);
     border-top: 1px solid var(--color-border);
     padding: var(--spacing-md);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     color: var(--color-text-muted);
     font-size: 0.875rem;
+}
+
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
 }
 
 .visually-hidden {

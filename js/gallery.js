@@ -1,5 +1,7 @@
 const GalleryData = {
     STORAGE_KEY: 'genshin_gallery',
+    useApi: true,
+    cachedGallery: null,
     
     defaultItems: [
         {
@@ -13,13 +15,27 @@ const GalleryData = {
         }
     ],
     
-    init() {
-        if (!localStorage.getItem(this.STORAGE_KEY)) {
-            this.saveAll(this.defaultItems);
+    async init() {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            try {
+                this.cachedGallery = await ApiClient.getGallery();
+            } catch (e) {
+                console.warn('Gallery API unavailable, using localStorage');
+                this.useApi = false;
+                this.initLocalStorage();
+            }
+        } else {
+            this.initLocalStorage();
         }
     },
     
-    getAll() {
+    initLocalStorage() {
+        if (!localStorage.getItem(this.STORAGE_KEY)) {
+            this.saveAllLocal(this.defaultItems);
+        }
+    },
+    
+    getAllLocal() {
         try {
             const data = localStorage.getItem(this.STORAGE_KEY);
             return data ? JSON.parse(data) : [];
@@ -29,12 +45,19 @@ const GalleryData = {
         }
     },
     
-    getById(id) {
-        const items = this.getAll();
+    async getAll() {
+        if (this.useApi) {
+            return this.cachedGallery || await ApiClient.getGallery();
+        }
+        return this.getAllLocal();
+    },
+    
+    async getById(id) {
+        const items = await this.getAll();
         return items.find(item => item.id === id) || null;
     },
     
-    saveAll(items) {
+    saveAllLocal(items) {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items));
             return true;
@@ -44,30 +67,76 @@ const GalleryData = {
         }
     },
     
-    add(item) {
-        const items = this.getAll();
+    async add(item) {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            const added = await ApiClient.addGalleryItem(item);
+            if (added) {
+                this.cachedGallery = await ApiClient.getGallery();
+            }
+            return added;
+        }
+        
+        const items = this.getAllLocal();
         item.id = Date.now().toString();
         items.unshift(item);
-        return this.saveAll(items) ? item : null;
+        return this.saveAllLocal(items) ? item : null;
     },
     
-    update(id, updates) {
-        const items = this.getAll();
+    async update(id, updates) {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            const updated = await ApiClient.updateGalleryItem(id, updates);
+            if (updated) {
+                this.cachedGallery = await ApiClient.getGallery();
+            }
+            return updated;
+        }
+        
+        const items = this.getAllLocal();
         const index = items.findIndex(item => item.id === id);
         if (index === -1) return null;
         
         items[index] = { ...items[index], ...updates };
-        return this.saveAll(items) ? items[index] : null;
+        return this.saveAllLocal(items) ? items[index] : null;
     },
     
-    delete(id) {
-        const items = this.getAll();
+    async delete(id) {
+        if (this.useApi && typeof ApiClient !== 'undefined') {
+            const result = await ApiClient.deleteGalleryItem(id);
+            if (result.success) {
+                this.cachedGallery = await ApiClient.getGallery();
+            }
+            return result.success;
+        }
+        
+        const items = this.getAllLocal();
         const filtered = items.filter(item => item.id !== id);
-        return this.saveAll(filtered);
+        return this.saveAllLocal(filtered);
     },
     
-    filter(filters = {}) {
-        let items = this.getAll();
+    async updateSortOrder(id, sortOrder) {
+        try {
+            await fetch('/api/gallery', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, sortOrder })
+            });
+            await this.loadFromApi();
+        } catch (e) {
+            console.error('Failed to update sort order:', e);
+        }
+    },
+    
+    async loadFromApi() {
+        try {
+            const response = await fetch('/api/gallery');
+            this.cachedGallery = await response.json();
+        } catch (e) {
+            console.error('Failed to load gallery:', e);
+        }
+    },
+    
+    async filter(filters = {}) {
+        let items = await this.getAll();
         
         if (filters.category && filters.category !== 'all') {
             items = items.filter(item => item.category === filters.category);
@@ -93,23 +162,58 @@ const GalleryData = {
 };
 
 const GalleryUI = {
+    getVideoThumbnail(url) {
+        if (!url) return null;
+        
+        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+        if (youtubeMatch) {
+            return `https://img.youtube.com/vi/${youtubeMatch[1]}/mqdefault.jpg`;
+        }
+        
+        const bilibiliMatch = url.match(/bilibili\.com\/video\/(BV[a-zA-Z0-9]+)/);
+        if (bilibiliMatch) {
+            return null;
+        }
+        
+        return null;
+    },
+    
+    extractYouTubeId(url) {
+        if (!url) return null;
+        const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+        return match ? match[1] : null;
+    },
+    
     renderItem(item) {
         const categoryLabel = GalleryData.getCategoryName(item.category);
+        const videoUrl = item.videoUrl || item.url;
+        const imagePosition = item.image_position || 50;
         
         let mediaHtml;
         if (item.type === 'video') {
-            mediaHtml = `
-                <div class="video-placeholder">
-                    <span class="play-icon">▶</span>
-                    <span class="video-title">${item.title}</span>
-                </div>
-            `;
+            const youtubeId = this.extractYouTubeId(videoUrl);
+            if (youtubeId) {
+                mediaHtml = `
+                    <div class="video-thumbnail" style="background-image: url('https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg')">
+                        <div class="video-play-overlay">
+                            <span class="play-icon">▶</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                mediaHtml = `
+                    <div class="video-placeholder">
+                        <span class="play-icon">▶</span>
+                        <span class="video-title">${item.title}</span>
+                    </div>
+                `;
+            }
         } else {
-            mediaHtml = `<img src="${item.url}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div class=\\'video-placeholder\\'><span>圖片載入失敗</span></div>'">`;
+            mediaHtml = `<img src="${item.url}" alt="${item.title}" style="object-position: center ${imagePosition}%" onerror="this.parentElement.innerHTML='<div class=\\'video-placeholder\\'><span>圖片載入失敗</span></div>'">`;
         }
         
         return `
-            <article class="gallery-card" data-id="${item.id}" data-type="${item.type}">
+            <article class="gallery-card" data-id="${item.id}" data-type="${item.type}" draggable="true">
                 <div class="gallery-card-media">
                     ${mediaHtml}
                 </div>
@@ -139,6 +243,60 @@ const GalleryUI = {
         } else {
             grid.innerHTML = items.map(item => this.renderItem(item)).join('');
         }
+        
+        this.setupDragAndDrop();
+    },
+    
+    setupDragAndDrop() {
+        const grid = document.getElementById('gallery-grid');
+        if (!grid) return;
+        
+        let draggedItem = null;
+        
+        grid.querySelectorAll('.gallery-card').forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                if (!Auth.isLoggedIn()) return;
+                draggedItem = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                draggedItem = null;
+            });
+            
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (!draggedItem || draggedItem === card) return;
+                
+                const rect = card.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                
+                if (e.clientY < midY) {
+                    card.parentNode.insertBefore(draggedItem, card);
+                } else {
+                    card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                }
+            });
+            
+            card.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                if (!Auth.isLoggedIn()) return;
+                
+                const newOrder = [...grid.querySelectorAll('.gallery-card')].map((c, i) => ({
+                    id: c.dataset.id,
+                    sortOrder: i
+                }));
+                
+                for (const item of newOrder) {
+                    await GalleryData.updateSortOrder(item.id, item.sortOrder);
+                }
+                
+                await GalleryData.loadFromApi();
+                GalleryUI.showToast('順序已更新');
+            });
+        });
     },
     
     showModal(modalId) {
@@ -174,6 +332,8 @@ const GalleryUI = {
     },
     
     showPreview(item) {
+        console.log('showPreview item:', item);
+        
         const container = document.getElementById('preview-container');
         const title = document.getElementById('preview-title');
         const description = document.getElementById('preview-description');
@@ -184,11 +344,18 @@ const GalleryUI = {
         description.textContent = item.description || '';
         
         if (item.type === 'video') {
-            const embedUrl = this.getEmbedUrl(item.videoUrl || item.url);
+            const videoUrl = item.videoUrl || item.url;
+            console.log('videoUrl:', videoUrl);
+            
+            const embedUrl = this.getEmbedUrl(videoUrl);
+            console.log('embedUrl:', embedUrl);
+            
             if (embedUrl) {
-                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+                container.innerHTML = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            } else if (videoUrl) {
+                container.innerHTML = `<video src="${videoUrl}" controls autoplay style="max-width:100%;max-height:70vh;"></video>`;
             } else {
-                container.innerHTML = `<video src="${item.videoUrl || item.url}" controls autoplay></video>`;
+                container.innerHTML = `<div style="color:white;padding:2rem;text-align:center;">無法載入影片</div>`;
             }
         } else {
             container.innerHTML = `<img src="${item.url}" alt="${item.title}">`;
@@ -201,7 +368,7 @@ const GalleryUI = {
     getEmbedUrl(url) {
         if (!url) return null;
         
-        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
+        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/);
         if (youtubeMatch) {
             return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
         }
@@ -223,19 +390,33 @@ const Gallery = {
     currentItemId: null,
     editMode: false,
     
-    init() {
-        GalleryData.init();
+    async init() {
+        await GalleryData.init();
         this.bindEvents();
-        this.refresh();
+        await this.refresh();
     },
     
-    refresh() {
-        const items = GalleryData.filter(this.currentFilters);
+    async refresh() {
+        const items = await GalleryData.filter(this.currentFilters);
         GalleryUI.renderGrid(items);
     },
     
     bindEvents() {
+        document.addEventListener('auth:login', () => {
+            this.updateEditButtons(true);
+        });
+        
+        document.addEventListener('auth:logout', () => {
+            this.updateEditButtons(false);
+        });
+        
+        this.updateEditButtons(Auth.isLoggedIn());
+        
         document.getElementById('add-media-btn')?.addEventListener('click', () => {
+            if (!Auth.isLoggedIn()) {
+                GalleryUI.showToast('請先登入', 'error');
+                return;
+            }
             this.editMode = false;
             document.getElementById('media-modal-title').textContent = '新增媒體';
             document.getElementById('media-form').reset();
@@ -270,28 +451,29 @@ const Gallery = {
         });
         
         document.querySelectorAll('.gallery-filters .filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 document.querySelectorAll('.gallery-filters .filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.currentFilters.category = btn.dataset.category;
-                this.refresh();
+                await this.refresh();
             });
         });
         
         document.querySelectorAll('.gallery-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', async () => {
                 document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 this.currentFilters.type = tab.dataset.type;
-                this.refresh();
+                await this.refresh();
             });
         });
         
-        document.getElementById('gallery-grid')?.addEventListener('click', (e) => {
+        document.getElementById('gallery-grid')?.addEventListener('click', async (e) => {
             const card = e.target.closest('.gallery-card');
             if (card) {
-                const item = GalleryData.getById(card.dataset.id);
+                const item = await GalleryData.getById(card.dataset.id);
                 if (item) {
+                    this.currentItemId = item.id;
                     GalleryUI.showPreview(item);
                 }
             }
@@ -309,18 +491,26 @@ const Gallery = {
             }
         });
         
-        document.getElementById('preview-delete')?.addEventListener('click', () => {
+        document.getElementById('preview-delete')?.addEventListener('click', async () => {
+            if (!Auth.isLoggedIn()) {
+                GalleryUI.showToast('請先登入', 'error');
+                return;
+            }
             if (this.currentItemId && confirm('確定要刪除此媒體嗎？')) {
-                GalleryData.delete(this.currentItemId);
+                await GalleryData.delete(this.currentItemId);
                 GalleryUI.hideModal('preview-modal');
                 document.getElementById('preview-container').innerHTML = '';
                 GalleryUI.showToast('已刪除');
-                this.refresh();
+                await this.refresh();
             }
         });
         
-        document.getElementById('preview-edit')?.addEventListener('click', () => {
-            const item = GalleryData.getById(this.currentItemId);
+        document.getElementById('preview-edit')?.addEventListener('click', async () => {
+            if (!Auth.isLoggedIn()) {
+                GalleryUI.showToast('請先登入', 'error');
+                return;
+            }
+            const item = await GalleryData.getById(this.currentItemId);
             if (item) {
                 this.editMode = true;
                 this.populateEditForm(item);
@@ -337,7 +527,7 @@ const Gallery = {
         });
     },
     
-    handleFormSubmit() {
+    async handleFormSubmit() {
         const form = document.getElementById('media-form');
         const formData = new FormData(form);
         const data = {};
@@ -346,20 +536,36 @@ const Gallery = {
             data[key] = value;
         }
         
-        if (data.type === 'video') {
-            data.url = data.videoUrl;
-            delete data.videoUrl;
+        const type = document.getElementById('media-type').value;
+        
+        if (type === 'video') {
+            const videoInput = document.getElementById('media-video-url');
+            data.url = videoInput ? videoInput.value : '';
+            document.getElementById('image-position-group').style.display = 'none';
+        } else {
+            const imageInput = document.getElementById('media-url');
+            data.url = imageInput ? imageInput.value : '';
+            data.imagePosition = parseInt(document.getElementById('media-image-position')?.value || 50);
+        }
+        
+        delete data.videoUrl;
+        
+        console.log('Processed data:', data);
+        
+        if (!data.url) {
+            GalleryUI.showToast('請輸入連結', 'error');
+            return;
         }
         
         if (this.editMode && this.currentItemId) {
-            const updated = GalleryData.update(this.currentItemId, data);
+            const updated = await GalleryData.update(this.currentItemId, data);
             if (updated) {
                 GalleryUI.showToast('已更新');
             } else {
                 GalleryUI.showToast('更新失敗', 'error');
             }
         } else {
-            const added = GalleryData.add(data);
+            const added = await GalleryData.add(data);
             if (added) {
                 GalleryUI.showToast('已新增');
             } else {
@@ -368,7 +574,7 @@ const Gallery = {
         }
         
         GalleryUI.hideModal('media-modal');
-        this.refresh();
+        await this.refresh();
         this.editMode = false;
     },
     
@@ -383,16 +589,41 @@ const Gallery = {
         if (item.type === 'video') {
             document.getElementById('image-url-group').style.display = 'none';
             document.getElementById('video-url-group').style.display = 'block';
+            document.getElementById('image-position-group').style.display = 'none';
             document.getElementById('media-video-url').value = item.url || item.videoUrl || '';
         } else {
             document.getElementById('image-url-group').style.display = 'block';
             document.getElementById('video-url-group').style.display = 'none';
+            document.getElementById('image-position-group').style.display = 'block';
             document.getElementById('media-url').value = item.url || '';
+            document.getElementById('media-image-position').value = item.image_position || 50;
         }
         
         this.currentItemId = item.id;
+    },
+    
+    updateEditButtons(isLoggedIn) {
+        const previewActions = document.querySelector('.preview-actions');
+        const addBtn = document.getElementById('add-media-btn');
+        const musicControl = document.getElementById('music-control-panel');
+        
+        if (previewActions) {
+            previewActions.style.display = isLoggedIn ? 'flex' : 'none';
+        }
+        
+        if (addBtn) {
+            addBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+        }
+        
+        if (musicControl) {
+            musicControl.style.display = isLoggedIn ? 'flex' : 'none';
+        }
     }
 };
+
+if (typeof window !== 'undefined') {
+    window.GalleryData = GalleryData;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     Gallery.init();

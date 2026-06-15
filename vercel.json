@@ -2,6 +2,12 @@
   "buildCommand": "npm install",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/gallery", "destination": "/gallery.html" },
+    { "source": "/shop", "destination": "/shop.html" },
+    { "source": "/index", "destination": "/index.html" },
+    { "source": "/character", "destination": "/character.html" }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
 }
