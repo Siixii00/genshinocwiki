@@ -171,6 +171,7 @@ h4 { font-size: 1.125rem; }
     padding: var(--spacing-lg);
     gap: var(--spacing-lg);
     width: 100%;
+    min-height: auto;
 }
 
 .main-content.detail-page {
