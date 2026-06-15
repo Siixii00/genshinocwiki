@@ -602,7 +602,7 @@ const UI = {
         
         const portraitImg = document.getElementById('portrait-image');
         if (portraitImg) {
-            portraitImg.src = character.images?.idcard || character.images?.portrait || '';
+            portraitImg.src = character.images?.portrait || character.images?.idcard || '';
         }
         
         const galleryArtwork = document.getElementById('gallery-artwork');
