@@ -458,16 +458,17 @@ const Gallery = {
             data[key] = value;
         }
         
-        if (data.type === 'video') {
+        const type = document.getElementById('media-type').value;
+        
+        if (type === 'video') {
             const videoInput = document.getElementById('media-video-url');
-            data.videoUrl = videoInput ? videoInput.value : (data.videoUrl || data.url || '');
-            data.url = data.videoUrl;
-            console.log('Video URL from input:', data.videoUrl);
+            data.url = videoInput ? videoInput.value : '';
         } else {
             const imageInput = document.getElementById('media-url');
-            data.url = imageInput ? imageInput.value : (data.url || '');
-            delete data.videoUrl;
+            data.url = imageInput ? imageInput.value : '';
         }
+        
+        delete data.videoUrl;
         
         console.log('Processed data:', data);
         
