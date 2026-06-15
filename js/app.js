@@ -6,15 +6,18 @@ const App = {
     },
     
     async init() {
-        Auth.init({
-            clientId: this.config.googleClientId,
-            adminEmails: this.config.adminEmails,
-            twoFactorEnabled: this.config.twoFactorEnabled
-        });
+        if (typeof Auth !== 'undefined') {
+            await Auth.init({
+                clientId: this.config.googleClientId,
+                adminEmails: this.config.adminEmails,
+                twoFactorEnabled: this.config.twoFactorEnabled
+            });
+            this.bindAuthEvents();
+        }
         
-        MusicPlayer.init();
-        
-        this.bindAuthEvents();
+        if (typeof MusicPlayer !== 'undefined') {
+            MusicPlayer.init();
+        }
         
         await CharacterData.init();
         Filter.init();
