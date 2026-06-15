@@ -442,6 +442,18 @@ const UI = {
             combat: this.getVoicesData('combat')
         };
         
+        data.images = {
+            artwork: data.artwork || null,
+            portrait: data.portrait || null,
+            avatar: data.avatar || null,
+            idcard: data.idcard || null
+        };
+        
+        delete data.artwork;
+        delete data.portrait;
+        delete data.avatar;
+        delete data.idcard;
+        
         return data;
     },
     
