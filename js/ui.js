@@ -210,7 +210,7 @@ const UI = {
         
         const constellationImageInput = document.getElementById('edit-constellation-image');
         const constellationBgPreview = document.getElementById('constellation-bg-preview');
-        const bgSettings = character.constellationBgSettings || { scale: 100, posX: 50, posY: 50 };
+        const bgSettings = character.constellationBgSettings || { scale: 100, posX: 50, posY: 50, nodeSize: 80 };
         
         if (constellationImageInput) {
             constellationImageInput.value = character.constellationImage || '';
@@ -225,14 +225,19 @@ const UI = {
             const scaleInput = document.getElementById('edit-constellation-scale');
             const posXInput = document.getElementById('edit-constellation-pos-x');
             const posYInput = document.getElementById('edit-constellation-pos-y');
+            const nodeSizeInput = document.getElementById('edit-constellation-node-size');
             const controlsDiv = document.getElementById('constellation-image-controls');
             
             if (scaleInput) scaleInput.value = bgSettings.scale || 100;
             if (posXInput) posXInput.value = bgSettings.posX || 50;
             if (posYInput) posYInput.value = bgSettings.posY || 50;
+            if (nodeSizeInput) nodeSizeInput.value = bgSettings.nodeSize || 80;
             
             const scaleValue = document.getElementById('constellation-scale-value');
             if (scaleValue) scaleValue.textContent = `${bgSettings.scale || 100}%`;
+            
+            const nodeSizeValue = document.getElementById('constellation-node-size-value');
+            if (nodeSizeValue) nodeSizeValue.textContent = `${bgSettings.nodeSize || 80}px`;
             
             if (controlsDiv) {
                 controlsDiv.style.display = character.constellationImage ? 'flex' : 'none';
@@ -513,9 +518,7 @@ const UI = {
         this.updateDragLines();
         this.updateBgPreviewSettings();
         
-        const scaleInput = document.getElementById('edit-constellation-scale');
-        const posXInput = document.getElementById('edit-constellation-pos-x');
-        const posYInput = document.getElementById('edit-constellation-pos-y');
+        const nodeSizeInput = document.getElementById('edit-constellation-node-size');
         
         if (scaleInput) {
             scaleInput.addEventListener('input', () => {
@@ -533,6 +536,14 @@ const UI = {
             posYInput.addEventListener('input', () => this.updateBgPreviewSettings());
         }
         
+        if (nodeSizeInput) {
+            nodeSizeInput.addEventListener('input', () => {
+                const nodeSizeValue = document.getElementById('constellation-node-size-value');
+                if (nodeSizeValue) nodeSizeValue.textContent = `${nodeSizeInput.value}px`;
+                this.updateBgPreviewSettings();
+            });
+        }
+        
         const bgInput = document.getElementById('edit-constellation-image');
         if (bgInput) {
             bgInput.addEventListener('input', () => this.updateBgPreviewSettings());
@@ -545,6 +556,7 @@ const UI = {
         const scaleInput = document.getElementById('edit-constellation-scale');
         const posXInput = document.getElementById('edit-constellation-pos-x');
         const posYInput = document.getElementById('edit-constellation-pos-y');
+        const nodeSizeInput = document.getElementById('edit-constellation-node-size');
         
         if (!preview || !bgInput) return;
         
@@ -563,6 +575,12 @@ const UI = {
             preview.classList.remove('has-bg');
         }
         
+        const nodeSize = parseInt(nodeSizeInput?.value || 80);
+        preview.querySelectorAll('.constellation-drag-node').forEach(node => {
+            node.style.width = `${nodeSize}px`;
+            node.style.height = `${nodeSize}px`;
+        });
+        
         this.saveBgSettings();
     },
     
@@ -570,6 +588,7 @@ const UI = {
         const scaleInput = document.getElementById('edit-constellation-scale');
         const posXInput = document.getElementById('edit-constellation-pos-x');
         const posYInput = document.getElementById('edit-constellation-pos-y');
+        const nodeSizeInput = document.getElementById('edit-constellation-node-size');
         const hiddenInput = document.getElementById('edit-constellation-bg-settings');
         
         if (!hiddenInput) return;
@@ -577,7 +596,8 @@ const UI = {
         const settings = {
             scale: parseInt(scaleInput?.value || 100),
             posX: parseInt(posXInput?.value || 50),
-            posY: parseInt(posYInput?.value || 50)
+            posY: parseInt(posYInput?.value || 50),
+            nodeSize: parseInt(nodeSizeInput?.value || 80)
         };
         
         hiddenInput.value = JSON.stringify(settings);
@@ -1614,7 +1634,8 @@ const UI = {
         const constellations = character.constellations || [];
         const element = character.element || 'geo';
         const constellationImage = character.constellationImage || null;
-        const bgSettings = character.constellationBgSettings || { scale: 100, posX: 50, posY: 50 };
+        const bgSettings = character.constellationBgSettings || { scale: 100, posX: 50, posY: 50, nodeSize: 80 };
+        const nodeSize = bgSettings.nodeSize || 80;
         
         if (constellations.length === 0) {
             constellationList.innerHTML = '<p class="empty-message">暫無命之座資料</p>';
@@ -1675,6 +1696,8 @@ const UI = {
             node.style.left = `${pos.x}%`;
             node.style.top = `${pos.y}%`;
             node.style.transform = 'translate(-50%, -50%)';
+            node.style.width = `${nodeSize}px`;
+            node.style.height = `${nodeSize}px`;
             
             node.innerHTML = `
                 <div class="constellation-node-glow"></div>
