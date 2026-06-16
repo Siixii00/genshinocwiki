@@ -1666,14 +1666,6 @@ const UI = {
             sparkleContainer.appendChild(sparkle);
         }
     },
-                this.showConstellationDetail(c, element);
-            });
-            
-            constellationList.appendChild(node);
-        });
-        
-        this.createConstellationDetailModal();
-    },
     
     createConstellationDetailModal() {
         if (document.getElementById('constellation-detail-modal')) return;
