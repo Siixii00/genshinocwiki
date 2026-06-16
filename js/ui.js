@@ -1016,9 +1016,14 @@ const UI = {
     
     populatePassivesEdit(passives) {
         console.log('[DEBUG] populatePassivesEdit called with:', passives);
+        console.trace('[DEBUG] populatePassivesEdit call stack');
         const container = document.getElementById('passives-list');
-        if (!container) return;
+        if (!container) {
+            console.error('[DEBUG] populatePassivesEdit: passives-list container not found!');
+            return;
+        }
         
+        console.log('[DEBUG] populatePassivesEdit: container children before clear:', container.children.length);
         container.innerHTML = '';
         
         if (passives && passives.length > 0) {
@@ -1026,6 +1031,7 @@ const UI = {
                 this.addPassiveEditItem(p.name, p.desc, p.icon, index);
             });
         }
+        console.log('[DEBUG] populatePassivesEdit: container children after:', container.children.length);
     },
     
     addPassiveEditItem(name = '', desc = '', icon = '', index = null) {
@@ -1069,6 +1075,7 @@ const UI = {
         `;
         
         container.appendChild(itemDiv);
+        console.log('[DEBUG] addPassiveEditItem appended, container children count:', container.children.length);
         
         const removeBtn = itemDiv.querySelector('.remove-passive-btn');
         if (removeBtn) {
