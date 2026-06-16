@@ -208,6 +208,30 @@ const UI = {
             modelUrlInput.value = character.model.url;
         }
         
+        const constellationImageInput = document.getElementById('edit-constellation-image');
+        const constellationBgPreview = document.getElementById('constellation-bg-preview');
+        if (constellationImageInput) {
+            constellationImageInput.value = character.constellationImage || '';
+            if (constellationBgPreview) {
+                if (character.constellationImage) {
+                    constellationBgPreview.innerHTML = `<img src="${character.constellationImage}" alt="命之座星座圖" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                } else {
+                    constellationBgPreview.innerHTML = '<span>星座圖</span>';
+                }
+            }
+        }
+        
+        if (constellationImageInput && constellationBgPreview) {
+            constellationImageInput.addEventListener('input', () => {
+                const url = constellationImageInput.value.trim();
+                if (url) {
+                    constellationBgPreview.innerHTML = `<img src="${url}" alt="命之座星座圖" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                } else {
+                    constellationBgPreview.innerHTML = '<span>星座圖</span>';
+                }
+            });
+        }
+        
         this.populateCustomImages(character.customImages || []);
         this.populateConstellationEdit(character.constellations);
         this.populatePassivesEdit(character.passives || []);
@@ -370,7 +394,7 @@ const UI = {
                             <div class="constellation-icon-preview" id="constellation-icon-${i}">
                                 ${c.icon ? `<img src="${c.icon}" alt="命之座圖標">` : '<span>圖標</span>'}
                             </div>
-                            <input type="text" id="constellation-icon-url-${i}" placeholder="圖標 URL" value="${c.icon || ''}" class="constellation-icon-url">
+                            <input type="text" id="constellation-icon-url-${i}" placeholder="圖床 URL (透明底)" value="${c.icon || ''}" class="constellation-icon-url">
                             <input type="hidden" id="constellation-icon-hidden-${i}" value="${c.icon || ''}" name="constellationIcon${i}">
                         </div>
                         <div class="constellation-edit-fields">
@@ -389,18 +413,18 @@ const UI = {
         }
         
         for (let i = 1; i <= 6; i++) {
-            const urlInput = document.getElementById(`constellation-icon-url-${i}`);
-            const preview = document.getElementById(`constellation-icon-${i}`);
-            const hiddenInput = document.getElementById(`constellation-icon-hidden-${i}`);
+            const iconUrlInput = document.getElementById(`constellation-icon-url-${i}`);
+            const iconPreview = document.getElementById(`constellation-icon-${i}`);
+            const iconHiddenInput = document.getElementById(`constellation-icon-hidden-${i}`);
             
-            if (urlInput && preview && hiddenInput) {
-                urlInput.addEventListener('input', () => {
-                    const url = urlInput.value.trim();
-                    hiddenInput.value = url;
+            if (iconUrlInput && iconPreview && iconHiddenInput) {
+                iconUrlInput.addEventListener('input', () => {
+                    const url = iconUrlInput.value.trim();
+                    iconHiddenInput.value = url;
                     if (url) {
-                        preview.innerHTML = `<img src="${url}" alt="命之座圖標" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                        iconPreview.innerHTML = `<img src="${url}" alt="命之座圖標" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
                     } else {
-                        preview.innerHTML = '<span>圖標</span>';
+                        iconPreview.innerHTML = '<span>圖標</span>';
                     }
                 });
             }
@@ -651,6 +675,8 @@ const UI = {
             const icon = document.getElementById(`constellation-icon-hidden-${i}`)?.value || '';
             data.constellations.push({ level: i, name, desc, icon });
         }
+        
+        data.constellationImage = data.constellationImage || null;
         
         data.customImages = this.getCustomImagesData();
         
@@ -947,27 +973,13 @@ const UI = {
             document.getElementById('skill-elemental-desc').textContent = character.skills.elemental?.desc || '暫無資料';
             document.getElementById('skill-burst-name').textContent = character.skills.burst?.name || '-';
             document.getElementById('skill-burst-desc').textContent = character.skills.burst?.desc || '暫無資料';
-            
-            this.renderSkillTableDisplay('normal', character.skills.normal?.table);
+        
+        this.renderSkillTableDisplay('normal', character.skills.normal?.table);
             this.renderSkillTableDisplay('elemental', character.skills.elemental?.table);
             this.renderSkillTableDisplay('burst', character.skills.burst?.table);
         }
         
-        const constellationList = document.getElementById('constellation-list');
-        if (constellationList) {
-            if (character.constellations && character.constellations.length > 0) {
-                constellationList.innerHTML = character.constellations.map(c => `
-                    <div class="constellation-card">
-                        ${c.icon ? `<div class="constellation-icon"><img src="${c.icon}" alt="${c.name}"></div>` : ''}
-                        <span class="constellation-level">第${c.level}層</span>
-                        <h4 class="constellation-name">${c.name || '-'}</h4>
-                        <p class="constellation-desc">${c.desc || '暫無資料'}</p>
-                    </div>
-                `).join('');
-            } else {
-                constellationList.innerHTML = '<p class="empty-message">暫無命之座資料</p>';
-            }
-        }
+        this.renderConstellations(character);
         
         const storyContent = document.getElementById('story-content');
         if (storyContent) {
@@ -1269,6 +1281,140 @@ const UI = {
         }
     },
     
+    renderConstellations(character) {
+        const constellationList = document.getElementById('constellation-list');
+        if (!constellationList) return;
+        
+        const constellations = character.constellations || [];
+        const element = character.element || 'geo';
+        const constellationImage = character.constellationImage || null;
+        
+        if (constellations.length === 0) {
+            constellationList.innerHTML = '<p class="empty-message">暫無命之座資料</p>';
+            return;
+        }
+        
+        constellationList.className = 'constellation-interactive-grid';
+        
+        if (constellationImage) {
+            constellationList.style.backgroundImage = `url(${constellationImage})`;
+            constellationList.style.backgroundSize = 'contain';
+            constellationList.style.backgroundPosition = 'center';
+            constellationList.style.backgroundRepeat = 'no-repeat';
+            constellationList.innerHTML = '';
+        } else {
+            constellationList.style.backgroundImage = '';
+            constellationList.innerHTML = `
+                <svg class="constellation-lines" viewBox="0 0 500 400">
+                    <polyline class="constellation-line" points="250,60 110,140 250,240 390,140 250,60" />
+                    <polyline class="constellation-line" points="250,240 110,320 250,240 390,320" />
+                </svg>
+            `;
+        }
+        
+        constellations.forEach((c, index) => {
+            const node = document.createElement('div');
+            node.className = 'constellation-node';
+            node.dataset.element = element;
+            node.dataset.level = c.level;
+            node.dataset.index = index;
+            
+            node.innerHTML = `
+                <div class="constellation-node-glow"></div>
+                <div class="constellation-node-inner">
+                    ${c.icon 
+                        ? `<img src="${c.icon}" alt="${c.name}" class="constellation-node-icon">`
+                        : `<div class="constellation-node-icon" style="background: var(--color-bg-secondary); border-radius: 50%;"></div>`
+                    }
+                </div>
+                <span class="constellation-node-number">C${c.level}</span>
+            `;
+            
+            node.addEventListener('click', () => {
+                this.showConstellationDetail(c, element);
+            });
+            
+            constellationList.appendChild(node);
+        });
+        
+        this.createConstellationDetailModal();
+    },
+    
+    createConstellationDetailModal() {
+        if (document.getElementById('constellation-detail-modal')) return;
+        
+        const modal = document.createElement('div');
+        modal.id = 'constellation-detail-modal';
+        modal.className = 'constellation-detail-modal';
+        modal.innerHTML = `
+            <div class="constellation-detail-content">
+                <button class="constellation-detail-close">&times;</button>
+                <div class="constellation-detail-header">
+                    <div class="constellation-detail-icon" id="constellation-detail-icon"></div>
+                    <div class="constellation-detail-title">
+                        <div class="constellation-detail-level" id="constellation-detail-level"></div>
+                        <div class="constellation-detail-name" id="constellation-detail-name"></div>
+                    </div>
+                </div>
+                <div class="constellation-detail-desc" id="constellation-detail-desc"></div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.closest('.constellation-detail-close')) {
+                this.hideConstellationDetail();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.hideConstellationDetail();
+            }
+        });
+    },
+    
+    showConstellationDetail(constellation, element) {
+        const modal = document.getElementById('constellation-detail-modal');
+        if (!modal) return;
+        
+        const iconEl = document.getElementById('constellation-detail-icon');
+        const levelEl = document.getElementById('constellation-detail-level');
+        const nameEl = document.getElementById('constellation-detail-name');
+        const descEl = document.getElementById('constellation-detail-desc');
+        
+        if (iconEl) {
+            iconEl.dataset.element = element;
+            iconEl.innerHTML = constellation.icon 
+                ? `<img src="${constellation.icon}" alt="${constellation.name}">`
+                : '';
+        }
+        
+        if (levelEl) {
+            levelEl.textContent = `第 ${constellation.level} 層命之座`;
+        }
+        
+        if (nameEl) {
+            nameEl.textContent = constellation.name || '未命名';
+        }
+        
+        if (descEl) {
+            descEl.textContent = constellation.desc || '暫無資料';
+        }
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    },
+    
+    hideConstellationDetail() {
+        const modal = document.getElementById('constellation-detail-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    },
+    
     getDraftKey(characterId) {
         return `genshin_draft_${characterId}`;
     },
@@ -1498,6 +1644,17 @@ const UI = {
             const modelUrlInput = document.getElementById('edit-model-url');
             if (modelUrlInput && draft.model.url) {
                 modelUrlInput.value = draft.model.url;
+            }
+        }
+        
+        if (draft.constellationImage) {
+            const constellationImageInput = document.getElementById('edit-constellation-image');
+            const constellationBgPreview = document.getElementById('constellation-bg-preview');
+            if (constellationImageInput) {
+                constellationImageInput.value = draft.constellationImage;
+            }
+            if (constellationBgPreview) {
+                constellationBgPreview.innerHTML = `<img src="${draft.constellationImage}" alt="命之座星座圖">`;
             }
         }
         
