@@ -518,6 +518,9 @@ const UI = {
         this.updateDragLines();
         this.updateBgPreviewSettings();
         
+        const scaleInput = document.getElementById('edit-constellation-scale');
+        const posXInput = document.getElementById('edit-constellation-pos-x');
+        const posYInput = document.getElementById('edit-constellation-pos-y');
         const nodeSizeInput = document.getElementById('edit-constellation-node-size');
         
         if (scaleInput) {
