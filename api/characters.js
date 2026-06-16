@@ -179,7 +179,7 @@ export default async function handler(req, res) {
           combat_voices = COALESCE(${c.combat_voices}, combat_voices),
           model_type = COALESCE(${c.model_type}, model_type),
           model_url = COALESCE(${c.model_url}, model_url),
-          passives = COALESCE(${c.passives}, passives),
+          passives = ${c.passives},
           constellation_image = ${c.constellation_image},
           constellation_bg_settings = ${c.constellation_bg_settings},
           story_detail = COALESCE(${c.story_detail}, story_detail),
