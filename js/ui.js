@@ -1564,10 +1564,12 @@ const UI = {
         
         const formatCell = (cell) => {
             let text = cell || '';
+            console.log('[DEBUG] formatCell input:', JSON.stringify(text));
             text = text.replace(/\n/g, '<br>');
             text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
             text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
             text = text.replace(/\[color:(#[0-9a-fA-F]{6})\](.+?)\[\/color\]/g, '<span style="color:$1">$2</span>');
+            console.log('[DEBUG] formatCell output:', text);
             return text;
         };
         
