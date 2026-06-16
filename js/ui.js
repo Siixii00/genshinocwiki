@@ -1013,6 +1013,7 @@ const UI = {
     },
     
     populatePassivesEdit(passives) {
+        console.log('[DEBUG] populatePassivesEdit called with:', passives);
         const container = document.getElementById('passives-list');
         if (!container) return;
         
@@ -1115,6 +1116,7 @@ const UI = {
                 passives.push({ name, desc, icon });
             }
         });
+        console.log('[DEBUG] getPassivesData result:', passives);
         return passives;
     },
     

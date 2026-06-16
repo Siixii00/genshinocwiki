@@ -56,7 +56,11 @@ function normalizeCharacter(c) {
     combat_voices: c.combatVoices || c.combat_voices || null,
     model_type: c.modelType || c.model_type || null,
     model_url: c.modelUrl || c.model_url || null,
-    passives: c.passives && Array.isArray(c.passives) && c.passives.length > 0 ? JSON.stringify(c.passives) : null,
+    passives: (() => {
+        const result = c.passives && Array.isArray(c.passives) && c.passives.length > 0 ? JSON.stringify(c.passives) : null;
+        console.log('[DEBUG] normalizeCharacter passives:', c.passives, '-> JSON:', result);
+        return result;
+    })(),
     constellation_image: c.constellationImage || c.constellation_image || null,
     constellation_bg_settings: c.constellationBgSettings || c.constellation_bg_settings || null,
     story_detail: c.storyDetail || c.story_detail || null,
@@ -90,6 +94,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const c = normalizeCharacter(req.body);
+      console.log('[DEBUG] POST normalizeCharacter result passives:', c.passives);
       const [character] = await sql`
         INSERT INTO characters (
           name, title, fullname, element, weapon, region, rarity, gender,
@@ -130,6 +135,7 @@ export default async function handler(req, res) {
       }
 
       const c = normalizeCharacter(updates);
+      console.log('[DEBUG] PUT normalizeCharacter result passives:', c.passives);
       
       const [character] = await sql`
         UPDATE characters SET

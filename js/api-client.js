@@ -149,7 +149,12 @@ const ApiClient = {
             constellationImage: c.constellation_image || c.constellationImage || null,
             constellationBgSettings: this.parseJSON(c.constellation_bg_settings || c.constellationBgSettings) || null,
             customImages: this.parseJSON(c.custom_images) || this.parseJSON(c.customImages) || [],
-            passives: this.parseJSON(c.passives) || [],
+            passives: (() => {
+                const parsed = this.parseJSON(c.passives);
+                console.log('[DEBUG] parseCharacter passives raw:', c.passives);
+                console.log('[DEBUG] parseCharacter passives parsed:', parsed);
+                return parsed || [];
+            })(),
             voices: {
                 normal: this.parseJSON(c.normal_voices) || this.parseJSON(c.normalVoices) || [],
                 combat: this.parseJSON(c.combat_voices) || this.parseJSON(c.combatVoices) || []
@@ -223,7 +228,12 @@ const ApiClient = {
             customImages: Array.isArray(customImages) && customImages.length > 0 ? JSON.stringify(customImages) : null,
             normalVoices: Array.isArray(normalVoices) && normalVoices.length > 0 ? JSON.stringify(normalVoices) : null,
             combatVoices: Array.isArray(combatVoices) && combatVoices.length > 0 ? JSON.stringify(combatVoices) : null,
-            passives: Array.isArray(passives) && passives.length > 0 ? JSON.stringify(passives) : null,
+            passives: (() => {
+                const passives = char.passives || [];
+                const result = Array.isArray(passives) && passives.length > 0 ? JSON.stringify(passives) : null;
+                console.log('[DEBUG] formatCharacter passives:', passives, '-> JSON:', result);
+                return result;
+            })(),
             modelType: char.model?.type || char.modelType || null,
             modelUrl: char.model?.url || char.modelUrl || null
         };
