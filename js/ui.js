@@ -1234,12 +1234,40 @@ const UI = {
             document.getElementById('skill-elemental-desc').textContent = character.skills.elemental?.desc || '暫無資料';
             document.getElementById('skill-burst-name').textContent = character.skills.burst?.name || '-';
             document.getElementById('skill-burst-desc').textContent = character.skills.burst?.desc || '暫無資料';
-        
-        this.renderSkillTableDisplay('normal', character.skills.normal?.table);
+            
+            const normalIconEl = document.getElementById('skill-normal-icon');
+            if (normalIconEl) {
+                if (character.skills.normal?.icon) {
+                    normalIconEl.innerHTML = `<img src="${character.skills.normal.icon}" alt="普通攻擊">`;
+                } else {
+                    normalIconEl.innerHTML = '';
+                }
+            }
+            
+            const elementalIconEl = document.getElementById('skill-elemental-icon');
+            if (elementalIconEl) {
+                if (character.skills.elemental?.icon) {
+                    elementalIconEl.innerHTML = `<img src="${character.skills.elemental.icon}" alt="元素戰技">`;
+                } else {
+                    elementalIconEl.innerHTML = '';
+                }
+            }
+            
+            const burstIconEl = document.getElementById('skill-burst-icon');
+            if (burstIconEl) {
+                if (character.skills.burst?.icon) {
+                    burstIconEl.innerHTML = `<img src="${character.skills.burst.icon}" alt="元素爆發">`;
+                } else {
+                    burstIconEl.innerHTML = '';
+                }
+            }
+            
+            this.renderSkillTableDisplay('normal', character.skills.normal?.table);
             this.renderSkillTableDisplay('elemental', character.skills.elemental?.table);
             this.renderSkillTableDisplay('burst', character.skills.burst?.table);
         }
         
+        this.renderPassives(character.passives || []);
         this.renderConstellations(character);
         
         const storyContent = document.getElementById('story-content');
@@ -1542,6 +1570,36 @@ const UI = {
         }
     },
     
+    renderPassives(passives) {
+        const skillsPanel = document.getElementById('skills-panel');
+        if (!skillsPanel) return;
+        
+        let passivesContainer = document.getElementById('passives-display');
+        if (!passivesContainer) {
+            passivesContainer = document.createElement('div');
+            passivesContainer.id = 'passives-display';
+            passivesContainer.className = 'passives-display';
+            skillsPanel.querySelector('.skills-section')?.appendChild(passivesContainer);
+        }
+        
+        if (!passives || passives.length === 0) {
+            passivesContainer.innerHTML = '';
+            return;
+        }
+        
+        passivesContainer.innerHTML = passives.map((p, index) => `
+            <div class="passive-card">
+                <div class="passive-icon">
+                    ${p.icon ? `<img src="${p.icon}" alt="${p.name}">` : '<div class="passive-icon-placeholder"></div>'}
+                </div>
+                <div class="passive-content">
+                    <h4 class="passive-name">${p.name || `天賦 ${index + 1}`}</h4>
+                    <p class="passive-desc">${p.desc || '暫無資料'}</p>
+                </div>
+            </div>
+        `).join('');
+    },
+    
     renderConstellations(character) {
         const constellationList = document.getElementById('constellation-list');
         if (!constellationList) return;
@@ -1568,13 +1626,13 @@ const UI = {
         const positions = constellations.map((c, i) => c.position || defaultPositions[i]);
         
         constellationList.className = 'constellation-interactive-grid';
+        constellationList.innerHTML = '';
         
         if (constellationImage) {
             constellationList.style.backgroundImage = `url(${constellationImage})`;
             constellationList.style.backgroundSize = `${bgSettings.scale}%`;
             constellationList.style.backgroundPosition = `${bgSettings.posX}% ${bgSettings.posY}%`;
             constellationList.style.backgroundRepeat = 'no-repeat';
-            this.createSparkles(constellationList, element);
         } else {
             constellationList.style.backgroundImage = '';
         }
@@ -1598,7 +1656,6 @@ const UI = {
             svgLines.appendChild(line);
         });
         
-        constellationList.innerHTML = '';
         constellationList.appendChild(svgLines);
         
         constellations.forEach((c, index) => {
@@ -1633,10 +1690,36 @@ const UI = {
         if (constellationImage) {
             const sparkleContainer = document.createElement('div');
             sparkleContainer.className = 'constellation-sparkles';
+            this.createSparkles(sparkleContainer, element);
             constellationList.appendChild(sparkleContainer);
         }
         
         this.createConstellationDetailModal();
+    },
+    
+    createSparkles(container, element) {
+        const colors = {
+            pyro: '#FF4D4D',
+            anemo: '#72E2C3',
+            geo: '#F8BA4E',
+            electro: '#AF8FE2',
+            hydro: '#4CC9F0',
+            cryo: '#99DFFF',
+            dendro: '#A5C83B'
+        };
+        
+        const color = colors[element] || colors.geo;
+        
+        for (let i = 0; i < 15; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'constellation-sparkle';
+            sparkle.style.left = `${Math.random() * 100}%`;
+            sparkle.style.top = `${Math.random() * 100}%`;
+            sparkle.style.background = color;
+            sparkle.style.animationDelay = `${Math.random() * 3}s`;
+            sparkle.style.animationDuration = `${2 + Math.random() * 2}s`;
+            container.appendChild(sparkle);
+        }
     },
     
     createSparkles(container, element) {
