@@ -1825,9 +1825,34 @@
     align-items: center;
 }
 
-.skill-format-btn {
+.text-format-toolbar {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+    align-items: center;
+}
+
+.text-format-btn {
     min-width: 32px;
     padding: 4px 8px;
+}
+
+.text-color-picker {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+}
+
+.passive-desc {
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.constellation-detail-desc {
+    white-space: pre-wrap;
+    line-height: 1.6;
 }
 
 .story-section {

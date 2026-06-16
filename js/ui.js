@@ -496,7 +496,13 @@ const UI = {
                             </div>
                             <div class="form-group">
                                 <label>命之座描述</label>
-                                <textarea id="constellation-desc-${i}" name="constellationDesc${i}" rows="2">${c.desc || ''}</textarea>
+                                <div class="text-format-toolbar">
+                                    <button type="button" class="btn btn-sm btn-secondary text-format-btn" data-format="bold" title="粗體"><b>B</b></button>
+                                    <button type="button" class="btn btn-sm btn-secondary text-format-btn" data-format="italic" title="斜體"><i>I</i></button>
+                                    <button type="button" class="btn btn-sm btn-secondary text-format-btn" data-format="color" title="顏色">🎨</button>
+                                    <input type="color" class="text-color-picker" value="#ff0000" title="選擇顏色">
+                                </div>
+                                <textarea id="constellation-desc-${i}" name="constellationDesc${i}" rows="2" placeholder="支援 **粗體** *斜體* [color:#ff0000]顏色[/color]">${c.desc || ''}</textarea>
                             </div>
                         </div>
                         <input type="hidden" id="constellation-pos-hidden-${i}" value='${JSON.stringify(pos)}'>
@@ -521,6 +527,12 @@ const UI = {
                     }
                     this.updateDragPreviewIcon(i, url);
                 });
+            }
+            
+            const constellationItem = document.querySelector(`.constellation-edit-item[data-level="${i}"]`);
+            const descTextarea = document.getElementById(`constellation-desc-${i}`);
+            if (constellationItem && descTextarea) {
+                this.setupTextFormatToolbar(constellationItem, descTextarea);
             }
         }
         
@@ -1134,7 +1146,13 @@ const UI = {
                     </div>
                     <div class="form-group">
                         <label>天賦描述</label>
-                        <textarea class="passive-desc-input" rows="2" placeholder="天賦描述">${desc}</textarea>
+                        <div class="text-format-toolbar">
+                            <button type="button" class="btn btn-sm btn-secondary text-format-btn" data-format="bold" title="粗體"><b>B</b></button>
+                            <button type="button" class="btn btn-sm btn-secondary text-format-btn" data-format="italic" title="斜體"><i>I</i></button>
+                            <button type="button" class="btn btn-sm btn-secondary text-format-btn" data-format="color" title="顏色">🎨</button>
+                            <input type="color" class="text-color-picker" value="#ff0000" title="選擇顏色">
+                        </div>
+                        <textarea class="passive-desc-input" rows="2" placeholder="天賦描述 (支援 **粗體** *斜體* [color:#ff0000]顏色[/color])">${desc}</textarea>
                     </div>
                 </div>
             </div>
@@ -1163,6 +1181,49 @@ const UI = {
                 }
             });
         }
+        
+        const descTextarea = itemDiv.querySelector('.passive-desc-input');
+        this.setupTextFormatToolbar(itemDiv, descTextarea);
+    },
+    
+    setupTextFormatToolbar(container, textarea) {
+        if (!textarea) return;
+        
+        container.querySelectorAll('.text-format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const format = btn.dataset.format;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const text = textarea.value;
+                const selectedText = text.substring(start, end);
+                
+                if (format === 'bold') {
+                    textarea.value = text.substring(0, start) + `**${selectedText}**` + text.substring(end);
+                } else if (format === 'italic') {
+                    textarea.value = text.substring(0, start) + `*${selectedText}*` + text.substring(end);
+                } else if (format === 'color') {
+                    const colorPicker = container.querySelector('.text-color-picker');
+                    const color = colorPicker?.value || '#ff0000';
+                    textarea.value = text.substring(0, start) + `[color:${color}]${selectedText}[/color]` + text.substring(end);
+                }
+                
+                textarea.focus();
+                textarea.dispatchEvent(new Event('input'));
+            });
+        });
+        
+        container.querySelector('.text-color-picker')?.addEventListener('input', (e) => {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selectedText = text.substring(start, end);
+            
+            if (selectedText) {
+                textarea.value = text.substring(0, start) + `[color:${e.target.value}]${selectedText}[/color]` + text.substring(end);
+                textarea.focus();
+                textarea.dispatchEvent(new Event('input'));
+            }
+        });
     },
     
     renumberPassives() {
@@ -1685,6 +1746,16 @@ const UI = {
         }
     },
     
+    formatText(text) {
+        if (!text) return '';
+        let result = text;
+        result = result.replace(/\n/g, '<br>');
+        result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        result = result.replace(/\[color:(#[0-9a-fA-F]{6})\](.+?)\[\/color\]/g, '<span style="color:$1">$2</span>');
+        return result;
+    },
+    
     renderPassives(passives) {
         const skillsPanel = document.getElementById('skills-panel');
         if (!skillsPanel) return;
@@ -1716,7 +1787,7 @@ const UI = {
                 </div>
                 <div class="passive-content">
                     <h4 class="passive-name">${p.name || `天賦 ${index + 1}`}</h4>
-                    <p class="passive-desc">${p.desc || '暫無資料'}</p>
+                    <p class="passive-desc">${this.formatText(p.desc) || '暫無資料'}</p>
                 </div>
             </div>
         `).join('');
@@ -1935,7 +2006,7 @@ const UI = {
         }
         
         if (descEl) {
-            descEl.textContent = constellation.desc || '暫無資料';
+            descEl.innerHTML = this.formatText(constellation.desc) || '暫無資料';
         }
         
         modal.classList.add('active');

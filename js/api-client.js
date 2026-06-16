@@ -212,7 +212,11 @@ const ApiClient = {
             skillNormalName: char.skills?.normal?.name || char.skillNormalName || null,
             skillNormalDesc: char.skills?.normal?.desc || char.skillNormalDesc || null,
             skillNormalIcon: char.skills?.normal?.icon || char.skillNormalIcon || null,
-            skillNormalTable: char.skills?.normal?.table ? JSON.stringify(char.skills.normal.table) : null,
+            skillNormalTable: (() => {
+                const table = char.skills?.normal?.table;
+                console.log('[DEBUG] formatCharacter skillNormalTable:', table);
+                return table ? JSON.stringify(table) : null;
+            })(),
             skillElementalName: char.skills?.elemental?.name || char.skillElementalName || null,
             skillElementalDesc: char.skills?.elemental?.desc || char.skillElementalDesc || null,
             skillElementalIcon: char.skills?.elemental?.icon || char.skillElementalIcon || null,
