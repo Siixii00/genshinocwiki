@@ -300,13 +300,19 @@ const UI = {
             html += '<tr>';
             for (let c = 0; c < colCount; c++) {
                 const val = row[c] || '';
-                html += `<td><input type="text" value="${val}" data-skill="${skillType}" data-type="cell" data-row="${r}" data-col="${c}"></td>`;
+                html += `<td><textarea data-skill="${skillType}" data-type="cell" data-row="${r}" data-col="${c}">${val}</textarea></td>`;
             }
             html += '</tr>';
         });
         html += '</tbody></table></div>';
         
         html += `
+            <div class="skill-table-toolbar">
+                <button type="button" class="btn btn-sm btn-secondary skill-format-btn" data-format="bold" title="粗體"><b>B</b></button>
+                <button type="button" class="btn btn-sm btn-secondary skill-format-btn" data-format="italic" title="斜體"><i>I</i></button>
+                <button type="button" class="btn btn-sm btn-secondary skill-format-btn" data-format="color" title="顏色">🎨</button>
+                <input type="color" class="skill-color-picker" value="#ff0000" style="width:30px;height:30px;padding:0;border:none;cursor:pointer;">
+            </div>
             <div class="skill-table-controls-row">
                 <button type="button" class="btn btn-sm btn-secondary skill-table-action" data-action="addRow" data-skill="${skillType}">+ 新增列</button>
                 <button type="button" class="btn btn-sm btn-secondary skill-table-action" data-action="addCol" data-skill="${skillType}">+ 新增欄</button>
@@ -317,13 +323,52 @@ const UI = {
         
         container.innerHTML = html;
         
-        container.querySelectorAll('.skill-table input').forEach(input => {
+        container.querySelectorAll('.skill-table textarea').forEach(input => {
             input.addEventListener('input', () => {
                 const tableData = this.getCurrentSkillTableData(skillType);
                 if (tableData) {
                     this.saveSkillTableData(skillType, tableData);
                 }
             });
+        });
+        
+        container.querySelectorAll('.skill-format-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const activeTextarea = container.querySelector('.skill-table textarea:focus');
+                if (!activeTextarea) return;
+                
+                const format = btn.dataset.format;
+                const start = activeTextarea.selectionStart;
+                const end = activeTextarea.selectionEnd;
+                const text = activeTextarea.value;
+                const selectedText = text.substring(start, end);
+                
+                if (format === 'bold') {
+                    activeTextarea.value = text.substring(0, start) + `**${selectedText}**` + text.substring(end);
+                } else if (format === 'italic') {
+                    activeTextarea.value = text.substring(0, start) + `*${selectedText}*` + text.substring(end);
+                } else if (format === 'color') {
+                    const colorPicker = container.querySelector('.skill-color-picker');
+                    const color = colorPicker?.value || '#ff0000';
+                    activeTextarea.value = text.substring(0, start) + `[color:${color}]${selectedText}[/color]` + text.substring(end);
+                }
+                
+                activeTextarea.dispatchEvent(new Event('input'));
+            });
+        });
+        
+        container.querySelector('.skill-color-picker')?.addEventListener('change', (e) => {
+            const activeTextarea = container.querySelector('.skill-table textarea:focus');
+            if (!activeTextarea) return;
+            
+            const start = activeTextarea.selectionStart;
+            const end = activeTextarea.selectionEnd;
+            const text = activeTextarea.value;
+            const selectedText = text.substring(start, end);
+            const color = e.target.value;
+            
+            activeTextarea.value = text.substring(0, start) + `[color:${color}]${selectedText}[/color]` + text.substring(end);
+            activeTextarea.dispatchEvent(new Event('input'));
         });
         
         container.dispatchEvent(new CustomEvent('skillTableRendered', { bubbles: true }));
@@ -352,7 +397,7 @@ const UI = {
         const rows = [];
         table.querySelectorAll('tbody tr').forEach(tr => {
             const row = [];
-            tr.querySelectorAll('td input').forEach(input => {
+            tr.querySelectorAll('td textarea, td input').forEach(input => {
                 row.push(input.value || '');
             });
             rows.push(row);
@@ -1517,6 +1562,15 @@ const UI = {
         
         const { rows = [], headers = [] } = tableData;
         
+        const formatCell = (cell) => {
+            let text = cell || '';
+            text = text.replace(/\n/g, '<br>');
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            text = text.replace(/\[color:(#[0-9a-fA-F]{6})\](.+?)\[\/color\]/g, '<span style="color:$1">$2</span>');
+            return text;
+        };
+        
         let html = '<div class="skill-table-container"><table class="skill-table skill-table-readonly">';
         
         if (headers.length > 0) {
@@ -1531,7 +1585,7 @@ const UI = {
         rows.forEach(row => {
             html += '<tr>';
             row.forEach(cell => {
-                html += `<td>${cell || ''}</td>`;
+                html += `<td>${formatCell(cell)}</td>`;
             });
             html += '</tr>';
         });
