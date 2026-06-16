@@ -1587,10 +1587,17 @@ const UI = {
             return;
         }
         
-        passivesContainer.innerHTML = passives.map((p, index) => `
+        const validPassives = passives.filter(p => p.name || p.desc);
+        
+        if (validPassives.length === 0) {
+            passivesContainer.innerHTML = '';
+            return;
+        }
+        
+        passivesContainer.innerHTML = validPassives.map((p, index) => `
             <div class="passive-card">
                 <div class="passive-icon">
-                    ${p.icon ? `<img src="${p.icon}" alt="${p.name}">` : '<div class="passive-icon-placeholder"></div>'}
+                    ${p.icon ? `<img src="${p.icon}" alt="${p.name}">` : ''}
                 </div>
                 <div class="passive-content">
                     <h4 class="passive-name">${p.name || `天賦 ${index + 1}`}</h4>

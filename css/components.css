@@ -890,7 +890,6 @@
     width: 40px;
     height: 40px;
     border-radius: var(--border-radius-md);
-    background: var(--color-accent-gold-light);
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -901,18 +900,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-}
-
-.skill-icon.normal-attack {
-    background: var(--color-bg-secondary);
-}
-
-.skill-icon.elemental-skill {
-    background: linear-gradient(135deg, var(--color-accent-gold-light) 0%, var(--color-accent-gold) 100%);
-}
-
-.skill-icon.elemental-burst {
-    background: linear-gradient(135deg, var(--element-electro-bg) 0%, var(--element-electro) 100%);
+    background: transparent;
 }
 
 .skill-name {
@@ -1855,19 +1843,13 @@
     justify-content: center;
     border-radius: var(--border-radius-md);
     overflow: hidden;
-    background: var(--color-bg-secondary);
 }
 
 .passive-card .passive-icon img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-}
-
-.passive-icon-placeholder {
-    width: 100%;
-    height: 100%;
-    background: var(--color-bg-tertiary);
+    background: transparent;
 }
 
 .passive-card .passive-content {
