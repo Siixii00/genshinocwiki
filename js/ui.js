@@ -260,14 +260,15 @@ const UI = {
         
         html += `
             <div class="skill-table-controls-row">
-                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.addSkillTableRow('${skillType}')">+ 新增列</button>
-                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.addSkillTableCol('${skillType}')">+ 新增欄</button>
-                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.removeSkillTableRow('${skillType}')">- 移除列</button>
-                <button type="button" class="btn btn-sm btn-secondary" onclick="UI.removeSkillTableCol('${skillType}')">- 移除欄</button>
+                <button type="button" class="btn btn-sm btn-secondary skill-table-action" data-action="addRow" data-skill="${skillType}">+ 新增列</button>
+                <button type="button" class="btn btn-sm btn-secondary skill-table-action" data-action="addCol" data-skill="${skillType}">+ 新增欄</button>
+                <button type="button" class="btn btn-sm btn-secondary skill-table-action" data-action="removeRow" data-skill="${skillType}">- 移除列</button>
+                <button type="button" class="btn btn-sm btn-secondary skill-table-action" data-action="removeCol" data-skill="${skillType}">- 移除欄</button>
             </div>
         `;
         
         container.innerHTML = html;
+        container.dispatchEvent(new CustomEvent('skillTableRendered', { bubbles: true }));
     },
     
     createDefaultSkillTable(skillType) {
@@ -278,9 +279,33 @@ const UI = {
         return { headers: defaultHeaders, rows: defaultRows };
     },
     
+    getCurrentSkillTableData(skillType) {
+        const container = document.getElementById(`skill-${skillType}-table-container`);
+        if (!container) return null;
+        
+        const table = container.querySelector('.skill-table');
+        if (!table) return null;
+        
+        const headers = [];
+        table.querySelectorAll('thead th input').forEach(input => {
+            headers.push(input.value || '');
+        });
+        
+        const rows = [];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td input').forEach(input => {
+                row.push(input.value || '');
+            });
+            rows.push(row);
+        });
+        
+        return { headers, rows };
+    },
+    
     addSkillTableRow(skillType) {
         const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
-        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        let tableData = this.getCurrentSkillTableData(skillType) || (hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType));
         const colCount = tableData.headers?.length || tableData.rows[0]?.length || 14;
         tableData.rows = tableData.rows || [];
         tableData.rows.push(new Array(colCount).fill(''));
@@ -290,7 +315,7 @@ const UI = {
     
     addSkillTableCol(skillType) {
         const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
-        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        let tableData = this.getCurrentSkillTableData(skillType) || (hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType));
         tableData.headers = tableData.headers || [];
         tableData.headers.push('');
         tableData.rows = tableData.rows || [[]];
@@ -301,7 +326,7 @@ const UI = {
     
     removeSkillTableRow(skillType) {
         const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
-        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        let tableData = this.getCurrentSkillTableData(skillType) || (hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType));
         if (tableData.rows && tableData.rows.length > 1) {
             tableData.rows.pop();
             this.saveSkillTableData(skillType, tableData);
@@ -311,7 +336,7 @@ const UI = {
     
     removeSkillTableCol(skillType) {
         const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
-        let tableData = hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType);
+        let tableData = this.getCurrentSkillTableData(skillType) || (hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType));
         if (tableData.headers && tableData.headers.length > 1) {
             tableData.headers.pop();
             tableData.rows?.forEach(row => row.pop());
@@ -1242,6 +1267,246 @@ const UI = {
             lightboxModal.classList.remove('active');
             document.body.style.overflow = '';
         }
+    },
+    
+    getDraftKey(characterId) {
+        return `genshin_draft_${characterId}`;
+    },
+    
+    saveDraft(characterId, formData) {
+        try {
+            localStorage.setItem(this.getDraftKey(characterId), JSON.stringify(formData));
+            return true;
+        } catch (e) {
+            console.error('Error saving draft:', e);
+            return false;
+        }
+    },
+    
+    loadDraft(characterId) {
+        try {
+            const draft = localStorage.getItem(this.getDraftKey(characterId));
+            return draft ? JSON.parse(draft) : null;
+        } catch (e) {
+            console.error('Error loading draft:', e);
+            return null;
+        }
+    },
+    
+    clearDraft(characterId) {
+        localStorage.removeItem(this.getDraftKey(characterId));
+    },
+    
+    hasDraft(characterId) {
+        return localStorage.getItem(this.getDraftKey(characterId)) !== null;
+    },
+    
+    setupDraftAutoSave(form, characterId) {
+        if (this._draftInitialized) return;
+        this._draftInitialized = true;
+        
+        const saveDraftHandler = () => {
+            const formData = this.getFormData(form);
+            this.saveDraft(characterId, formData);
+        };
+        
+        form.addEventListener('input', saveDraftHandler);
+        form.addEventListener('change', saveDraftHandler);
+        
+        const editModal = document.getElementById('edit-modal');
+        if (editModal) {
+            editModal.addEventListener('click', (e) => {
+                const btn = e.target.closest('.skill-table-action');
+                if (btn) {
+                    const action = btn.dataset.action;
+                    const skillType = btn.dataset.skill;
+                    if (action === 'addRow') {
+                        this.addSkillTableRow(skillType);
+                    } else if (action === 'addCol') {
+                        this.addSkillTableCol(skillType);
+                    } else if (action === 'removeRow') {
+                        this.removeSkillTableRow(skillType);
+                    } else if (action === 'removeCol') {
+                        this.removeSkillTableCol(skillType);
+                    }
+                    setTimeout(saveDraftHandler, 50);
+                }
+            });
+            
+            editModal.addEventListener('skillTableRendered', saveDraftHandler);
+        }
+        
+        const containers = ['passives-list', 'normal-voice-edit-list', 'combat-voice-edit-list', 'custom-images-list'];
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.addEventListener('input', saveDraftHandler);
+                container.addEventListener('change', saveDraftHandler);
+            }
+        });
+        
+        ['normal', 'elemental', 'burst'].forEach(skillType => {
+            const tableContainer = document.getElementById(`skill-${skillType}-table-container`);
+            if (tableContainer) {
+                tableContainer.addEventListener('input', saveDraftHandler);
+                tableContainer.addEventListener('change', saveDraftHandler);
+            }
+        });
+        
+        const addPassiveBtn = document.getElementById('add-passive-btn');
+        if (addPassiveBtn) {
+            addPassiveBtn.addEventListener('click', () => {
+                setTimeout(saveDraftHandler, 100);
+            });
+        }
+        
+        const addNormalVoiceBtn = document.getElementById('add-normal-voice-btn');
+        const addCombatVoiceBtn = document.getElementById('add-combat-voice-btn');
+        if (addNormalVoiceBtn) {
+            addNormalVoiceBtn.addEventListener('click', () => {
+                setTimeout(saveDraftHandler, 100);
+            });
+        }
+        if (addCombatVoiceBtn) {
+            addCombatVoiceBtn.addEventListener('click', () => {
+                setTimeout(saveDraftHandler, 100);
+            });
+        }
+        
+        const addCustomImageBtn = document.getElementById('add-custom-image-btn');
+        if (addCustomImageBtn) {
+            addCustomImageBtn.addEventListener('click', () => {
+                setTimeout(saveDraftHandler, 100);
+            });
+        }
+    },
+    
+    populateFormFromDraft(form, draft) {
+        if (!draft) return false;
+        
+        const textFields = [
+            'name', 'title', 'fullname', 'element', 'weapon', 'region', 'rarity',
+            'gender', 'affiliation', 'constellation', 'vision', 'dish', 'birthday',
+            'vaCn', 'vaJp', 'description', 'avatarPosition', 'avatarScale'
+        ];
+        
+        textFields.forEach(field => {
+            const input = form.elements[field];
+            if (input && draft[field] !== undefined) {
+                input.value = draft[field];
+            }
+        });
+        
+        const storyFields = [
+            { id: 'edit-story-detail', key: 'stories', subkey: 'detail' },
+            { id: 'edit-story-1', key: 'stories', subkey: 'story1' },
+            { id: 'edit-story-2', key: 'stories', subkey: 'story2' },
+            { id: 'edit-story-3', key: 'stories', subkey: 'story3' },
+            { id: 'edit-story-4', key: 'stories', subkey: 'story4' },
+            { id: 'edit-story-5', key: 'stories', subkey: 'story5' },
+            { id: 'edit-story-vision', key: 'stories', subkey: 'vision' },
+            { id: 'edit-story-extra', key: 'stories', subkey: 'extra' }
+        ];
+        
+        storyFields.forEach(({ id, key, subkey }) => {
+            const el = document.getElementById(id);
+            if (el && draft[key] && draft[key][subkey]) {
+                el.value = draft[key][subkey];
+            }
+        });
+        
+        if (draft.images) {
+            const imageFields = {
+                'artwork': draft.images.artwork,
+                'portrait': draft.images.portrait,
+                'avatar': draft.images.avatar,
+                'idcard': draft.images.idcard
+            };
+            
+            Object.entries(imageFields).forEach(([field, url]) => {
+                const input = form.elements[field];
+                if (input && url) {
+                    input.value = url;
+                }
+            });
+            
+            const imagePreviewMap = {
+                'edit-artwork-preview': draft.images.artwork,
+                'edit-portrait-preview': draft.images.portrait,
+                'edit-avatar-preview': draft.images.avatar,
+                'edit-idcard-preview': draft.images.idcard
+            };
+            
+            Object.entries(imagePreviewMap).forEach(([id, url]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (url) {
+                        el.innerHTML = `<img src="${url}" alt="預覽">`;
+                    } else {
+                        const label = el.closest('.image-upload-item')?.querySelector('span')?.textContent || '預覽';
+                        el.innerHTML = `<span>${label}</span>`;
+                    }
+                }
+            });
+        }
+        
+        if (draft.skills) {
+            const skillFieldMap = {
+                'skill-normal-name': draft.skills.normal?.name,
+                'skill-normal-desc': draft.skills.normal?.desc,
+                'skill-normal-icon': draft.skills.normal?.icon,
+                'skill-elemental-name': draft.skills.elemental?.name,
+                'skill-elemental-desc': draft.skills.elemental?.desc,
+                'skill-elemental-icon': draft.skills.elemental?.icon,
+                'skill-burst-name': draft.skills.burst?.name,
+                'skill-burst-desc': draft.skills.burst?.desc,
+                'skill-burst-icon': draft.skills.burst?.icon
+            };
+            
+            Object.entries(skillFieldMap).forEach(([id, value]) => {
+                const el = document.getElementById(`edit-${id}`);
+                if (el) el.value = value || '';
+            });
+            
+            const skillIconPreviews = {
+                'skill-normal-icon-preview': draft.skills.normal?.icon,
+                'skill-elemental-icon-preview': draft.skills.elemental?.icon,
+                'skill-burst-icon-preview': draft.skills.burst?.icon
+            };
+            
+            Object.entries(skillIconPreviews).forEach(([id, url]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (url) {
+                        el.innerHTML = `<img src="${url}" alt="技能圖標">`;
+                    } else {
+                        el.innerHTML = '<span>圖標</span>';
+                    }
+                }
+            });
+            
+            this.populateSkillTable('normal', draft.skills.normal?.table);
+            this.populateSkillTable('elemental', draft.skills.elemental?.table);
+            this.populateSkillTable('burst', draft.skills.burst?.table);
+        }
+        
+        if (draft.model) {
+            const modelTypeSelect = document.getElementById('edit-model-type');
+            if (modelTypeSelect && draft.model.type) {
+                modelTypeSelect.value = draft.model.type;
+            }
+            const modelUrlInput = document.getElementById('edit-model-url');
+            if (modelUrlInput && draft.model.url) {
+                modelUrlInput.value = draft.model.url;
+            }
+        }
+        
+        this.populateCustomImages(draft.customImages || []);
+        this.populateConstellationEdit(draft.constellations);
+        this.populatePassivesEdit(draft.passives || []);
+        this.populateVoiceEdit(draft.voices?.normal || [], draft.voices?.combat || []);
+        
+        return true;
     }
 };
 

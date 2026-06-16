@@ -208,7 +208,14 @@ const DetailPage = {
         const editCancel = document.getElementById('edit-cancel');
         if (editCancel) {
             editCancel.addEventListener('click', () => {
-                UI.hideModal('edit-modal');
+                if (UI.hasDraft(this.currentCharacterId)) {
+                    if (confirm('您有未儲存的變更，是否要放棄？')) {
+                        UI.clearDraft(this.currentCharacterId);
+                        UI.hideModal('edit-modal');
+                    }
+                } else {
+                    UI.hideModal('edit-modal');
+                }
             });
         }
         
@@ -245,9 +252,17 @@ const DetailPage = {
         const character = await CharacterData.getById(this.currentCharacterId);
         if (!character) return;
         
+        UI._draftInitialized = false;
+        
         const form = document.getElementById('edit-form');
         if (form) {
-            UI.populateForm(form, character);
+            const draft = UI.loadDraft(this.currentCharacterId);
+            if (draft) {
+                UI.populateFormFromDraft(form, draft);
+            } else {
+                UI.populateForm(form, character);
+            }
+            UI.setupDraftAutoSave(form, this.currentCharacterId);
         }
         
         UI.showModal('edit-modal');
@@ -265,6 +280,7 @@ const DetailPage = {
         const updated = await CharacterData.update(id, formData);
         
         if (updated) {
+            UI.clearDraft(id);
             UI.showToast('角色已更新');
             UI.updateDetailPage(updated);
             UI.hideModal('edit-modal');
