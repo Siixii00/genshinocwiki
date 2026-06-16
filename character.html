@@ -609,15 +609,37 @@
                 <div class="form-section">
                     <h4 class="form-section-title">命之座</h4>
                     <div class="form-group">
-                        <label>命之座星座圖 (整體背景)</label>
+                        <label>命之座底圖 (選填)</label>
                         <div class="constellation-bg-upload">
                             <div class="constellation-bg-preview" id="constellation-bg-preview">
-                                <span>星座圖</span>
+                                <span>底圖</span>
                             </div>
-                            <input type="text" id="edit-constellation-image" name="constellationImage" placeholder="圖床 URL (透明底星座圖)" class="constellation-bg-url">
+                            <input type="text" id="edit-constellation-image" name="constellationImage" placeholder="圖床 URL (選填背景圖)" class="constellation-bg-url">
                         </div>
-                        <p class="form-hint">上傳包含 6 個命之座位置的透明底圖片，節點會依據圖片中的位置顯示</p>
+                        <p class="form-hint">上傳底圖後，可調整縮放和位置，並拖曳節點到想要的位置</p>
                     </div>
+                    
+                    <div class="form-row constellation-image-controls" id="constellation-image-controls" style="display:none;">
+                        <div class="form-group">
+                            <label>縮放倍率</label>
+                            <input type="range" id="edit-constellation-scale" min="50" max="200" value="100" step="5">
+                            <span id="constellation-scale-value">100%</span>
+                        </div>
+                        <div class="form-group">
+                            <label>水平位置</label>
+                            <input type="range" id="edit-constellation-pos-x" min="0" max="100" value="50" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label>垂直位置</label>
+                            <input type="range" id="edit-constellation-pos-y" min="0" max="100" value="50" step="1">
+                        </div>
+                        <input type="hidden" id="edit-constellation-bg-settings" name="constellationBgSettings" value=''>
+                    </div>
+                    
+                    <div class="constellation-drag-preview" id="constellation-drag-preview">
+                        <svg class="constellation-drag-lines" id="constellation-drag-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+                    </div>
+                    
                     <div class="constellation-edit-list" id="constellation-edit-list">
                     </div>
                 </div>

@@ -210,25 +210,44 @@ const UI = {
         
         const constellationImageInput = document.getElementById('edit-constellation-image');
         const constellationBgPreview = document.getElementById('constellation-bg-preview');
+        const bgSettings = character.constellationBgSettings || { scale: 100, posX: 50, posY: 50 };
+        
         if (constellationImageInput) {
             constellationImageInput.value = character.constellationImage || '';
             if (constellationBgPreview) {
                 if (character.constellationImage) {
-                    constellationBgPreview.innerHTML = `<img src="${character.constellationImage}" alt="命之座星座圖" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                    constellationBgPreview.innerHTML = `<img src="${character.constellationImage}" alt="命之座底圖" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
                 } else {
-                    constellationBgPreview.innerHTML = '<span>星座圖</span>';
+                    constellationBgPreview.innerHTML = '<span>底圖</span>';
                 }
             }
-        }
-        
-        if (constellationImageInput && constellationBgPreview) {
+            
+            const scaleInput = document.getElementById('edit-constellation-scale');
+            const posXInput = document.getElementById('edit-constellation-pos-x');
+            const posYInput = document.getElementById('edit-constellation-pos-y');
+            const controlsDiv = document.getElementById('constellation-image-controls');
+            
+            if (scaleInput) scaleInput.value = bgSettings.scale || 100;
+            if (posXInput) posXInput.value = bgSettings.posX || 50;
+            if (posYInput) posYInput.value = bgSettings.posY || 50;
+            
+            const scaleValue = document.getElementById('constellation-scale-value');
+            if (scaleValue) scaleValue.textContent = `${bgSettings.scale || 100}%`;
+            
+            if (controlsDiv) {
+                controlsDiv.style.display = character.constellationImage ? 'flex' : 'none';
+            }
+            
             constellationImageInput.addEventListener('input', () => {
                 const url = constellationImageInput.value.trim();
                 if (url) {
-                    constellationBgPreview.innerHTML = `<img src="${url}" alt="命之座星座圖" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                    constellationBgPreview.innerHTML = `<img src="${url}" alt="命之座底圖" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                    if (controlsDiv) controlsDiv.style.display = 'flex';
                 } else {
-                    constellationBgPreview.innerHTML = '<span>星座圖</span>';
+                    constellationBgPreview.innerHTML = '<span>底圖</span>';
+                    if (controlsDiv) controlsDiv.style.display = 'none';
                 }
+                this.initConstellationDragPreview();
             });
         }
         
@@ -382,8 +401,19 @@ const UI = {
         
         container.innerHTML = '';
         
+        const defaultPositions = [
+            { x: 50, y: 10 },
+            { x: 20, y: 30 },
+            { x: 80, y: 30 },
+            { x: 50, y: 50 },
+            { x: 20, y: 70 },
+            { x: 80, y: 70 }
+        ];
+        
         for (let i = 1; i <= 6; i++) {
-            const c = constellations?.find(c => c.level === i) || { level: i, name: '', desc: '', icon: '' };
+            const c = constellations?.find(c => c.level === i) || { level: i, name: '', desc: '', icon: '', position: null };
+            const pos = c.position || defaultPositions[i - 1];
+            
             container.innerHTML += `
                 <div class="constellation-edit-item" data-level="${i}">
                     <div class="constellation-edit-header">
@@ -407,6 +437,7 @@ const UI = {
                                 <textarea id="constellation-desc-${i}" name="constellationDesc${i}" rows="2">${c.desc || ''}</textarea>
                             </div>
                         </div>
+                        <input type="hidden" id="constellation-pos-hidden-${i}" value='${JSON.stringify(pos)}'>
                     </div>
                 </div>
             `;
@@ -426,9 +457,218 @@ const UI = {
                     } else {
                         iconPreview.innerHTML = '<span>圖標</span>';
                     }
+                    this.updateDragPreviewIcon(i, url);
                 });
             }
         }
+        
+        this.initConstellationDragPreview();
+    },
+    
+    initConstellationDragPreview() {
+        const preview = document.getElementById('constellation-drag-preview');
+        if (!preview) return;
+        
+        preview.innerHTML = '<svg class="constellation-drag-lines" id="constellation-drag-lines" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>';
+        
+        const defaultPositions = [
+            { x: 50, y: 15 },
+            { x: 25, y: 35 },
+            { x: 75, y: 35 },
+            { x: 50, y: 55 },
+            { x: 25, y: 80 },
+            { x: 75, y: 80 }
+        ];
+        
+        for (let i = 1; i <= 6; i++) {
+            const posInput = document.getElementById(`constellation-pos-hidden-${i}`);
+            let pos = defaultPositions[i - 1];
+            if (posInput?.value) {
+                try {
+                    pos = JSON.parse(posInput.value);
+                } catch (e) {}
+            }
+            
+            const node = document.createElement('div');
+            node.className = 'constellation-drag-node';
+            node.dataset.level = i;
+            node.id = `constellation-drag-node-${i}`;
+            node.textContent = `C${i}`;
+            node.style.left = `${pos.x}%`;
+            node.style.top = `${pos.y}%`;
+            node.style.transform = 'translate(-50%, -50%)';
+            
+            node.addEventListener('mousedown', (e) => this.startDragNode(e, i));
+            node.addEventListener('touchstart', (e) => this.startDragNode(e, i), { passive: false });
+            
+            preview.appendChild(node);
+            
+            const iconInput = document.getElementById(`constellation-icon-hidden-${i}`);
+            if (iconInput?.value) {
+                this.updateDragPreviewIcon(i, iconInput.value);
+            }
+        }
+        
+        this.updateDragLines();
+        this.updateBgPreviewSettings();
+        
+        const scaleInput = document.getElementById('edit-constellation-scale');
+        const posXInput = document.getElementById('edit-constellation-pos-x');
+        const posYInput = document.getElementById('edit-constellation-pos-y');
+        
+        if (scaleInput) {
+            scaleInput.addEventListener('input', () => {
+                const scaleValue = document.getElementById('constellation-scale-value');
+                if (scaleValue) scaleValue.textContent = `${scaleInput.value}%`;
+                this.updateBgPreviewSettings();
+            });
+        }
+        
+        if (posXInput) {
+            posXInput.addEventListener('input', () => this.updateBgPreviewSettings());
+        }
+        
+        if (posYInput) {
+            posYInput.addEventListener('input', () => this.updateBgPreviewSettings());
+        }
+        
+        const bgInput = document.getElementById('edit-constellation-image');
+        if (bgInput) {
+            bgInput.addEventListener('input', () => this.updateBgPreviewSettings());
+        }
+    },
+    
+    updateBgPreviewSettings() {
+        const preview = document.getElementById('constellation-drag-preview');
+        const bgInput = document.getElementById('edit-constellation-image');
+        const scaleInput = document.getElementById('edit-constellation-scale');
+        const posXInput = document.getElementById('edit-constellation-pos-x');
+        const posYInput = document.getElementById('edit-constellation-pos-y');
+        
+        if (!preview || !bgInput) return;
+        
+        const url = bgInput.value.trim();
+        if (url) {
+            const scale = scaleInput?.value || 100;
+            const posX = posXInput?.value || 50;
+            const posY = posYInput?.value || 50;
+            
+            preview.style.backgroundImage = `url(${url})`;
+            preview.style.backgroundSize = `${scale}%`;
+            preview.style.backgroundPosition = `${posX}% ${posY}%`;
+            preview.classList.add('has-bg');
+        } else {
+            preview.style.backgroundImage = '';
+            preview.classList.remove('has-bg');
+        }
+        
+        this.saveBgSettings();
+    },
+    
+    saveBgSettings() {
+        const scaleInput = document.getElementById('edit-constellation-scale');
+        const posXInput = document.getElementById('edit-constellation-pos-x');
+        const posYInput = document.getElementById('edit-constellation-pos-y');
+        const hiddenInput = document.getElementById('edit-constellation-bg-settings');
+        
+        if (!hiddenInput) return;
+        
+        const settings = {
+            scale: parseInt(scaleInput?.value || 100),
+            posX: parseInt(posXInput?.value || 50),
+            posY: parseInt(posYInput?.value || 50)
+        };
+        
+        hiddenInput.value = JSON.stringify(settings);
+    },
+    
+    updateDragPreviewIcon(level, iconUrl) {
+        const node = document.getElementById(`constellation-drag-node-${level}`);
+        if (!node) return;
+        
+        if (iconUrl) {
+            node.innerHTML = `<img src="${iconUrl}" alt="C${level}" onerror="this.parentElement.textContent='C${level}'">`;
+        } else {
+            node.textContent = `C${level}`;
+        }
+    },
+    
+    startDragNode(e, level) {
+        e.preventDefault();
+        const node = document.getElementById(`constellation-drag-node-${level}`);
+        if (!node) return;
+        
+        node.classList.add('dragging');
+        
+        const preview = document.getElementById('constellation-drag-preview');
+        const rect = preview.getBoundingClientRect();
+        
+        const isTouch = e.type === 'touchstart';
+        const clientX = isTouch ? e.touches[0].clientX : e.clientX;
+        const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+        
+        const onMove = (moveEvent) => {
+            const mx = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+            const my = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+            
+            let x = ((mx - rect.left) / rect.width) * 100;
+            let y = ((my - rect.top) / rect.height) * 100;
+            
+            x = Math.max(5, Math.min(95, x));
+            y = Math.max(5, Math.min(95, y));
+            
+            node.style.left = `${x}%`;
+            node.style.top = `${y}%`;
+            
+            const posInput = document.getElementById(`constellation-pos-hidden-${level}`);
+            if (posInput) {
+                posInput.value = JSON.stringify({ x, y });
+            }
+            
+            this.updateDragLines();
+        };
+        
+        const onEnd = () => {
+            node.classList.remove('dragging');
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
+        };
+        
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+    },
+    
+    updateDragLines() {
+        const svg = document.getElementById('constellation-drag-lines');
+        if (!svg) return;
+        
+        svg.innerHTML = '';
+        
+        const connections = [
+            [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]
+        ];
+        
+        connections.forEach(([from, to]) => {
+            const fromNode = document.getElementById(`constellation-drag-node-${from}`);
+            const toNode = document.getElementById(`constellation-drag-node-${to}`);
+            if (!fromNode || !toNode) return;
+            
+            const fromLeft = parseFloat(fromNode.style.left);
+            const fromTop = parseFloat(fromNode.style.top);
+            const toLeft = parseFloat(toNode.style.left);
+            const toTop = parseFloat(toNode.style.top);
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromLeft);
+            line.setAttribute('y1', fromTop);
+            line.setAttribute('x2', toLeft);
+            line.setAttribute('y2', toTop);
+            svg.appendChild(line);
+        });
     },
     
     populateVoiceEdit(normalVoices, combatVoices) {
@@ -673,10 +913,30 @@ const UI = {
             const name = document.getElementById(`constellation-name-${i}`)?.value || '';
             const desc = document.getElementById(`constellation-desc-${i}`)?.value || '';
             const icon = document.getElementById(`constellation-icon-hidden-${i}`)?.value || '';
-            data.constellations.push({ level: i, name, desc, icon });
+            const posInput = document.getElementById(`constellation-pos-hidden-${i}`)?.value || '';
+            let position = null;
+            if (posInput) {
+                try {
+                    position = JSON.parse(posInput);
+                } catch (e) {
+                    position = null;
+                }
+            }
+            data.constellations.push({ level: i, name, desc, icon, position });
         }
         
         data.constellationImage = data.constellationImage || null;
+        
+        const bgSettingsInput = document.getElementById('edit-constellation-bg-settings');
+        if (bgSettingsInput?.value) {
+            try {
+                data.constellationBgSettings = JSON.parse(bgSettingsInput.value);
+            } catch (e) {
+                data.constellationBgSettings = { scale: 100, posX: 50, posY: 50 };
+            }
+        } else {
+            data.constellationBgSettings = { scale: 100, posX: 50, posY: 50 };
+        }
         
         data.customImages = this.getCustomImagesData();
         
@@ -1288,36 +1548,68 @@ const UI = {
         const constellations = character.constellations || [];
         const element = character.element || 'geo';
         const constellationImage = character.constellationImage || null;
+        const bgSettings = character.constellationBgSettings || { scale: 100, posX: 50, posY: 50 };
         
         if (constellations.length === 0) {
             constellationList.innerHTML = '<p class="empty-message">暫無命之座資料</p>';
             return;
         }
         
+        const defaultPositions = [
+            { x: 50, y: 10 },
+            { x: 20, y: 30 },
+            { x: 80, y: 30 },
+            { x: 50, y: 50 },
+            { x: 20, y: 70 },
+            { x: 80, y: 70 }
+        ];
+        
+        const positions = constellations.map((c, i) => c.position || defaultPositions[i]);
+        
         constellationList.className = 'constellation-interactive-grid';
         
         if (constellationImage) {
             constellationList.style.backgroundImage = `url(${constellationImage})`;
-            constellationList.style.backgroundSize = 'contain';
-            constellationList.style.backgroundPosition = 'center';
+            constellationList.style.backgroundSize = `${bgSettings.scale}%`;
+            constellationList.style.backgroundPosition = `${bgSettings.posX}% ${bgSettings.posY}%`;
             constellationList.style.backgroundRepeat = 'no-repeat';
-            constellationList.innerHTML = '';
+            this.createSparkles(constellationList, element);
         } else {
             constellationList.style.backgroundImage = '';
-            constellationList.innerHTML = `
-                <svg class="constellation-lines" viewBox="0 0 500 400">
-                    <polyline class="constellation-line" points="250,60 110,140 250,240 390,140 250,60" />
-                    <polyline class="constellation-line" points="250,240 110,320 250,240 390,320" />
-                </svg>
-            `;
         }
         
+        const svgLines = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svgLines.setAttribute('class', 'constellation-lines');
+        svgLines.setAttribute('viewBox', '0 0 100 100');
+        svgLines.setAttribute('preserveAspectRatio', 'none');
+        
+        const connections = [
+            [0, 1], [1, 2], [2, 3], [3, 4], [4, 5]
+        ];
+        
+        connections.forEach(([from, to]) => {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', positions[from].x);
+            line.setAttribute('y1', positions[from].y);
+            line.setAttribute('x2', positions[to].x);
+            line.setAttribute('y2', positions[to].y);
+            line.setAttribute('class', 'constellation-line');
+            svgLines.appendChild(line);
+        });
+        
+        constellationList.innerHTML = '';
+        constellationList.appendChild(svgLines);
+        
         constellations.forEach((c, index) => {
+            const pos = positions[index];
             const node = document.createElement('div');
             node.className = 'constellation-node';
             node.dataset.element = element;
             node.dataset.level = c.level;
             node.dataset.index = index;
+            node.style.left = `${pos.x}%`;
+            node.style.top = `${pos.y}%`;
+            node.style.transform = 'translate(-50%, -50%)';
             
             node.innerHTML = `
                 <div class="constellation-node-glow"></div>
@@ -1331,6 +1623,48 @@ const UI = {
             `;
             
             node.addEventListener('click', () => {
+                this.showConstellationDetail(c, element);
+            });
+            
+            constellationList.appendChild(node);
+        });
+        
+        if (constellationImage) {
+            const sparkleContainer = document.createElement('div');
+            sparkleContainer.className = 'constellation-sparkles';
+            constellationList.appendChild(sparkleContainer);
+        }
+        
+        this.createConstellationDetailModal();
+    },
+    
+    createSparkles(container, element) {
+        const sparkleContainer = container.querySelector('.constellation-sparkles');
+        if (!sparkleContainer) return;
+        
+        const colors = {
+            pyro: '#FF4D4D',
+            anemo: '#72E2C3',
+            geo: '#F8BA4E',
+            electro: '#AF8FE2',
+            hydro: '#4CC9F0',
+            cryo: '#99DFFF',
+            dendro: '#A5C83B'
+        };
+        
+        const color = colors[element] || colors.geo;
+        
+        for (let i = 0; i < 15; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'constellation-sparkle';
+            sparkle.style.left = `${Math.random() * 100}%`;
+            sparkle.style.top = `${Math.random() * 100}%`;
+            sparkle.style.background = color;
+            sparkle.style.animationDelay = `${Math.random() * 3}s`;
+            sparkle.style.animationDuration = `${2 + Math.random() * 2}s`;
+            sparkleContainer.appendChild(sparkle);
+        }
+    },
                 this.showConstellationDetail(c, element);
             });
             
@@ -1656,6 +1990,20 @@ const UI = {
             if (constellationBgPreview) {
                 constellationBgPreview.innerHTML = `<img src="${draft.constellationImage}" alt="命之座星座圖">`;
             }
+        }
+        
+        if (draft.constellationBgSettings) {
+            const scaleInput = document.getElementById('edit-constellation-scale');
+            const posXInput = document.getElementById('edit-constellation-pos-x');
+            const posYInput = document.getElementById('edit-constellation-pos-y');
+            const controlsDiv = document.getElementById('constellation-image-controls');
+            const scaleValue = document.getElementById('constellation-scale-value');
+            
+            if (scaleInput) scaleInput.value = draft.constellationBgSettings.scale || 100;
+            if (posXInput) posXInput.value = draft.constellationBgSettings.posX || 50;
+            if (posYInput) posYInput.value = draft.constellationBgSettings.posY || 50;
+            if (scaleValue) scaleValue.textContent = `${draft.constellationBgSettings.scale || 100}%`;
+            if (controlsDiv && draft.constellationImage) controlsDiv.style.display = 'flex';
         }
         
         this.populateCustomImages(draft.customImages || []);
