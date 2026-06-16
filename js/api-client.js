@@ -146,6 +146,8 @@ const ApiClient = {
                 extra: c.story_extra || c.storyExtra || null
             },
             constellations: this.parseJSON(c.constellations) || [],
+            constellationImage: c.constellation_image || c.constellationImage || null,
+            constellationBgSettings: this.parseJSON(c.constellation_bg_settings || c.constellationBgSettings) || null,
             customImages: this.parseJSON(c.custom_images) || this.parseJSON(c.customImages) || [],
             passives: this.parseJSON(c.passives) || [],
             voices: {
@@ -216,6 +218,8 @@ const ApiClient = {
             storyVision: char.stories?.vision || char.storyVision || null,
             storyExtra: char.stories?.extra || char.storyExtra || null,
             constellations: Array.isArray(constellations) && constellations.length > 0 ? JSON.stringify(constellations) : null,
+            constellationImage: char.constellationImage || null,
+            constellationBgSettings: char.constellationBgSettings ? JSON.stringify(char.constellationBgSettings) : null,
             customImages: Array.isArray(customImages) && customImages.length > 0 ? JSON.stringify(customImages) : null,
             normalVoices: Array.isArray(normalVoices) && normalVoices.length > 0 ? JSON.stringify(normalVoices) : null,
             combatVoices: Array.isArray(combatVoices) && combatVoices.length > 0 ? JSON.stringify(combatVoices) : null,

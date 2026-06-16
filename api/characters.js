@@ -9,7 +9,7 @@ function getCharacterFields() {
     'va_cn', 'va_jp', 'description', 'artwork', 'gacha_image', 'portrait', 'avatar',
     'skill_normal_name', 'skill_normal_desc', 'skill_elemental_name', 'skill_elemental_desc', 'skill_burst_name', 'skill_burst_desc',
     'constellations', 'custom_images', 'normal_voices', 'combat_voices', 'model_type', 'model_url',
-    'passives',
+    'passives', 'constellation_image', 'constellation_bg_settings',
     ...STORY_FIELDS
   ];
 }
@@ -57,6 +57,8 @@ function normalizeCharacter(c) {
     model_type: c.modelType || c.model_type || null,
     model_url: c.modelUrl || c.model_url || null,
     passives: c.passives && Array.isArray(c.passives) && c.passives.length > 0 ? JSON.stringify(c.passives) : null,
+    constellation_image: c.constellationImage || c.constellation_image || null,
+    constellation_bg_settings: c.constellationBgSettings || c.constellation_bg_settings || null,
     story_detail: c.storyDetail || c.story_detail || null,
     story_1: c.story1 || c.story_1 || null,
     story_2: c.story2 || c.story_2 || null,
@@ -98,7 +100,7 @@ export default async function handler(req, res) {
           skill_elemental_name, skill_elemental_desc, skill_elemental_icon, skill_elemental_table,
           skill_burst_name, skill_burst_desc, skill_burst_icon, skill_burst_table,
           constellations, custom_images, normal_voices, combat_voices, model_type, model_url,
-          passives,
+          passives, constellation_image, constellation_bg_settings,
           story_detail, story_1, story_2, story_3, story_4, story_5, story_vision, story_extra
         ) VALUES (
           ${c.name}, ${c.title}, ${c.fullname},
@@ -112,7 +114,7 @@ export default async function handler(req, res) {
           ${c.skill_elemental_name}, ${c.skill_elemental_desc}, ${c.skill_elemental_icon}, ${c.skill_elemental_table},
           ${c.skill_burst_name}, ${c.skill_burst_desc}, ${c.skill_burst_icon}, ${c.skill_burst_table},
           ${c.constellations}, ${c.custom_images}, ${c.normal_voices}, ${c.combat_voices}, ${c.model_type}, ${c.model_url},
-          ${c.passives},
+          ${c.passives}, ${c.constellation_image}, ${c.constellation_bg_settings},
           ${c.story_detail}, ${c.story_1}, ${c.story_2}, ${c.story_3}, ${c.story_4}, ${c.story_5}, ${c.story_vision}, ${c.story_extra}
         ) RETURNING *
       `;
@@ -172,6 +174,8 @@ export default async function handler(req, res) {
           model_type = COALESCE(${c.model_type}, model_type),
           model_url = COALESCE(${c.model_url}, model_url),
           passives = COALESCE(${c.passives}, passives),
+          constellation_image = ${c.constellation_image},
+          constellation_bg_settings = ${c.constellation_bg_settings},
           story_detail = COALESCE(${c.story_detail}, story_detail),
           story_1 = COALESCE(${c.story_1}, story_1),
           story_2 = COALESCE(${c.story_2}, story_2),

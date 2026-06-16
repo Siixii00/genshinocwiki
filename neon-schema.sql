@@ -105,6 +105,8 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_elemental_icon TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_elemental_table JSONB;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_burst_icon TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_burst_table JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS constellation_image TEXT;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS constellation_bg_settings JSONB;
 
 -- 圖庫表
 CREATE TABLE IF NOT EXISTS gallery (
