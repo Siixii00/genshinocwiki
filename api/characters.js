@@ -57,6 +57,10 @@ function normalizeCharacter(c) {
     model_type: c.modelType || c.model_type || null,
     model_url: c.modelUrl || c.model_url || null,
     passives: (() => {
+        if (typeof c.passives === 'string') {
+            console.log('[DEBUG] normalizeCharacter passives (already string):', c.passives);
+            return c.passives;
+        }
         const result = c.passives && Array.isArray(c.passives) && c.passives.length > 0 ? JSON.stringify(c.passives) : null;
         console.log('[DEBUG] normalizeCharacter passives:', c.passives, '-> JSON:', result);
         return result;
