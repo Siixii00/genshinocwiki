@@ -1029,8 +1029,12 @@ const UI = {
     },
     
     addPassiveEditItem(name = '', desc = '', icon = '', index = null) {
+        console.log('[DEBUG] addPassiveEditItem called:', { name, desc, icon, index });
         const container = document.getElementById('passives-list');
-        if (!container) return;
+        if (!container) {
+            console.error('[DEBUG] passives-list container not found!');
+            return;
+        }
         
         const itemIndex = index !== null ? index : container.children.length;
         if (itemIndex >= 7) return;
