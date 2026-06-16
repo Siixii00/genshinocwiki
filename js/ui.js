@@ -352,6 +352,8 @@ const UI = {
     },
     
     addSkillTableRow(skillType) {
+        console.log('[DEBUG] addSkillTableRow called for:', skillType);
+        console.trace('[DEBUG] addSkillTableRow call stack');
         const hiddenInput = document.getElementById(`skill-${skillType}-table-data`);
         let tableData = this.getCurrentSkillTableData(skillType) || (hiddenInput?.value ? JSON.parse(hiddenInput.value) : this.createDefaultSkillTable(skillType));
         const colCount = tableData.headers?.length || tableData.rows[0]?.length || 14;
@@ -918,6 +920,15 @@ const UI = {
                 table: this.parseJSON(data.skillBurstTable) || null
             }
         };
+        
+        console.log('[DEBUG] getFormData skill tables:', {
+            normalTable: data.skillNormalTable,
+            elementalTable: data.skillElementalTable,
+            burstTable: data.skillBurstTable,
+            parsedNormal: data.skills.normal.table,
+            parsedElemental: data.skills.elemental.table,
+            parsedBurst: data.skills.burst.table
+        });
         
         delete data.skillNormalName;
         delete data.skillNormalDesc;
