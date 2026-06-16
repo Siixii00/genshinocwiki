@@ -88,6 +88,8 @@ const ApiClient = {
     },
     
     parseCharacter(c) {
+        console.log('[DEBUG] parseCharacter called for:', c?.name, 'id:', c?.id);
+        console.trace('[DEBUG] parseCharacter call stack');
         return {
             id: c.id,
             name: c.name,
