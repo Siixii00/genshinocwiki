@@ -482,6 +482,8 @@ const UI = {
         
         for (let i = 1; i <= 6; i++) {
             const posInput = document.getElementById(`constellation-pos-hidden-${i}`);
+            const iconInput = document.getElementById(`constellation-icon-hidden-${i}`);
+            
             let pos = defaultPositions[i - 1];
             if (posInput?.value) {
                 try {
@@ -498,15 +500,14 @@ const UI = {
             node.style.top = `${pos.y}%`;
             node.style.transform = 'translate(-50%, -50%)';
             
+            if (iconInput?.value) {
+                node.innerHTML = `<img src="${iconInput.value}" alt="C${i}" onerror="this.parentElement.textContent='C${i}'">`;
+            }
+            
             node.addEventListener('mousedown', (e) => this.startDragNode(e, i));
             node.addEventListener('touchstart', (e) => this.startDragNode(e, i), { passive: false });
             
             preview.appendChild(node);
-            
-            const iconInput = document.getElementById(`constellation-icon-hidden-${i}`);
-            if (iconInput?.value) {
-                this.updateDragPreviewIcon(i, iconInput.value);
-            }
         }
         
         this.updateDragLines();
