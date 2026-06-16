@@ -39,11 +39,16 @@ const ApiClient = {
     },
     
     async updateCharacter(id, updates) {
+        console.log('[DEBUG] updateCharacter called with id:', id, 'updates:', updates);
         const formatted = this.formatCharacter(updates);
+        console.log('[DEBUG] updateCharacter formatted:', formatted);
+        const payload = { id, ...formatted };
+        console.log('[DEBUG] updateCharacter payload passives:', payload.passives);
         const result = await this.request('/api/characters', {
             method: 'PUT',
-            body: JSON.stringify({ id, ...formatted })
+            body: JSON.stringify(payload)
         });
+        console.log('[DEBUG] updateCharacter result:', result);
         return result ? this.parseCharacter(result) : null;
     },
     

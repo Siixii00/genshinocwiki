@@ -966,6 +966,8 @@ const UI = {
         
         data.passives = this.getPassivesData();
         
+        console.log('[DEBUG] getFormData final data.passives:', data.passives);
+        
         data.voices = {
             normal: this.getVoicesData('normal'),
             combat: this.getVoicesData('combat')
