@@ -316,6 +316,16 @@ const UI = {
         `;
         
         container.innerHTML = html;
+        
+        container.querySelectorAll('.skill-table input').forEach(input => {
+            input.addEventListener('input', () => {
+                const tableData = this.getCurrentSkillTableData(skillType);
+                if (tableData) {
+                    this.saveSkillTableData(skillType, tableData);
+                }
+            });
+        });
+        
         container.dispatchEvent(new CustomEvent('skillTableRendered', { bubbles: true }));
     },
     
