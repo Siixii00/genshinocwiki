@@ -167,6 +167,38 @@ const DetailPage = {
                 UI.addVoiceEditItem(container, '', '', '');
             });
         }
+        
+        const addScreenshotBtn = document.getElementById('add-screenshot-btn');
+        if (addScreenshotBtn) {
+            addScreenshotBtn.addEventListener('click', () => {
+                const container = document.getElementById('screenshots-edit-list');
+                UI.addScreenshotEditItem(container, '', '');
+            });
+        }
+        
+        const addWeaponBtn = document.getElementById('add-weapon-btn');
+        if (addWeaponBtn) {
+            addWeaponBtn.addEventListener('click', () => {
+                const container = document.getElementById('guide-weapons-list');
+                UI.addGuideItemEdit(container, 'weapon', '', '');
+            });
+        }
+        
+        const addArtifactBtn = document.getElementById('add-artifact-btn');
+        if (addArtifactBtn) {
+            addArtifactBtn.addEventListener('click', () => {
+                const container = document.getElementById('guide-artifacts-list');
+                UI.addGuideItemEdit(container, 'artifact', '', '');
+            });
+        }
+        
+        const addTeammateBtn = document.getElementById('add-teammate-btn');
+        if (addTeammateBtn) {
+            addTeammateBtn.addEventListener('click', () => {
+                const container = document.getElementById('guide-teammates-list');
+                UI.addGuideItemEdit(container, 'teammate', '', '');
+            });
+        }
     },
     
     bindEvents() {

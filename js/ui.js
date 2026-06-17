@@ -260,6 +260,9 @@ const UI = {
         this.populateConstellationEdit(character.constellations);
         this.populatePassivesEdit(character.passives || []);
         this.populateVoiceEdit(character.voices?.normal || [], character.voices?.combat || []);
+        this.populateScreenshotsEdit(character.screenshots || []);
+        this.populateDishEdit(character.dishData || null);
+        this.populateGuideEdit(character.guide || null);
     },
     
     populateSkillTable(skillType, tableData) {
@@ -837,6 +840,179 @@ const UI = {
         return voices;
     },
     
+    populateScreenshotsEdit(screenshots) {
+        const container = document.getElementById('screenshots-edit-list');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        if (screenshots && screenshots.length > 0) {
+            screenshots.forEach((s, i) => this.addScreenshotEditItem(container, s.url, s.caption, i));
+        }
+    },
+    
+    addScreenshotEditItem(container, url = '', caption = '', index = null) {
+        if (!container) return;
+        
+        const itemIndex = index !== null ? index : container.children.length;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'screenshot-edit-item';
+        itemDiv.dataset.index = itemIndex;
+        
+        itemDiv.innerHTML = `
+            <div class="form-row">
+                <div class="form-group">
+                    <label>截圖 URL</label>
+                    <input type="text" class="screenshot-url-input" value="${url}" placeholder="圖床 URL">
+                </div>
+                <div class="form-group">
+                    <label>說明文字</label>
+                    <input type="text" class="screenshot-caption-input" value="${caption}" placeholder="截圖說明（選填）">
+                </div>
+                <button type="button" class="btn btn-sm btn-danger remove-screenshot-btn" style="align-self: flex-end;">刪除</button>
+            </div>
+        `;
+        
+        container.appendChild(itemDiv);
+        
+        const removeBtn = itemDiv.querySelector('.remove-screenshot-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => itemDiv.remove());
+        }
+    },
+    
+    getScreenshotsData() {
+        const container = document.getElementById('screenshots-edit-list');
+        if (!container) return [];
+        
+        const screenshots = [];
+        container.querySelectorAll('.screenshot-edit-item').forEach(item => {
+            const url = item.querySelector('.screenshot-url-input')?.value || '';
+            const caption = item.querySelector('.screenshot-caption-input')?.value || '';
+            if (url) {
+                screenshots.push({ url, caption });
+            }
+        });
+        return screenshots;
+    },
+    
+    populateDishEdit(dishData) {
+        const nameInput = document.getElementById('edit-dish-name');
+        const originalInput = document.getElementById('edit-dish-original');
+        const imageInput = document.getElementById('edit-dish-image');
+        const effectInput = document.getElementById('edit-dish-effect');
+        const descInput = document.getElementById('edit-dish-desc');
+        
+        if (nameInput) nameInput.value = dishData?.name || '';
+        if (originalInput) originalInput.value = dishData?.originalDish || '';
+        if (imageInput) imageInput.value = dishData?.image || '';
+        if (effectInput) effectInput.value = dishData?.effect || '';
+        if (descInput) descInput.value = dishData?.description || '';
+    },
+    
+    getDishData() {
+        const name = document.getElementById('edit-dish-name')?.value || '';
+        const originalDish = document.getElementById('edit-dish-original')?.value || '';
+        const image = document.getElementById('edit-dish-image')?.value || '';
+        const effect = document.getElementById('edit-dish-effect')?.value || '';
+        const description = document.getElementById('edit-dish-desc')?.value || '';
+        
+        if (!name) return null;
+        return { name, originalDish, image, effect, description };
+    },
+    
+    populateGuideEdit(guide) {
+        const container = document.getElementById('guide-weapons-list');
+        const artifactsContainer = document.getElementById('guide-artifacts-list');
+        const teammatesContainer = document.getElementById('guide-teammates-list');
+        const talentsInput = document.getElementById('edit-guide-talents');
+        const notesInput = document.getElementById('edit-guide-notes');
+        
+        if (container) {
+            container.innerHTML = '';
+            if (guide?.weapons && guide.weapons.length > 0) {
+                guide.weapons.forEach((w, i) => this.addGuideItemEdit(container, 'weapon', w.name, w.reason, i));
+            }
+        }
+        
+        if (artifactsContainer) {
+            artifactsContainer.innerHTML = '';
+            if (guide?.artifacts && guide.artifacts.length > 0) {
+                guide.artifacts.forEach((a, i) => this.addGuideItemEdit(artifactsContainer, 'artifact', a.name, a.reason, i));
+            }
+        }
+        
+        if (teammatesContainer) {
+            teammatesContainer.innerHTML = '';
+            if (guide?.teammates && guide.teammates.length > 0) {
+                guide.teammates.forEach((t, i) => this.addGuideItemEdit(teammatesContainer, 'teammate', t.name, t.reason, i));
+            }
+        }
+        
+        if (talentsInput) talentsInput.value = guide?.talents || '';
+        if (notesInput) notesInput.value = guide?.notes || '';
+    },
+    
+    addGuideItemEdit(container, type, name = '', reason = '', index = null) {
+        if (!container) return;
+        
+        const itemIndex = index !== null ? index : container.children.length;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'guide-item-edit';
+        itemDiv.dataset.type = type;
+        itemDiv.dataset.index = itemIndex;
+        
+        const label = type === 'weapon' ? '武器' : type === 'artifact' ? '聖遺物' : '隊友';
+        
+        itemDiv.innerHTML = `
+            <div class="form-row">
+                <div class="form-group">
+                    <label>${label}名稱</label>
+                    <input type="text" class="guide-item-name" value="${name}" placeholder="名稱">
+                </div>
+                <div class="form-group">
+                    <label>推薦原因</label>
+                    <input type="text" class="guide-item-reason" value="${reason}" placeholder="原因（選填）">
+                </div>
+                <button type="button" class="btn btn-sm btn-danger remove-guide-item-btn" style="align-self: flex-end;">刪除</button>
+            </div>
+        `;
+        
+        container.appendChild(itemDiv);
+        
+        const removeBtn = itemDiv.querySelector('.remove-guide-item-btn');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => itemDiv.remove());
+        }
+    },
+    
+    getGuideData() {
+        const weaponsContainer = document.getElementById('guide-weapons-list');
+        const artifactsContainer = document.getElementById('guide-artifacts-list');
+        const teammatesContainer = document.getElementById('guide-teammates-list');
+        
+        const getItems = (container) => {
+            if (!container) return [];
+            const items = [];
+            container.querySelectorAll('.guide-item-edit').forEach(item => {
+                const name = item.querySelector('.guide-item-name')?.value || '';
+                const reason = item.querySelector('.guide-item-reason')?.value || '';
+                if (name) items.push({ name, reason });
+            });
+            return items;
+        };
+        
+        const talents = document.getElementById('edit-guide-talents')?.value || '';
+        const notes = document.getElementById('edit-guide-notes')?.value || '';
+        
+        const weapons = getItems(weaponsContainer);
+        const artifacts = getItems(artifactsContainer);
+        const teammates = getItems(teammatesContainer);
+        
+        if (!weapons.length && !artifacts.length && !teammates.length && !talents && !notes) return null;
+        
+        return { weapons, artifacts, teammates, talents, notes };
+    },
+    
     populateCustomImages(customImages) {
         const container = document.getElementById('custom-images-list');
         if (!container) return;
@@ -1050,6 +1226,10 @@ const UI = {
             normal: this.getVoicesData('normal'),
             combat: this.getVoicesData('combat')
         };
+        
+        data.screenshots = this.getScreenshotsData();
+        data.dishData = this.getDishData();
+        data.guide = this.getGuideData();
         
         data.images = {
             artwork: data.artwork || null,
@@ -1525,6 +1705,10 @@ const UI = {
             }
         }
         
+        this.renderScreenshots(character.screenshots || []);
+        this.renderDish(character.dishData || null);
+        this.renderGuide(character.guide || null);
+        
         this.hideEmptyInfoRows(character);
         this.renderVoices(character.voices?.normal || [], character.voices?.combat || []);
         
@@ -1562,6 +1746,128 @@ const UI = {
         }
         
         this.renderCustomGallery(character.customImages || []);
+    },
+    
+    renderScreenshots(screenshots) {
+        const container = document.getElementById('screenshots-grid');
+        if (!container) return;
+        
+        if (!screenshots || screenshots.length === 0) {
+            container.innerHTML = '<p class="empty-message">暫無截圖資料</p>';
+            return;
+        }
+        
+        container.innerHTML = screenshots.map(s => `
+            <div class="screenshot-item">
+                <img src="${s.url}" alt="${s.caption || '遊戲截圖'}">
+                ${s.caption ? `<div class="screenshot-caption">${s.caption}</div>` : ''}
+            </div>
+        `).join('');
+    },
+    
+    renderDish(dishData) {
+        const container = document.getElementById('dish-content');
+        if (!container) return;
+        
+        if (!dishData || !dishData.name) {
+            container.innerHTML = '<p class="empty-message">暫無特殊料理資料</p>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="dish-image-section">
+                ${dishData.image ? `<img src="${dishData.image}" alt="${dishData.name}" class="dish-image">` : '<div class="dish-image" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);">無圖片</div>'}
+            </div>
+            <div class="dish-info-section">
+                <div class="dish-info-item">
+                    <label>料理名稱</label>
+                    <p>${dishData.name}</p>
+                </div>
+                ${dishData.originalDish ? `
+                <div class="dish-info-item">
+                    <label>原始料理</label>
+                    <p>${dishData.originalDish}</p>
+                </div>
+                ` : ''}
+                ${dishData.effect ? `
+                <div class="dish-info-item">
+                    <label>效果</label>
+                    <p>${dishData.effect}</p>
+                </div>
+                ` : ''}
+                ${dishData.description ? `
+                <div class="dish-info-item">
+                    <label>描述</label>
+                    <p>${dishData.description}</p>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    },
+    
+    renderGuide(guide) {
+        const container = document.getElementById('guide-content');
+        if (!container) return;
+        
+        if (!guide || (!guide.weapons && !guide.artifacts && !guide.teammates && !guide.talents && !guide.notes)) {
+            container.innerHTML = '<p class="empty-message">暫無養成建議資料</p>';
+            return;
+        }
+        
+        let html = '';
+        
+        if (guide.weapons && guide.weapons.length > 0) {
+            html += `
+                <div class="guide-card">
+                    <h4>推薦武器</h4>
+                    <ul>
+                        ${guide.weapons.map(w => `<li><strong>${w.name}</strong>${w.reason ? `：${w.reason}` : ''}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (guide.artifacts && guide.artifacts.length > 0) {
+            html += `
+                <div class="guide-card">
+                    <h4>推薦聖遺物</h4>
+                    <ul>
+                        ${guide.artifacts.map(a => `<li><strong>${a.name}</strong>${a.reason ? `：${a.reason}` : ''}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (guide.talents) {
+            html += `
+                <div class="guide-card">
+                    <h4>天賦升級順序</h4>
+                    <p>${guide.talents}</p>
+                </div>
+            `;
+        }
+        
+        if (guide.teammates && guide.teammates.length > 0) {
+            html += `
+                <div class="guide-card">
+                    <h4>推薦隊友</h4>
+                    <ul>
+                        ${guide.teammates.map(t => `<li><strong>${t.name}</strong>${t.reason ? `：${t.reason}` : ''}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (guide.notes) {
+            html += `
+                <div class="guide-card">
+                    <h4>備註</h4>
+                    <p>${guide.notes}</p>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = html || '<p class="empty-message">暫無養成建議資料</p>';
     },
     
     renderCustomGallery(customImages) {
