@@ -1819,16 +1819,44 @@ const UI = {
         
         const positions = constellations.map((c, i) => c.position || defaultPositions[i]);
         
-        constellationList.className = 'constellation-interactive-grid';
-        constellationList.innerHTML = '';
+        constellationList.className = 'constellation-display-container';
+        constellationList.innerHTML = `
+            <div class="constellation-image-section">
+                <div class="constellation-image-wrapper" id="constellation-image-wrapper"></div>
+            </div>
+            <div class="constellation-table-section">
+                <table class="constellation-table">
+                    <thead>
+                        <tr>
+                            <th>圖標</th>
+                            <th>層數</th>
+                            <th>名稱</th>
+                            <th>描述</th>
+                        </tr>
+                    </thead>
+                    <tbody id="constellation-table-body">
+                        ${constellations.map(c => `
+                            <tr class="constellation-row" data-level="${c.level}">
+                                <td class="constellation-table-icon">
+                                    ${c.icon ? `<img src="${c.icon}" alt="${c.name}" class="constellation-icon-img">` : '<span class="constellation-icon-placeholder">C' + c.level + '</span>'}
+                                </td>
+                                <td class="constellation-table-level">C${c.level}</td>
+                                <td class="constellation-table-name">${c.name || '-'}</td>
+                                <td class="constellation-table-desc">${this.formatText(c.desc) || '暫無資料'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
         
-        if (constellationImage) {
-            constellationList.style.backgroundImage = `url(${constellationImage})`;
-            constellationList.style.backgroundSize = `${bgSettings.scale}%`;
-            constellationList.style.backgroundPosition = `${bgSettings.posX}% ${bgSettings.posY}%`;
-            constellationList.style.backgroundRepeat = 'no-repeat';
-        } else {
-            constellationList.style.backgroundImage = '';
+        const imageWrapper = document.getElementById('constellation-image-wrapper');
+        
+        if (constellationImage && imageWrapper) {
+            imageWrapper.style.backgroundImage = `url(${constellationImage})`;
+            imageWrapper.style.backgroundSize = `${bgSettings.scale}%`;
+            imageWrapper.style.backgroundPosition = `${bgSettings.posX}% ${bgSettings.posY}%`;
+            imageWrapper.style.backgroundRepeat = 'no-repeat';
         }
         
         const svgLines = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1850,7 +1878,9 @@ const UI = {
             svgLines.appendChild(line);
         });
         
-        constellationList.appendChild(svgLines);
+        if (imageWrapper) {
+            imageWrapper.appendChild(svgLines);
+        }
         
         constellations.forEach((c, index) => {
             const pos = positions[index];
@@ -1876,43 +1906,17 @@ const UI = {
                 this.showConstellationDetail(c, element);
             });
             
-            constellationList.appendChild(node);
+            if (imageWrapper) {
+                imageWrapper.appendChild(node);
+            }
         });
         
-        if (constellationImage) {
+        if (constellationImage && imageWrapper) {
             const sparkleContainer = document.createElement('div');
             sparkleContainer.className = 'constellation-sparkles';
             this.createSparkles(sparkleContainer, element);
-            constellationList.appendChild(sparkleContainer);
+            imageWrapper.appendChild(sparkleContainer);
         }
-        
-        const tableContainer = document.createElement('div');
-        tableContainer.className = 'constellation-table-container';
-        tableContainer.innerHTML = `
-            <table class="constellation-table">
-                <thead>
-                    <tr>
-                        <th>圖標</th>
-                        <th>層數</th>
-                        <th>名稱</th>
-                        <th>描述</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${constellations.map(c => `
-                        <tr class="constellation-row" data-level="${c.level}">
-                            <td class="constellation-table-icon">
-                                ${c.icon ? `<img src="${c.icon}" alt="${c.name}" class="constellation-icon-img">` : '<span class="constellation-icon-placeholder">C' + c.level + '</span>'}
-                            </td>
-                            <td class="constellation-table-level">C${c.level}</td>
-                            <td class="constellation-table-name">${c.name || '-'}</td>
-                            <td class="constellation-table-desc">${this.formatText(c.desc) || '暫無資料'}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-        constellationList.appendChild(tableContainer);
         
         this.createConstellationDetailModal();
     },
