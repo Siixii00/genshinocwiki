@@ -1868,12 +1868,8 @@ const UI = {
             node.innerHTML = `
                 <div class="constellation-node-glow"></div>
                 <div class="constellation-node-inner">
-                    ${c.icon 
-                        ? `<img src="${c.icon}" alt="${c.name}" class="constellation-node-icon">`
-                        : `<div class="constellation-node-icon" style="background: var(--color-bg-secondary); border-radius: 50%;"></div>`
-                    }
+                    <span class="constellation-node-text">C${c.level}</span>
                 </div>
-                <span class="constellation-node-number">C${c.level}</span>
             `;
             
             node.addEventListener('click', () => {
@@ -1889,6 +1885,34 @@ const UI = {
             this.createSparkles(sparkleContainer, element);
             constellationList.appendChild(sparkleContainer);
         }
+        
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'constellation-table-container';
+        tableContainer.innerHTML = `
+            <table class="constellation-table">
+                <thead>
+                    <tr>
+                        <th>圖標</th>
+                        <th>層數</th>
+                        <th>名稱</th>
+                        <th>描述</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${constellations.map(c => `
+                        <tr class="constellation-row" data-level="${c.level}">
+                            <td class="constellation-table-icon">
+                                ${c.icon ? `<img src="${c.icon}" alt="${c.name}" class="constellation-icon-img">` : '<span class="constellation-icon-placeholder">C' + c.level + '</span>'}
+                            </td>
+                            <td class="constellation-table-level">C${c.level}</td>
+                            <td class="constellation-table-name">${c.name || '-'}</td>
+                            <td class="constellation-table-desc">${this.formatText(c.desc) || '暫無資料'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        constellationList.appendChild(tableContainer);
         
         this.createConstellationDetailModal();
     },
