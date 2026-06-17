@@ -2290,13 +2290,13 @@
 }
 
 .constellation-table-icon {
-    width: 60px;
+    width: 80px;
     text-align: center;
 }
 
 .constellation-table-icon-img {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
@@ -2308,8 +2308,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
     border: 2px solid rgba(255, 255, 255, 0.5);
