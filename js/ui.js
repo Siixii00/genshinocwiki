@@ -2094,7 +2094,8 @@ const UI = {
         form.addEventListener('change', saveDraftHandler);
         
         const editModal = document.getElementById('edit-modal');
-        if (editModal) {
+        if (editModal && !this._skillTableActionInitialized) {
+            this._skillTableActionInitialized = true;
             editModal.addEventListener('click', (e) => {
                 const btn = e.target.closest('.skill-table-action');
                 if (btn) {
@@ -2112,6 +2113,7 @@ const UI = {
                     setTimeout(saveDraftHandler, 50);
                 }
             });
+        }
             
             editModal.addEventListener('skillTableRendered', saveDraftHandler);
         }
