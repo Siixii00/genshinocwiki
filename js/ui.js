@@ -1774,6 +1774,8 @@ const UI = {
         const container = document.getElementById('dish-content');
         if (!container) return;
         
+        console.log('[DEBUG] renderDish called with:', dishData);
+        
         if (!dishData || !dishData.name) {
             container.innerHTML = '<p class="empty-message">暫無特殊料理資料</p>';
             return;

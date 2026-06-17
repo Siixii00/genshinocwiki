@@ -167,8 +167,16 @@ const ApiClient = {
                 combat: this.parseJSON(c.combat_voices) || this.parseJSON(c.combatVoices) || []
             },
             screenshots: this.parseJSON(c.screenshots) || [],
-            dishData: this.parseJSON(c.dish_data) || this.parseJSON(c.dishData) || null,
-            guide: this.parseJSON(c.guide) || null
+            dishData: (() => {
+                const parsed = this.parseJSON(c.dish_data) || this.parseJSON(c.dishData);
+                console.log('[DEBUG] parseCharacter dishData raw:', c.dish_data, 'parsed:', parsed);
+                return parsed;
+            })(),
+            guide: (() => {
+                const parsed = this.parseJSON(c.guide);
+                console.log('[DEBUG] parseCharacter guide raw:', c.guide, 'parsed:', parsed);
+                return parsed;
+            })()
         };
     },
     
