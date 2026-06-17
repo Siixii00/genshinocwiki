@@ -2104,7 +2104,7 @@
 .constellation-lines line,
 .constellation-line {
     stroke: var(--color-accent-gold);
-    stroke-width: 2;
+    stroke-width: 0.5;
     stroke-opacity: 0.4;
 }
 
