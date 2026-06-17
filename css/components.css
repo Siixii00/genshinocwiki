@@ -1969,8 +1969,8 @@
 
 .constellation-node {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     cursor: pointer;
     transition: transform 0.3s ease, filter 0.3s ease;
     z-index: 10;
@@ -1991,7 +1991,17 @@
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
+    background: var(--color-bg-secondary);
+    border: 2px solid var(--color-accent-gold);
 }
+
+.constellation-node[data-element="pyro"] .constellation-node-inner { border-color: var(--element-pyro); background: var(--element-pyro); }
+.constellation-node[data-element="anemo"] .constellation-node-inner { border-color: var(--element-anemo); background: var(--element-anemo); }
+.constellation-node[data-element="geo"] .constellation-node-inner { border-color: var(--element-geo); background: var(--element-geo); }
+.constellation-node[data-element="electro"] .constellation-node-inner { border-color: var(--element-electro); background: var(--element-electro); }
+.constellation-node[data-element="hydro"] .constellation-node-inner { border-color: var(--element-hydro); background: var(--element-hydro); }
+.constellation-node[data-element="cryo"] .constellation-node-inner { border-color: var(--element-cryo); background: var(--element-cryo); }
+.constellation-node[data-element="dendro"] .constellation-node-inner { border-color: var(--element-dendro); background: var(--element-dendro); }
 
 .constellation-node-inner::before {
     content: '';
@@ -2001,14 +2011,6 @@
     opacity: 0.15;
     transition: opacity 0.3s ease;
 }
-
-.constellation-node[data-element="pyro"] .constellation-node-inner::before { background: var(--element-pyro); }
-.constellation-node[data-element="anemo"] .constellation-node-inner::before { background: var(--element-anemo); }
-.constellation-node[data-element="geo"] .constellation-node-inner::before { background: var(--element-geo); }
-.constellation-node[data-element="electro"] .constellation-node-inner::before { background: var(--element-electro); }
-.constellation-node[data-element="hydro"] .constellation-node-inner::before { background: var(--element-hydro); }
-.constellation-node[data-element="cryo"] .constellation-node-inner::before { background: var(--element-cryo); }
-.constellation-node[data-element="dendro"] .constellation-node-inner::before { background: var(--element-dendro); }
 
 .constellation-node:hover .constellation-node-inner::before {
     opacity: 0.3;
@@ -2030,34 +2032,34 @@
 
 .constellation-node-glow {
     position: absolute;
-    inset: -10px;
+    inset: 0;
     border-radius: 50%;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
 }
 
 .constellation-node[data-element="pyro"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-pyro), 0 0 60px 30px rgba(255, 77, 77, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-pyro), 0 0 15px 4px rgba(255, 77, 77, 0.4);
 }
 .constellation-node[data-element="anemo"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-anemo), 0 0 60px 30px rgba(114, 226, 195, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-anemo), 0 0 15px 4px rgba(114, 226, 195, 0.4);
 }
 .constellation-node[data-element="geo"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-geo), 0 0 60px 30px rgba(248, 186, 78, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-geo), 0 0 15px 4px rgba(248, 186, 78, 0.4);
 }
 .constellation-node[data-element="electro"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-electro), 0 0 60px 30px rgba(175, 143, 226, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-electro), 0 0 15px 4px rgba(175, 143, 226, 0.4);
 }
 .constellation-node[data-element="hydro"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-hydro), 0 0 60px 30px rgba(76, 201, 240, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-hydro), 0 0 15px 4px rgba(76, 201, 240, 0.4);
 }
 .constellation-node[data-element="cryo"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-cryo), 0 0 60px 30px rgba(153, 223, 255, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-cryo), 0 0 15px 4px rgba(153, 223, 255, 0.4);
 }
 .constellation-node[data-element="dendro"] .constellation-node-glow {
-    box-shadow: 0 0 30px 15px var(--element-dendro), 0 0 60px 30px rgba(165, 200, 59, 0.3);
+    box-shadow: 0 0 8px 2px var(--element-dendro), 0 0 15px 4px rgba(165, 200, 59, 0.4);
 }
 
 .constellation-node:hover .constellation-node-glow,
@@ -2068,11 +2070,9 @@
 
 @keyframes constellation-pulse {
     0%, 100% {
-        transform: scale(1);
-        opacity: 0.8;
+        opacity: 0.7;
     }
     50% {
-        transform: scale(1.1);
         opacity: 1;
     }
 }
@@ -2243,10 +2243,10 @@
 }
 
 .constellation-node-text {
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     font-weight: 700;
     color: var(--color-white);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .constellation-table-container {
