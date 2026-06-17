@@ -2114,9 +2114,8 @@ const UI = {
                 }
             });
         }
-            
-            editModal.addEventListener('skillTableRendered', saveDraftHandler);
-        }
+        
+        editModal.addEventListener('skillTableRendered', saveDraftHandler);
         
         const containers = ['passives-list', 'normal-voice-edit-list', 'combat-voice-edit-list', 'custom-images-list'];
         containers.forEach(containerId => {
