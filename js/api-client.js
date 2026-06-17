@@ -165,7 +165,10 @@ const ApiClient = {
             voices: {
                 normal: this.parseJSON(c.normal_voices) || this.parseJSON(c.normalVoices) || [],
                 combat: this.parseJSON(c.combat_voices) || this.parseJSON(c.combatVoices) || []
-            }
+            },
+            screenshots: this.parseJSON(c.screenshots) || [],
+            dishData: this.parseJSON(c.dish_data) || this.parseJSON(c.dishData) || null,
+            guide: this.parseJSON(c.guide) || null
         };
     },
     
@@ -246,7 +249,10 @@ const ApiClient = {
                 return result;
             })(),
             modelType: char.model?.type || char.modelType || null,
-            modelUrl: char.model?.url || char.modelUrl || null
+            modelUrl: char.model?.url || char.modelUrl || null,
+            screenshots: Array.isArray(char.screenshots) && char.screenshots.length > 0 ? JSON.stringify(char.screenshots) : null,
+            dishData: char.dishData ? JSON.stringify(char.dishData) : null,
+            guide: char.guide ? JSON.stringify(char.guide) : null
         };
     },
     

@@ -108,6 +108,10 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS skill_burst_table JSONB;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS constellation_image TEXT;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS constellation_bg_settings JSONB;
 
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS screenshots JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS dish_data JSONB;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS guide JSONB;
+
 -- 圖庫表
 CREATE TABLE IF NOT EXISTS gallery (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

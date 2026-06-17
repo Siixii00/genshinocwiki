@@ -930,21 +930,21 @@ const UI = {
         if (container) {
             container.innerHTML = '';
             if (guide?.weapons && guide.weapons.length > 0) {
-                guide.weapons.forEach((w, i) => this.addGuideItemEdit(container, 'weapon', w.name, w.reason, i));
+                guide.weapons.forEach((w, i) => this.addGuideItemEdit(container, 'weapon', w.name, w.reason, w.image, i));
             }
         }
         
         if (artifactsContainer) {
             artifactsContainer.innerHTML = '';
             if (guide?.artifacts && guide.artifacts.length > 0) {
-                guide.artifacts.forEach((a, i) => this.addGuideItemEdit(artifactsContainer, 'artifact', a.name, a.reason, i));
+                guide.artifacts.forEach((a, i) => this.addGuideItemEdit(artifactsContainer, 'artifact', a.name, a.reason, a.image, i));
             }
         }
         
         if (teammatesContainer) {
             teammatesContainer.innerHTML = '';
             if (guide?.teammates && guide.teammates.length > 0) {
-                guide.teammates.forEach((t, i) => this.addGuideItemEdit(teammatesContainer, 'teammate', t.name, t.reason, i));
+                guide.teammates.forEach((t, i) => this.addGuideItemEdit(teammatesContainer, 'teammate', t.name, t.reason, t.image, i));
             }
         }
         
@@ -952,7 +952,7 @@ const UI = {
         if (notesInput) notesInput.value = guide?.notes || '';
     },
     
-    addGuideItemEdit(container, type, name = '', reason = '', index = null) {
+    addGuideItemEdit(container, type, name = '', reason = '', image = '', index = null) {
         if (!container) return;
         
         const itemIndex = index !== null ? index : container.children.length;
@@ -968,6 +968,10 @@ const UI = {
                 <div class="form-group">
                     <label>${label}名稱</label>
                     <input type="text" class="guide-item-name" value="${name}" placeholder="名稱">
+                </div>
+                <div class="form-group">
+                    <label>圖片 URL</label>
+                    <input type="text" class="guide-item-image" value="${image}" placeholder="圖片 URL（選填）">
                 </div>
                 <div class="form-group">
                     <label>推薦原因</label>
@@ -995,8 +999,9 @@ const UI = {
             const items = [];
             container.querySelectorAll('.guide-item-edit').forEach(item => {
                 const name = item.querySelector('.guide-item-name')?.value || '';
+                const image = item.querySelector('.guide-item-image')?.value || '';
                 const reason = item.querySelector('.guide-item-reason')?.value || '';
-                if (name) items.push({ name, reason });
+                if (name) items.push({ name, image, reason });
             });
             return items;
         };
@@ -1816,13 +1821,25 @@ const UI = {
         
         let html = '';
         
+        const renderItem = (item) => {
+            return `
+                <div class="guide-item">
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}" class="guide-item-image">` : ''}
+                    <div class="guide-item-info">
+                        <strong>${item.name}</strong>
+                        ${item.reason ? `<span class="guide-item-reason">：${item.reason}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        };
+        
         if (guide.weapons && guide.weapons.length > 0) {
             html += `
                 <div class="guide-card">
                     <h4>推薦武器</h4>
-                    <ul>
-                        ${guide.weapons.map(w => `<li><strong>${w.name}</strong>${w.reason ? `：${w.reason}` : ''}</li>`).join('')}
-                    </ul>
+                    <div class="guide-items-grid">
+                        ${guide.weapons.map(w => renderItem(w)).join('')}
+                    </div>
                 </div>
             `;
         }
@@ -1831,9 +1848,9 @@ const UI = {
             html += `
                 <div class="guide-card">
                     <h4>推薦聖遺物</h4>
-                    <ul>
-                        ${guide.artifacts.map(a => `<li><strong>${a.name}</strong>${a.reason ? `：${a.reason}` : ''}</li>`).join('')}
-                    </ul>
+                    <div class="guide-items-grid">
+                        ${guide.artifacts.map(a => renderItem(a)).join('')}
+                    </div>
                 </div>
             `;
         }
@@ -1851,9 +1868,9 @@ const UI = {
             html += `
                 <div class="guide-card">
                     <h4>推薦隊友</h4>
-                    <ul>
-                        ${guide.teammates.map(t => `<li><strong>${t.name}</strong>${t.reason ? `：${t.reason}` : ''}</li>`).join('')}
-                    </ul>
+                    <div class="guide-items-grid">
+                        ${guide.teammates.map(t => renderItem(t)).join('')}
+                    </div>
                 </div>
             `;
         }
