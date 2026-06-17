@@ -10,6 +10,7 @@ function getCharacterFields() {
     'skill_normal_name', 'skill_normal_desc', 'skill_elemental_name', 'skill_elemental_desc', 'skill_burst_name', 'skill_burst_desc',
     'constellations', 'custom_images', 'normal_voices', 'combat_voices', 'model_type', 'model_url',
     'passives', 'constellation_image', 'constellation_bg_settings',
+    'screenshots', 'dish_data', 'guide',
     ...STORY_FIELDS
   ];
 }
@@ -74,7 +75,10 @@ function normalizeCharacter(c) {
     story_4: c.story4 || c.story_4 || null,
     story_5: c.story5 || c.story_5 || null,
     story_vision: c.storyVision || c.story_vision || null,
-    story_extra: c.storyExtra || c.story_extra || null
+    story_extra: c.storyExtra || c.story_extra || null,
+    screenshots: c.screenshots || null,
+    dish_data: c.dishData || c.dish_data || null,
+    guide: c.guide || null
   };
 }
 
@@ -110,6 +114,7 @@ export default async function handler(req, res) {
           skill_burst_name, skill_burst_desc, skill_burst_icon, skill_burst_table,
           constellations, custom_images, normal_voices, combat_voices, model_type, model_url,
           passives, constellation_image, constellation_bg_settings,
+          screenshots, dish_data, guide,
           story_detail, story_1, story_2, story_3, story_4, story_5, story_vision, story_extra
         ) VALUES (
           ${c.name}, ${c.title}, ${c.fullname},
@@ -124,6 +129,7 @@ export default async function handler(req, res) {
           ${c.skill_burst_name}, ${c.skill_burst_desc}, ${c.skill_burst_icon}, ${c.skill_burst_table},
           ${c.constellations}, ${c.custom_images}, ${c.normal_voices}, ${c.combat_voices}, ${c.model_type}, ${c.model_url},
           ${c.passives}, ${c.constellation_image}, ${c.constellation_bg_settings},
+          ${c.screenshots}, ${c.dish_data}, ${c.guide},
           ${c.story_detail}, ${c.story_1}, ${c.story_2}, ${c.story_3}, ${c.story_4}, ${c.story_5}, ${c.story_vision}, ${c.story_extra}
         ) RETURNING *
       `;
@@ -186,6 +192,9 @@ export default async function handler(req, res) {
           passives = ${c.passives},
           constellation_image = ${c.constellation_image},
           constellation_bg_settings = ${c.constellation_bg_settings},
+          screenshots = COALESCE(${c.screenshots}, screenshots),
+          dish_data = COALESCE(${c.dish_data}, dish_data),
+          guide = COALESCE(${c.guide}, guide),
           story_detail = COALESCE(${c.story_detail}, story_detail),
           story_1 = COALESCE(${c.story_1}, story_1),
           story_2 = COALESCE(${c.story_2}, story_2),
