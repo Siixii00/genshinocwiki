@@ -1838,7 +1838,7 @@ const UI = {
                         ${constellations.map(c => `
                             <tr class="constellation-row" data-level="${c.level}">
                                 <td class="constellation-table-icon">
-                                    <span class="constellation-icon-placeholder">C${c.level}</span>
+                                    ${c.icon ? `<img src="${c.icon}" alt="C${c.level}" class="constellation-table-icon-img">` : `<span class="constellation-icon-placeholder">C${c.level}</span>`}
                                 </td>
                                 <td class="constellation-table-level">第${c.level}層</td>
                                 <td class="constellation-table-name">${c.name || '-'}</td>
