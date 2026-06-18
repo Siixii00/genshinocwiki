@@ -6,6 +6,10 @@ const App = {
     },
     
     async init() {
+        if (typeof DeviceDetect !== 'undefined') {
+            DeviceDetect.init();
+        }
+        
         if (typeof Auth !== 'undefined') {
             await Auth.init({
                 clientId: this.config.googleClientId,

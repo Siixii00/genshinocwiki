@@ -809,6 +809,7 @@
     </div>
 
     <script src="js/auth.js"></script>
+    <script src="js/device-detect.js"></script>
     <script src="js/music-player.js"></script>
     <script src="js/api-client.js"></script>
     <script src="js/character-data.js"></script>
@@ -817,6 +818,7 @@
     <script src="js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            DeviceDetect.init();
             await Auth.init({
                 clientId: '807013160344-7u52pcr2s2cplmck6jdq0nija2nu0dks.apps.googleusercontent.com',
                 adminEmails: ['yaninlin@gmail.com'],
