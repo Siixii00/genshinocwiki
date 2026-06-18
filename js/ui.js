@@ -964,20 +964,27 @@ const UI = {
         const label = type === 'weapon' ? '武器' : type === 'artifact' ? '聖遺物' : '隊友';
         
         itemDiv.innerHTML = `
-            <div class="form-row">
-                <div class="form-group">
-                    <label>${label}名稱</label>
-                    <input type="text" class="guide-item-name" value="${name}" placeholder="名稱">
+            <div class="guide-edit-layout">
+                <div class="guide-edit-image-section">
+                    <div class="guide-edit-image-preview" id="guide-image-preview-${itemIndex}">
+                        ${image ? `<img src="${image}" alt="預覽" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">` : '<span>圖片預覽</span>'}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>圖片 URL</label>
-                    <input type="text" class="guide-item-image" value="${image}" placeholder="圖片 URL（選填）">
+                <div class="guide-edit-fields">
+                    <div class="form-group">
+                        <label>${label}名稱</label>
+                        <input type="text" class="guide-item-name" value="${name}" placeholder="名稱">
+                    </div>
+                    <div class="form-group">
+                        <label>圖片 URL</label>
+                        <input type="text" class="guide-item-image-url" value="${image}" placeholder="圖床 URL">
+                    </div>
+                    <div class="form-group">
+                        <label>推薦原因</label>
+                        <textarea class="guide-item-reason" rows="3" placeholder="推薦原因">${reason}</textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>推薦原因</label>
-                    <input type="text" class="guide-item-reason" value="${reason}" placeholder="原因（選填）">
-                </div>
-                <button type="button" class="btn btn-sm btn-danger remove-guide-item-btn" style="align-self: flex-end;">刪除</button>
+                <button type="button" class="btn btn-sm btn-danger remove-guide-item-btn">刪除</button>
             </div>
         `;
         
@@ -986,6 +993,19 @@ const UI = {
         const removeBtn = itemDiv.querySelector('.remove-guide-item-btn');
         if (removeBtn) {
             removeBtn.addEventListener('click', () => itemDiv.remove());
+        }
+        
+        const imageInput = itemDiv.querySelector('.guide-item-image-url');
+        const imagePreview = itemDiv.querySelector('.guide-edit-image-preview');
+        if (imageInput && imagePreview) {
+            imageInput.addEventListener('input', () => {
+                const url = imageInput.value.trim();
+                if (url) {
+                    imagePreview.innerHTML = `<img src="${url}" alt="預覽" onerror="this.parentElement.innerHTML='<span>載入失敗</span>'">`;
+                } else {
+                    imagePreview.innerHTML = '<span>圖片預覽</span>';
+                }
+            });
         }
     },
     
@@ -999,7 +1019,7 @@ const UI = {
             const items = [];
             container.querySelectorAll('.guide-item-edit').forEach(item => {
                 const name = item.querySelector('.guide-item-name')?.value || '';
-                const image = item.querySelector('.guide-item-image')?.value || '';
+                const image = item.querySelector('.guide-item-image-url')?.value || '';
                 const reason = item.querySelector('.guide-item-reason')?.value || '';
                 if (name) items.push({ name, image, reason });
             });
