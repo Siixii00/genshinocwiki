@@ -188,6 +188,7 @@
     padding: 3px;
     background: linear-gradient(135deg, var(--color-accent-gold) 0%, var(--color-accent-gold-dark) 50%, var(--color-accent-gold) 100%);
     box-shadow: 0 0 8px rgba(211, 188, 142, 0.4);
+    overflow: hidden;
 }
 
 .avatar-ring img {
@@ -196,6 +197,7 @@
     object-fit: cover;
     border-radius: var(--border-radius-full);
     background: var(--color-bg-secondary);
+    transform-origin: center center;
 }
 
 .character-avatar .element-icon {

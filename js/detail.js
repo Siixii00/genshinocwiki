@@ -338,6 +338,10 @@ const DetailPage = {
         }
         
         const formData = UI.getFormData(form);
+        console.log('[DEBUG] handleEditSubmit formData:', formData);
+        console.log('[DEBUG] cardAvatarScale:', formData.cardAvatarScale);
+        console.log('[DEBUG] cardAvatarPositionY:', formData.cardAvatarPositionY);
+        
         const id = this.currentCharacterId;
         
         const updated = await CharacterData.update(id, formData);
