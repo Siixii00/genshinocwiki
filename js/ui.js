@@ -1819,10 +1819,16 @@ const UI = {
         
         container.innerHTML = screenshots.map(s => `
             <div class="screenshot-item">
-                <img src="${s.url}" alt="${s.caption || '遊戲截圖'}">
+                <img src="${s.url}" alt="${s.caption || '遊戲截圖'}" class="lightboxable" data-url="${s.url}">
                 ${s.caption ? `<div class="screenshot-caption">${s.caption}</div>` : ''}
             </div>
         `).join('');
+        
+        container.querySelectorAll('.screenshot-item img').forEach(img => {
+            img.addEventListener('click', () => {
+                this.showLightbox(img.dataset.url);
+            });
+        });
     },
     
     renderDish(dishData) {
@@ -1838,7 +1844,7 @@ const UI = {
         
         container.innerHTML = `
             <div class="dish-image-section">
-                ${dishData.image ? `<img src="${dishData.image}" alt="${dishData.name}" class="dish-image">` : '<div class="dish-image" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);">無圖片</div>'}
+                ${dishData.image ? `<img src="${dishData.image}" alt="${dishData.name}" class="dish-image lightboxable" data-url="${dishData.image}">` : '<div class="dish-image" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);">無圖片</div>'}
             </div>
             <div class="dish-info-section">
                 <div class="dish-info-item">
@@ -1865,6 +1871,13 @@ const UI = {
                 ` : ''}
             </div>
         `;
+        
+        const dishImage = container.querySelector('.dish-image.lightboxable');
+        if (dishImage) {
+            dishImage.addEventListener('click', () => {
+                this.showLightbox(dishImage.dataset.url);
+            });
+        }
     },
     
     renderGuide(guide) {
@@ -1881,7 +1894,7 @@ const UI = {
         const renderItem = (item) => {
             return `
                 <div class="guide-item">
-                    ${item.image ? `<img src="${item.image}" alt="${item.name}" class="guide-item-image">` : ''}
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}" class="guide-item-image lightboxable" data-url="${item.image}">` : ''}
                     <div class="guide-item-info">
                         <strong>${item.name}</strong>
                         ${item.reason ? `<span class="guide-item-reason">：${item.reason}</span>` : ''}
@@ -1942,6 +1955,12 @@ const UI = {
         }
         
         container.innerHTML = html || '<p class="empty-message">暫無養成建議資料</p>';
+        
+        container.querySelectorAll('.guide-item-image.lightboxable').forEach(img => {
+            img.addEventListener('click', () => {
+                this.showLightbox(img.dataset.url);
+            });
+        });
     },
     
     renderCustomGallery(customImages) {
@@ -1962,12 +1981,18 @@ const UI = {
                 <div class="gallery-grid">
                     ${section.images.map(url => `
                         <div class="gallery-item">
-                            <img src="${url}" alt="${section.title || '圖片'}">
+                            <img src="${url}" alt="${section.title || '圖片'}" class="lightboxable" data-url="${url}">
                         </div>
                     `).join('')}
                 </div>
             `;
             container.appendChild(sectionDiv);
+        });
+        
+        container.querySelectorAll('.gallery-item img.lightboxable').forEach(img => {
+            img.addEventListener('click', () => {
+                this.showLightbox(img.dataset.url);
+            });
         });
     },
     
@@ -2076,7 +2101,7 @@ const UI = {
         galleryImages.forEach(({ id, url }) => {
             const img = document.getElementById(id);
             if (img && url) {
-                img.style.cursor = 'pointer';
+                img.classList.add('lightboxable');
                 img.addEventListener('click', () => {
                     this.showLightbox(url);
                 });

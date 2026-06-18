@@ -20,9 +20,12 @@
             -ms-user-select: none;
         }
         body:not(.edit-mode) img {
-            pointer-events: none;
             -webkit-user-drag: none;
             user-drag: none;
+        }
+        body:not(.edit-mode) .lightboxable {
+            pointer-events: auto;
+            cursor: pointer;
         }
     </style>
 </head>

@@ -158,30 +158,31 @@
     }
     
     .skill-header {
-        flex-wrap: wrap;
-        gap: var(--spacing-sm);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
     }
     
     .skill-icon {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
     }
     
     .skill-title h4 {
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
     }
     
     .skill-name {
-        font-size: 0.75rem;
+        font-size: 0.6875rem;
     }
     
     .skill-description {
-        font-size: 0.875rem;
-        line-height: 1.6;
+        font-size: 0.8125rem;
+        line-height: 1.5;
     }
     
     .skill-table-display {
-        font-size: 0.75rem;
+        font-size: 0.6875rem;
     }
     
     .skill-table-display table th,
@@ -196,6 +197,30 @@
     
     .constellation-card {
         padding: var(--spacing-sm);
+    }
+    
+    .constellation-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+    
+    .constellation-card .constellation-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .constellation-level {
+        font-size: 0.6875rem;
+    }
+    
+    .constellation-name {
+        font-size: 0.8125rem;
+    }
+    
+    .constellation-desc {
+        font-size: 0.8125rem;
+        line-height: 1.5;
     }
     
     .constellation-header {
@@ -472,21 +497,66 @@
         padding: var(--spacing-xs);
     }
     
+    .skill-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+    
     .skill-icon {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
     }
     
     .skill-header h4 {
-        font-size: 0.75rem;
-    }
-    
-    .skill-name {
         font-size: 0.6875rem;
     }
     
+    .skill-name {
+        font-size: 0.625rem;
+    }
+    
     .skill-description {
-        font-size: 0.75rem;
+        font-size: 0.6875rem;
+        line-height: 1.5;
+    }
+    
+    .skill-content {
+        padding-top: var(--spacing-xs);
+    }
+    
+    .constellation-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xs);
+    }
+    
+    .constellation-card {
+        padding: var(--spacing-xs);
+    }
+    
+    .constellation-card .constellation-icon {
+        width: 32px;
+        height: 32px;
+        margin-bottom: var(--spacing-xs);
+    }
+    
+    .constellation-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+    
+    .constellation-level {
+        font-size: 0.625rem;
+    }
+    
+    .constellation-name {
+        font-size: 0.6875rem;
+    }
+    
+    .constellation-desc {
+        font-size: 0.6875rem;
+        line-height: 1.5;
     }
     
     .screenshots-grid {
