@@ -109,7 +109,13 @@ const ShopUI = {
             </div>
         `}).join('');
         
-        track.innerHTML = content + content;
+        if (featuredItems.length >= 3) {
+            track.innerHTML = content + content;
+        } else {
+            track.innerHTML = content;
+            track.style.justifyContent = 'center';
+            track.style.animation = 'none';
+        }
     },
     
     renderSeriesAlbums(items) {
