@@ -312,7 +312,6 @@ const Shop = {
     async refresh() {
         const items = await ShopData.filter(this.currentFilters);
         ShopUI.renderFeaturedMarquee(items);
-        ShopUI.renderSeriesAlbums(items);
         ShopUI.renderGrid(items);
     },
     
