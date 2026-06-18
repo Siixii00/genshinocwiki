@@ -2481,8 +2481,8 @@
 }
 
 .guide-item-image {
-    width: 120px;
-    height: 80px;
+    width: 100px;
+    height: 150px;
     object-fit: cover;
     border-radius: var(--border-radius-sm);
     background: var(--color-bg-primary);
@@ -2526,8 +2526,8 @@
 }
 
 .guide-edit-image-preview {
-    width: 140px;
-    height: 90px;
+    width: 100px;
+    height: 150px;
     background: var(--color-bg-primary);
     border: 2px dashed var(--color-border);
     border-radius: var(--border-radius-sm);
