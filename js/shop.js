@@ -87,10 +87,10 @@ const ShopData = {
 };
 
 const ShopUI = {
-    renderFeatured(items) {
-        const container = document.getElementById('featured-grid');
-        const section = document.getElementById('featured-section');
-        if (!container) return;
+    renderFeaturedMarquee(items) {
+        const track = document.getElementById('featured-marquee-track');
+        const section = document.getElementById('featured-marquee-section');
+        if (!track) return;
         
         const featuredItems = items.filter(item => item.featured);
         
@@ -101,21 +101,19 @@ const ShopUI = {
         
         if (section) section.style.display = 'block';
         
-        container.innerHTML = featuredItems.map(item => {
+        const content = featuredItems.map(item => {
             const imagePosition = item.image_position || 50;
             return `
-            <div class="featured-item" data-id="${item.id}">
+            <div class="featured-marquee-item" data-id="${item.id}">
                 <img src="${item.main_image}" alt="${item.name}" style="object-position: center ${imagePosition}%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/></svg>'">
-                <div class="featured-item-overlay">
-                    <div class="featured-item-name">${item.name}</div>
-                    <div class="featured-item-price">${item.price || ''}</div>
-                </div>
             </div>
         `}).join('');
+        
+        track.innerHTML = content + content;
     },
     
-    renderSeriesSections(items) {
-        const container = document.getElementById('series-sections');
+    renderSeriesAlbums(items) {
+        const container = document.getElementById('series-albums');
         if (!container) return;
         
         const itemsWithSeries = items.filter(item => item.series);
@@ -138,19 +136,23 @@ const ShopUI = {
             const itemsHtml = seriesItems.map(item => {
                 const imagePosition = item.image_position || 50;
                 return `
-                <div class="series-item" data-id="${item.id}">
+                <div class="series-album-item" data-id="${item.id}">
                     <img src="${item.main_image}" alt="${item.name}" style="object-position: center ${imagePosition}%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/></svg>'">
+                    <div class="series-album-item-overlay">
+                        <div class="series-album-item-name">${item.name}</div>
+                        <div class="series-album-item-price">${item.price || ''}</div>
+                    </div>
                 </div>
             `}).join('');
             
             return `
-            <div class="series-section">
-                <h3 class="series-title">${series}</h3>
-                <div class="series-grid">${itemsHtml}</div>
+            <div class="series-album">
+                <h3 class="series-album-title">${series}</h3>
+                <div class="series-album-grid">${itemsHtml}</div>
             </div>
         `}).join('');
         
-        container.querySelectorAll('.series-item').forEach(el => {
+        container.querySelectorAll('.series-album-item').forEach(el => {
             el.addEventListener('click', async () => {
                 const item = await ShopData.getById(el.dataset.id);
                 if (item) {
@@ -160,7 +162,7 @@ const ShopUI = {
             });
         });
         
-        container.querySelectorAll('.featured-item').forEach(el => {
+        container.querySelectorAll('.featured-marquee-item').forEach(el => {
             el.addEventListener('click', async () => {
                 const item = await ShopData.getById(el.dataset.id);
                 if (item) {
@@ -309,9 +311,8 @@ const Shop = {
     
     async refresh() {
         const items = await ShopData.filter(this.currentFilters);
-        ShopUI.renderFeatured(items);
-        ShopUI.renderSeriesSections(items);
-        ShopUI.renderMarquee(items);
+        ShopUI.renderFeaturedMarquee(items);
+        ShopUI.renderSeriesAlbums(items);
         ShopUI.renderGrid(items);
     },
     
