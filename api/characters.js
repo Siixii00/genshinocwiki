@@ -76,9 +76,9 @@ function normalizeCharacter(c) {
     story_5: c.story5 || c.story_5 || null,
     story_vision: c.storyVision || c.story_vision || null,
     story_extra: c.storyExtra || c.story_extra || null,
-    screenshots: c.screenshots || null,
-    dish_data: c.dishData || c.dish_data || null,
-    guide: c.guide || null
+    screenshots: c.screenshots ? (typeof c.screenshots === 'string' ? c.screenshots : JSON.stringify(c.screenshots)) : null,
+    dish_data: c.dishData || c.dish_data ? (typeof (c.dishData || c.dish_data) === 'string' ? (c.dishData || c.dish_data) : JSON.stringify(c.dishData || c.dish_data)) : null,
+    guide: c.guide ? (typeof c.guide === 'string' ? c.guide : JSON.stringify(c.guide)) : null
   };
 }
 

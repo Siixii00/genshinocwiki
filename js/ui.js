@@ -2636,6 +2636,9 @@ const UI = {
         this.populateConstellationEdit(draft.constellations);
         this.populatePassivesEdit(draft.passives || []);
         this.populateVoiceEdit(draft.voices?.normal || [], draft.voices?.combat || []);
+        this.populateScreenshotsEdit(draft.screenshots || []);
+        this.populateDishEdit(draft.dishData || null);
+        this.populateGuideEdit(draft.guide || null);
         
         return true;
     }
