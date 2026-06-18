@@ -121,8 +121,13 @@ const UI = {
         }
         
         const avatarScaleInput = document.getElementById('edit-avatar-scale');
+        const avatarScaleValue = document.getElementById('avatar-scale-value');
         if (avatarScaleInput) {
-            avatarScaleInput.value = character.avatarScale || '';
+            const scaleValue = character.avatarScale || '1';
+            avatarScaleInput.value = scaleValue;
+            if (avatarScaleValue) {
+                avatarScaleValue.textContent = scaleValue;
+            }
         }
         
         const imageFields = {
