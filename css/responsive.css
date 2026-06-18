@@ -177,17 +177,19 @@
     }
     
     .skill-description {
-        font-size: 0.8125rem;
+        font-size: 0.75rem;
         line-height: 1.5;
     }
     
     .skill-table-display {
-        font-size: 0.6875rem;
+        font-size: 0.625rem;
+        overflow-x: auto;
     }
     
     .skill-table-display table th,
     .skill-table-display table td {
-        padding: 4px 8px;
+        padding: 4px 6px;
+        font-size: 0.625rem;
     }
     
     .constellation-grid {
@@ -517,12 +519,28 @@
     }
     
     .skill-description {
-        font-size: 0.6875rem;
-        line-height: 1.5;
+        font-size: 0.625rem;
+        line-height: 1.4;
     }
     
     .skill-content {
         padding-top: var(--spacing-xs);
+    }
+    
+    .skill-table-display {
+        font-size: 0.5625rem;
+        overflow-x: auto;
+    }
+    
+    .skill-table-display table {
+        width: 100%;
+        font-size: 0.5625rem;
+    }
+    
+    .skill-table-display table th,
+    .skill-table-display table td {
+        padding: 2px 4px;
+        font-size: 0.5625rem;
     }
     
     .constellation-grid {
@@ -547,16 +565,64 @@
     }
     
     .constellation-level {
-        font-size: 0.625rem;
+        font-size: 0.5625rem;
     }
     
     .constellation-name {
-        font-size: 0.6875rem;
+        font-size: 0.625rem;
     }
     
     .constellation-desc {
-        font-size: 0.6875rem;
-        line-height: 1.5;
+        font-size: 0.625rem;
+        line-height: 1.4;
+    }
+    
+    .constellation-table-container {
+        padding: var(--spacing-xs);
+        overflow-x: auto;
+    }
+    
+    .constellation-table {
+        font-size: 0.5625rem;
+        min-width: 500px;
+    }
+    
+    .constellation-table th {
+        padding: 4px 8px;
+        font-size: 0.5625rem;
+    }
+    
+    .constellation-table td {
+        padding: 4px 8px;
+        font-size: 0.5625rem;
+    }
+    
+    .constellation-table-icon {
+        width: 40px;
+    }
+    
+    .constellation-table-icon-img {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .constellation-icon-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 0.5625rem;
+    }
+    
+    .constellation-table-level {
+        width: 40px;
+        font-size: 0.5625rem;
+    }
+    
+    .constellation-table-name {
+        font-size: 0.625rem;
+    }
+    
+    .constellation-table-desc {
+        font-size: 0.5625rem;
     }
     
     .screenshots-grid {
