@@ -2,11 +2,16 @@ const UI = {
     renderCharacterCard(character) {
         const rarityClass = character.rarity === 5 ? 'rarity-5' : 'rarity-4';
         const elementName = CharacterData.getElementName(character.element);
+        const avatar = character.images?.avatar || character.avatar;
         const idcard = character.images?.idcard || character.idcard;
         const portrait = character.images?.portrait || character.portrait;
-        const cardImage = idcard || portrait;
+        const cardImage = avatar || idcard || portrait;
+        
+        const scale = character.cardAvatarScale || '1';
+        const posY = character.cardAvatarPositionY || '50';
+        
         const cardImageHtml = cardImage
-            ? `<img src="${cardImage}" alt="${character.name}">`
+            ? `<img src="${cardImage}" alt="${character.name}" style="transform: scale(${scale}); object-position: center ${posY}%;">`
             : `<div style="width:100%;height:100%;background:var(--color-bg-secondary);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:600;">${character.name[0]}</div>`;
         
         return `
@@ -128,6 +133,31 @@ const UI = {
             if (avatarScaleValue) {
                 avatarScaleValue.textContent = scaleValue;
             }
+        }
+        
+        const cardAvatarScaleInput = document.getElementById('edit-card-avatar-scale');
+        const cardAvatarScaleValue = document.getElementById('card-avatar-scale-value');
+        if (cardAvatarScaleInput) {
+            const cardScaleValue = character.cardAvatarScale || '1';
+            cardAvatarScaleInput.value = cardScaleValue;
+            if (cardAvatarScaleValue) {
+                cardAvatarScaleValue.textContent = cardScaleValue;
+            }
+        }
+        
+        const cardAvatarPositionYInput = document.getElementById('edit-card-avatar-position-y');
+        const cardAvatarPositionValue = document.getElementById('card-avatar-position-value');
+        if (cardAvatarPositionYInput) {
+            const posValue = character.cardAvatarPositionY || '50';
+            cardAvatarPositionYInput.value = posValue;
+            if (cardAvatarPositionValue) {
+                cardAvatarPositionValue.textContent = posValue;
+            }
+        }
+        
+        const cardAvatarPreviewImg = document.getElementById('card-avatar-preview-img');
+        if (cardAvatarPreviewImg && character.images?.avatar) {
+            cardAvatarPreviewImg.src = character.images.avatar;
         }
         
         const imageFields = {

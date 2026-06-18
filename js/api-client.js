@@ -108,6 +108,8 @@ const ApiClient = {
             description: c.description || null,
             avatarPosition: c.avatar_position || c.avatarPosition || null,
             avatarScale: c.avatar_scale || c.avatarScale || null,
+            cardAvatarScale: c.card_avatar_scale || c.cardAvatarScale || null,
+            cardAvatarPositionY: c.card_avatar_position_y || c.cardAvatarPositionY || null,
             va: {
                 cn: c.va_cn || c.vaCn || null,
                 jp: c.va_jp || c.vaJp || null
@@ -220,6 +222,8 @@ const ApiClient = {
             gachaImage: char.images?.idcard || char.idcard || null,
             avatarPosition: char.avatarPosition || null,
             avatarScale: char.avatarScale || null,
+            cardAvatarScale: char.cardAvatarScale || null,
+            cardAvatarPositionY: char.cardAvatarPositionY || null,
             skillNormalName: char.skills?.normal?.name || char.skillNormalName || null,
             skillNormalDesc: char.skills?.normal?.desc || char.skillNormalDesc || null,
             skillNormalIcon: char.skills?.normal?.icon || char.skillNormalIcon || null,

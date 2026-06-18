@@ -199,6 +199,37 @@ const DetailPage = {
                 UI.addGuideItemEdit(container, 'teammate', '', '');
             });
         }
+        
+        const avatarScaleSlider = document.getElementById('edit-avatar-scale');
+        const avatarScaleValueEl = document.getElementById('avatar-scale-value');
+        if (avatarScaleSlider && avatarScaleValueEl) {
+            avatarScaleSlider.addEventListener('input', () => {
+                avatarScaleValueEl.textContent = avatarScaleSlider.value;
+            });
+        }
+        
+        const cardAvatarScaleSlider = document.getElementById('edit-card-avatar-scale');
+        const cardAvatarScaleValueEl = document.getElementById('card-avatar-scale-value');
+        const cardAvatarPreviewImg = document.getElementById('card-avatar-preview-img');
+        if (cardAvatarScaleSlider && cardAvatarScaleValueEl) {
+            cardAvatarScaleSlider.addEventListener('input', () => {
+                cardAvatarScaleValueEl.textContent = cardAvatarScaleSlider.value;
+                if (cardAvatarPreviewImg) {
+                    cardAvatarPreviewImg.style.transform = `scale(${cardAvatarScaleSlider.value})`;
+                }
+            });
+        }
+        
+        const cardAvatarPositionSlider = document.getElementById('edit-card-avatar-position-y');
+        const cardAvatarPositionValueEl = document.getElementById('card-avatar-position-value');
+        if (cardAvatarPositionSlider && cardAvatarPositionValueEl) {
+            cardAvatarPositionSlider.addEventListener('input', () => {
+                cardAvatarPositionValueEl.textContent = cardAvatarPositionSlider.value;
+                if (cardAvatarPreviewImg) {
+                    cardAvatarPreviewImg.style.objectPosition = `center ${cardAvatarPositionSlider.value}%`;
+                }
+            });
+        }
     },
     
     bindEvents() {
