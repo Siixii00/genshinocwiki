@@ -23,8 +23,8 @@ export default async function handler(req, res) {
       const images = Array.isArray(item.images) ? item.images : (item.images ? item.images.split('\n').filter(Boolean) : []);
       
       const [result] = await sql`
-        INSERT INTO products (name, price, category, main_image, images, description, link, image_position)
-        VALUES (${item.name}, ${item.price || null}, ${item.category}, ${item.mainImage || item.main_image}, ${JSON.stringify(images)}, ${item.description || null}, ${item.link || null}, ${item.imagePosition || 50})
+        INSERT INTO products (name, price, category, main_image, images, description, link, image_position, featured, series)
+        VALUES (${item.name}, ${item.price || null}, ${item.category}, ${item.mainImage || item.main_image}, ${JSON.stringify(images)}, ${item.description || null}, ${item.link || null}, ${item.imagePosition || 50}, ${item.featured || false}, ${item.series || null})
         RETURNING *
       `;
       return res.status(201).json(result);
@@ -50,6 +50,8 @@ export default async function handler(req, res) {
           description = COALESCE(${updates.description || updates.description === null ? updates.description : sql`description`}, description),
           link = COALESCE(${updates.link || updates.link === null ? updates.link : sql`link`}, link),
           image_position = COALESCE(${updates.imagePosition || updates.image_position}, image_position),
+          featured = COALESCE(${updates.featured !== undefined ? updates.featured : sql`featured`}, featured),
+          series = COALESCE(${updates.series || updates.series === null ? updates.series : sql`series`}, series),
           updated_at = NOW()
         WHERE id = ${itemId}
         RETURNING *

@@ -36,6 +36,13 @@
             <button class="btn btn-primary" id="add-product-btn" style="display:none;">新增商品</button>
         </div>
 
+        <div class="featured-section" id="featured-section">
+            <h3 class="section-title">精選商品</h3>
+            <div class="featured-grid" id="featured-grid"></div>
+        </div>
+
+        <div class="series-sections" id="series-sections"></div>
+
         <div class="marquee-section" id="marquee-section">
             <div class="marquee-container">
                 <div class="marquee-track" id="marquee-track">
@@ -83,6 +90,20 @@
                         <option value="accessory">配件</option>
                         <option value="other">其他</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-series">商品系列</label>
+                    <input type="text" id="product-series" name="series" placeholder="例如：芙寧娜系列、納西妲系列">
+                    <p class="form-hint">相同系列的商品會顯示在同一個相簿區塊</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="product-featured" name="featured">
+                        <span>設為精選商品</span>
+                    </label>
+                    <p class="form-hint">精選商品會顯示在頁面上方的精選區塊</p>
                 </div>
 
                 <div class="form-group">

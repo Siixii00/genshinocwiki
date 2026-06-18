@@ -87,6 +87,90 @@ const ShopData = {
 };
 
 const ShopUI = {
+    renderFeatured(items) {
+        const container = document.getElementById('featured-grid');
+        const section = document.getElementById('featured-section');
+        if (!container) return;
+        
+        const featuredItems = items.filter(item => item.featured);
+        
+        if (featuredItems.length === 0) {
+            if (section) section.style.display = 'none';
+            return;
+        }
+        
+        if (section) section.style.display = 'block';
+        
+        container.innerHTML = featuredItems.map(item => {
+            const imagePosition = item.image_position || 50;
+            return `
+            <div class="featured-item" data-id="${item.id}">
+                <img src="${item.main_image}" alt="${item.name}" style="object-position: center ${imagePosition}%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/></svg>'">
+                <div class="featured-item-overlay">
+                    <div class="featured-item-name">${item.name}</div>
+                    <div class="featured-item-price">${item.price || ''}</div>
+                </div>
+            </div>
+        `}).join('');
+    },
+    
+    renderSeriesSections(items) {
+        const container = document.getElementById('series-sections');
+        if (!container) return;
+        
+        const itemsWithSeries = items.filter(item => item.series);
+        
+        if (itemsWithSeries.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        const seriesMap = {};
+        itemsWithSeries.forEach(item => {
+            const series = item.series;
+            if (!seriesMap[series]) {
+                seriesMap[series] = [];
+            }
+            seriesMap[series].push(item);
+        });
+        
+        container.innerHTML = Object.entries(seriesMap).map(([series, seriesItems]) => {
+            const itemsHtml = seriesItems.map(item => {
+                const imagePosition = item.image_position || 50;
+                return `
+                <div class="series-item" data-id="${item.id}">
+                    <img src="${item.main_image}" alt="${item.name}" style="object-position: center ${imagePosition}%" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/></svg>'">
+                </div>
+            `}).join('');
+            
+            return `
+            <div class="series-section">
+                <h3 class="series-title">${series}</h3>
+                <div class="series-grid">${itemsHtml}</div>
+            </div>
+        `}).join('');
+        
+        container.querySelectorAll('.series-item').forEach(el => {
+            el.addEventListener('click', async () => {
+                const item = await ShopData.getById(el.dataset.id);
+                if (item) {
+                    Shop.currentItemId = item.id;
+                    this.showPreview(item);
+                }
+            });
+        });
+        
+        container.querySelectorAll('.featured-item').forEach(el => {
+            el.addEventListener('click', async () => {
+                const item = await ShopData.getById(el.dataset.id);
+                if (item) {
+                    Shop.currentItemId = item.id;
+                    this.showPreview(item);
+                }
+            });
+        });
+    },
+    
     renderMarquee(items) {
         const track = document.getElementById('marquee-track');
         if (!track || items.length === 0) return;
@@ -225,6 +309,8 @@ const Shop = {
     
     async refresh() {
         const items = await ShopData.filter(this.currentFilters);
+        ShopUI.renderFeatured(items);
+        ShopUI.renderSeriesSections(items);
         ShopUI.renderMarquee(items);
         ShopUI.renderGrid(items);
     },
@@ -355,6 +441,7 @@ const Shop = {
         }
         
         data.imagePosition = parseInt(document.getElementById('product-image-position')?.value || 50);
+        data.featured = document.getElementById('product-featured')?.checked || false;
         
         if (!data.name || !data.mainImage) {
             ShopUI.showToast('請填寫必要欄位', 'error');
@@ -391,6 +478,8 @@ const Shop = {
         document.getElementById('product-description').value = item.description || '';
         document.getElementById('product-link').value = item.link || '';
         document.getElementById('product-image-position').value = item.image_position || 50;
+        document.getElementById('product-series').value = item.series || '';
+        document.getElementById('product-featured').checked = item.featured || false;
         
         const images = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
         document.getElementById('product-images').value = (images || []).join('\n');
