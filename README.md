@@ -10,16 +10,31 @@
 - 模型渲染展示（支援 YouTube、MP4、GIF、圖片）
 - 角色語音管理（一般語音、戰鬥語音）
 - 自定義圖片區塊
+- 遊戲截圖展示
+- 特殊料理資訊
+- 養成建議（推薦武器、聖、聖遺物、隊友）
 
-### 其他頁面
-- 活動圖片/影片媒體庫
-- 商品目錄頁面
+### 商品目錄
+- 精選商品跑馬燈展示
+- 商品分類篩選
+- 商品相簿功能
+- 商品系列管理
+
+### 圖片保護
+- 動態浮水印（顯示訪客 IP）
+- 防止右鍵、拖拽、選取
+- 圖片點擊放大查看
 
 ### 安全性
 - Google OAuth 登入
 - 二階段驗證（TOTP）
 - 管理員權限控制
-- 內容保護（防止未登入使用者複製/右鍵）
+- 內容保護
+
+### 響應式設計
+- 支援手機、平板、桌面
+- 設備自動偵測
+- 觸控裝置優化
 
 ## 技術架構
 
@@ -32,10 +47,72 @@
 - Vercel Serverless Functions
 - Neon PostgreSQL 資料庫
 
+## 快速開始
+
+### 步驟 1：Fork 或 Clone 專案
+
+```bash
+git clone https://github.com/你的帳號/genshin-wiki.git
+cd genshin-wiki
+```
+
+### 步驟 2：建立 Neon 資料庫
+
+1. 前往 [Neon Console](https://console.neon.tech/)
+2. 註冊/登入並建立新專案
+3. 複製連線字串（格式：`postgresql://username:password@host/database?sslmode=require`）
+
+### 步驟 3：建立資料庫 Schema
+
+在 Neon SQL Editor 中執行 `neon-schema.sql` 的完整內容：
+
+```sql
+-- 複製 neon-schema.sql 的全部內容貼上執行
+```
+
+### 步驟 4：設定 Google OAuth
+
+1. 前往 [Google Cloud Console](https://console.cloud.google.com/)
+2. 建立新專案或選擇現有專案
+3. 啟用「Google+ API」
+4. 建立 OAuth 2.0 憑證
+5. 設定授權重新導向 URI：
+   - `http://localhost:3000`（本地開發）
+   - `https://你的網域/`（正式部署）
+
+### 步驟 5：部署到 Vercel
+
+1. 將專案推送到 GitHub
+2. 前往 [Vercel](https://vercel.com/)
+3. 點擊「New Project」匯入 GitHub 專案
+4. 設定環境變數：
+   - `DATABASE_URL`: Neon 連線字串
+
+### 步驟 6：更新設定
+
+在以下檔案中更新你的設定：
+
+**js/app.js**
+```javascript
+const App = {
+    config: {
+        googleClientId: '你的_GOOGLE_CLIENT_ID',
+        adminEmails: ['管理員_EMAIL'],
+        twoFactorEnabled: true
+    }
+};
+```
+
+**js/auth.js** - 更新 `allowList` 為你的管理員 Email
+
+### 步驟 7：重新部署
+
+更新設定後，在 Vercel 重新部署專案。
+
 ## 專案結構
 
 ```
-genshin-character-wiki/
+genshin-wiki/
 ├── index.html              # 首頁 - 角色列表
 ├── character.html          # 角色詳情頁
 ├── gallery.html            # 活動圖片頁
@@ -57,6 +134,8 @@ genshin-character-wiki/
 │   ├── gallery.js          # 圖庫頁邏輯
 │   ├── shop.js             # 商品頁邏輯
 │   ├── auth.js             # 登入驗證模組
+│   ├── device-detect.js    # 設備偵測
+│   ├── watermark.js        # 浮水印功能
 │   └── music-player.js     # 音樂播放器
 ├── api/
 │   ├── characters.js       # 角色 API
@@ -69,48 +148,8 @@ genshin-character-wiki/
 │   └── characters.json     # 本地測試資料
 ├── neon-schema.sql         # 資料庫 Schema
 ├── vercel.json             # Vercel 路由配置
-├── wrangler.toml           # Cloudflare 配置（可選）
 ├── .env.example            # 環境變數範例
 └── package.json
-```
-
-## 部署指南
-
-### 步驟 1：建立 Neon 資料庫
-
-1. 前往 [Neon Console](https://console.neon.tech/)
-2. 建立新專案
-3. 複製連線字串
-
-### 步驟 2：設定資料庫 Schema
-
-在 Neon SQL Editor 中執行 `neon-schema.sql`
-
-### 步驟 3：設定 Google OAuth
-
-1. 前往 [Google Cloud Console](https://console.cloud.google.com/)
-2. 建立 OAuth 2.0 憑證
-3. 設定授權重新導向 URI：`https://你的網域/`
-
-### 步驟 4：部署到 Vercel
-
-1. 將專案推送到 GitHub
-2. 在 Vercel 匯入專案
-3. 設定環境變數：
-   - `DATABASE_URL`: Neon 連線字串
-
-### 步驟 5：更新設定
-
-在 `js/app.js` 中更新：
-
-```javascript
-const App = {
-    config: {
-        googleClientId: '你的_GOOGLE_CLIENT_ID',
-        adminEmails: ['管理員_EMAIL'],
-        twoFactorEnabled: true
-    }
-};
 ```
 
 ## 本地開發
@@ -119,67 +158,72 @@ const App = {
 # 安裝依賴
 npm install
 
-# 設定環境變數
+# 複製環境變數
 cp .env.example .env
+
 # 編輯 .env 填入 DATABASE_URL
+# DATABASE_URL=postgresql://username:password@host/database?sslmode=require
 
 # 啟動本地伺服器（需要 Vercel CLI）
 npx vercel dev
 ```
 
-## 資料結構
+## 資料庫 Schema 總覽
 
-### 角色資料
+### characters 表（角色資料）
 
-```javascript
-{
-  id: "uuid",
-  name: "角色名稱",
-  title: "稱號",
-  fullname: "全名/本名",
-  element: "pyro|anemo|geo|electro|hydro|cryo|dendro",
-  weapon: "sword|claymore|polearm|bow|catalyst",
-  region: "mondstadt|liyue|inazuma|sumeru|fontaine|natlan|snezhnaya",
-  rarity: 4|5,
-  gender: "male|female|other",
-  affiliation: "所屬組織",
-  constellation: "命之座",
-  vision: "神之眼",
-  dish: "特殊料理",
-  birthday: "生日",
-  va: { cn: "中文配音", jp: "日文配音" },
-  description: "角色描述",
-  images: {
-    artwork: "立繪 URL",
-    portrait: "方卡 URL",
-    avatar: "頭像 URL",
-    idcard: "證件照 URL"
-  },
-  model: { type: "video|gif|image", url: "展示 URL" },
-  skills: {
-    normal: { name: "普通攻擊名稱", desc: "描述" },
-    elemental: { name: "元素戰技名稱", desc: "描述" },
-    burst: { name: "元素爆發名稱", desc: "描述" }
-  },
-  constellations: [{ level: 1, name: "名稱", desc: "描述", icon: "圖標 URL" }],
-  passives: [{ name: "天賦名稱", desc: "描述", icon: "圖標 URL" }],
-  voices: {
-    normal: [{ title: "標題", content: "內容", audioUrl: "音檔 URL" }],
-    combat: [{ title: "標題", content: "內容", audioUrl: "音檔 URL" }]
-  },
-  stories: {
-    detail: "角色詳細",
-    story1: "角色故事1",
-    story2: "角色故事2",
-    story3: "角色故事3",
-    story4: "角色故事4",
-    story5: "角色故事5",
-    vision: "神之眼故事",
-    extra: "額外故事"
-  },
-  customImages: [{ title: "標題", images: ["URL1", "URL2"] }]
-}
-```
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| id | UUID | 主鍵 |
+| name | TEXT | 角色名稱 |
+| title | TEXT | 稱號 |
+| element | TEXT | 元素 |
+| weapon | TEXT | 武器類型 |
+| region | TEXT | 地區 |
+| rarity | INTEGER | 稀有度 |
+| avatar_scale | TEXT | 頭像縮放 |
+| card_avatar_scale | TEXT | 列表頭像縮放 |
+| screenshots | JSONB | 遊戲截圖 |
+| dish_data | JSONB | 特殊料理 |
+| guide | JSONB | 養成建議 |
+| ... | ... | 更多欄位見 SQL |
+
+### products 表（商品資料）
+
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| id | UUID | 主鍵 |
+| name | TEXT | 商品名稱 |
+| price | TEXT | 價格 |
+| category | TEXT | 分類 |
+| main_image | TEXT | 主圖 URL |
+| images | JSONB | 相簿圖片 |
+| featured | BOOLEAN | 精選商品 |
+| series | TEXT | 商品系列 |
+
+### gallery 表（圖庫資料）
+
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| id | UUID | 主鍵 |
+| title | TEXT | 標題 |
+| url | TEXT | 圖片/影片 URL |
+| type | TEXT | 類型（image/video） |
+| category | TEXT | 分類 |
+
+## 常見問題
+
+### Q: 圖片無法顯示？
+A: 確保圖片 URL 是有效的圖床連結，建議使用穩定的圖床服務。
+
+### Q: 登入後無法編輯？
+A: 確認你的 Email 已加入 `auth.js` 的 `allowList` 中。
+
+### Q: 資料庫連線失敗？
+A: 檢查 `DATABASE_URL` 環境變數是否正確設定。
+
+### Q: 水印沒有顯示？
+A: 確保 `watermark.js` 已正確載入，且圖片有 `lightboxable` class。
 
 ## 授權
 
