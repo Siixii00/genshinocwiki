@@ -229,10 +229,79 @@ const App = {
     }
 };
 
+const ImageProtection = {
+    init() {
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName === 'IMG' || e.target.closest('.character-avatar') || e.target.closest('.lightbox-content') || e.target.closest('.detail-image')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('selectstart', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            }
+        });
+        
+        this.protectExistingImages();
+        
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                        if (node.tagName === 'IMG') {
+                            this.protectImage(node);
+                        }
+                        node.querySelectorAll('img').forEach(img => this.protectImage(img));
+                    }
+                });
+            });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+    },
+    
+    protectImage(img) {
+        img.setAttribute('draggable', 'false');
+        img.style.userSelect = 'none';
+        img.style.webkitUserDrag = 'none';
+        img.style.pointerEvents = 'none';
+        
+        const parent = img.parentElement;
+        if (parent && !parent.dataset.protected) {
+            parent.style.cursor = 'pointer';
+            parent.dataset.protected = 'true';
+        }
+    },
+    
+    protectExistingImages() {
+        document.querySelectorAll('img').forEach(img => this.protectImage(img));
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+    ImageProtection.init();
     App.init();
 });
 
 if (typeof window !== 'undefined') {
     window.App = App;
+    window.ImageProtection = ImageProtection;
 }

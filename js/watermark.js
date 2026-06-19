@@ -1,19 +1,25 @@
 const Watermark = {
     enabled: true,
     watermarks: [],
+    pageWatermarks: [],
+    ipInfo: null,
     observer: null,
     
     async getIPInfo() {
+        if (this.ipInfo) return this.ipInfo;
+        
         try {
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
-            return data.ip || 'Unknown';
+            this.ipInfo = data.ip || 'Visitor';
+            return this.ipInfo;
         } catch (e) {
-            return 'Visitor';
+            this.ipInfo = 'Visitor';
+            return this.ipInfo;
         }
     },
     
-    generateWatermarks(container, ipInfo) {
+    generateWatermarks(container, ipInfo, isPageWatermark = false) {
         const count = Math.floor(Math.random() * 4) + 7;
         const watermarks = [];
         
@@ -23,11 +29,11 @@ const Watermark = {
             watermark.textContent = ipInfo;
             watermark.style.cssText = `
                 position: absolute;
-                color: rgba(0, 0, 0, 0.3);
+                color: rgba(0, 0, 0, 0.15);
                 font-size: ${Math.random() * 8 + 12}px;
                 font-weight: 500;
                 pointer-events: none;
-                z-index: 10000;
+                z-index: ${isPageWatermark ? '9999' : '10000'};
                 white-space: nowrap;
                 transform: rotate(-${Math.random() * 30 + 15}deg);
                 user-select: none;
@@ -41,18 +47,48 @@ const Watermark = {
         return watermarks;
     },
     
-    animateWatermarks() {
-        this.watermarks.forEach((wm, index) => {
-            const duration = 3000 + Math.random() * 2000;
+    generatePageWatermarks(container, ipInfo) {
+        const count = Math.floor(Math.random() * 6) + 10;
+        const watermarks = [];
+        
+        for (let i = 0; i < count; i++) {
+            const watermark = document.createElement('div');
+            watermark.className = 'page-watermark';
+            watermark.textContent = ipInfo;
+            watermark.style.cssText = `
+                position: fixed;
+                color: rgba(128, 128, 128, 0.08);
+                font-size: ${Math.random() * 10 + 14}px;
+                font-weight: 500;
+                pointer-events: none;
+                z-index: 9998;
+                white-space: nowrap;
+                transform: rotate(-${Math.random() * 40 + 20}deg);
+                user-select: none;
+                top: ${Math.random() * 90 + 5}%;
+                left: ${Math.random() * 90 + 5}%;
+            `;
+            watermarks.push(watermark);
+            container.appendChild(watermark);
+        }
+        
+        return watermarks;
+    },
+    
+    animateWatermarks(watermarkList, duration = 3000) {
+        watermarkList.forEach((wm, index) => {
+            const animDuration = duration + Math.random() * 2000;
             const delay = index * 200;
             
             setTimeout(() => {
-                this.animateSingle(wm, duration);
+                this.animateSingle(wm, animDuration);
             }, delay);
         });
     },
     
     animateSingle(element, duration) {
+        if (!element) return;
+        
         const startX = parseFloat(element.style.left);
         const startY = parseFloat(element.style.top);
         
@@ -72,13 +108,24 @@ const Watermark = {
         animate();
     },
     
-    clearWatermarks() {
-        this.watermarks.forEach(wm => {
+    clearWatermarks(watermarkList = this.watermarks) {
+        watermarkList.forEach(wm => {
             if (wm.parentElement) {
                 wm.parentElement.removeChild(wm);
             }
         });
-        this.watermarks = [];
+        if (watermarkList === this.watermarks) {
+            this.watermarks = [];
+        }
+    },
+    
+    clearPageWatermarks() {
+        this.pageWatermarks.forEach(wm => {
+            if (wm.parentElement) {
+                wm.parentElement.removeChild(wm);
+            }
+        });
+        this.pageWatermarks = [];
     },
     
     async showWatermark(container) {
@@ -87,12 +134,42 @@ const Watermark = {
         this.clearWatermarks();
         
         const ipInfo = await this.getIPInfo();
-        this.watermarks = this.generateWatermarks(container, ipInfo);
-        this.animateWatermarks();
+        this.watermarks = this.generateWatermarks(container, ipInfo, false);
+        this.animateWatermarks(this.watermarks);
     },
     
     hideWatermark() {
         this.clearWatermarks();
+    },
+    
+    async showPageWatermark() {
+        if (!this.enabled) return;
+        
+        this.clearPageWatermarks();
+        
+        const ipInfo = await this.getIPInfo();
+        this.pageWatermarks = this.generatePageWatermarks(document.body, ipInfo);
+        this.animateWatermarks(this.pageWatermarks, 5000);
+    },
+    
+    hidePageWatermark() {
+        this.clearPageWatermarks();
+    },
+    
+    initPageWatermark() {
+        this.showPageWatermark();
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                this.showPageWatermark();
+            }
+        });
+        
+        setInterval(() => {
+            if (this.pageWatermarks.length === 0 && this.enabled) {
+                this.showPageWatermark();
+            }
+        }, 10000);
     },
     
     init() {
@@ -137,6 +214,8 @@ const Watermark = {
             
             observer.observe(previewModal, { attributes: true });
         }
+        
+        this.initPageWatermark();
     }
 };
 

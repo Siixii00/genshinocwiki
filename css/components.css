@@ -2657,3 +2657,27 @@
         margin: 0 auto;
     }
 }
+
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.character-avatar img,
+.character-artwork img,
+.lightbox-content img,
+.preview-container img,
+.gallery-item img,
+.shop-item img,
+.detail-image img,
+.constellation-node img,
+.dish-image img {
+    pointer-events: none;
+}
