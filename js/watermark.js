@@ -48,7 +48,7 @@ const Watermark = {
     },
     
     generatePageWatermarks(container, ipInfo) {
-        const count = Math.floor(Math.random() * 6) + 10;
+        const count = Math.floor(Math.random() * 8) + 15;
         const watermarks = [];
         
         for (let i = 0; i < count; i++) {
@@ -57,16 +57,17 @@ const Watermark = {
             watermark.textContent = ipInfo;
             watermark.style.cssText = `
                 position: fixed;
-                color: rgba(128, 128, 128, 0.08);
-                font-size: ${Math.random() * 10 + 14}px;
-                font-weight: 500;
+                color: rgba(100, 100, 100, 0.25);
+                font-size: ${Math.random() * 12 + 18}px;
+                font-weight: 600;
                 pointer-events: none;
                 z-index: 9998;
                 white-space: nowrap;
-                transform: rotate(-${Math.random() * 40 + 20}deg);
+                transform: rotate(-${Math.random() * 50 + 15}deg);
                 user-select: none;
-                top: ${Math.random() * 90 + 5}%;
-                left: ${Math.random() * 90 + 5}%;
+                top: ${Math.random() * 85 + 5}%;
+                left: ${Math.random() * 85 + 5}%;
+                text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
             `;
             watermarks.push(watermark);
             container.appendChild(watermark);
@@ -149,11 +150,45 @@ const Watermark = {
         
         const ipInfo = await this.getIPInfo();
         this.pageWatermarks = this.generatePageWatermarks(document.body, ipInfo);
-        this.animateWatermarks(this.pageWatermarks, 5000);
+        this.animatePageWatermarks();
     },
     
     hidePageWatermark() {
         this.clearPageWatermarks();
+    },
+    
+    animatePageWatermarks() {
+        this.pageWatermarks.forEach((wm, index) => {
+            const duration = 4000 + Math.random() * 3000;
+            const delay = index * 150;
+            
+            setTimeout(() => {
+                this.animatePageSingle(wm, duration);
+            }, delay);
+        });
+    },
+    
+    animatePageSingle(element, duration) {
+        if (!element) return;
+        
+        const startX = parseFloat(element.style.left);
+        const startY = parseFloat(element.style.top);
+        const baseOpacity = 0.22;
+        
+        const animate = () => {
+            if (!this.enabled || !element.parentElement) return;
+            
+            const newX = startX + (Math.random() - 0.5) * 10;
+            const newY = startY + (Math.random() - 0.5) * 10;
+            
+            element.style.left = `${Math.max(3, Math.min(92, newX))}%`;
+            element.style.top = `${Math.max(3, Math.min(92, newY))}%`;
+            element.style.opacity = baseOpacity + Math.random() * 0.1;
+            
+            setTimeout(() => animate(), duration);
+        };
+        
+        animate();
     },
     
     initPageWatermark() {
